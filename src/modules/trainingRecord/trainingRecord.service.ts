@@ -1,15 +1,10 @@
 import prisma from "../../utils/prisma";
 import {
-    CreateTrainingRecordInput,
-    DeleteTrainingRecord,
-    GetTrainingRecord,
-    TrainingRecordsQueryString,
-    UpdateTrainingRecord
+    CreateTrainingRecordInput, DeleteTrainingRecord, GetTrainingRecord,
+    TrainingRecordsQueryString, UpdateTrainingRecord
 } from "./trainingRecord.schema";
 
-
 export async function createTrainingRecord(input: CreateTrainingRecordInput) {
-
     return prisma.trainingRecord.createMany({
         data: input,
     });

@@ -7,8 +7,8 @@ export async function documentation(server: FastifyInstance) {
     server.register(fastifySwagger, {
         swagger: {
             info: {
-                title: 'Gym Manager API',
-                description: 'API about Gym Manager',
+                title: 'API Gym Management',
+                description: 'API about Gym Management System',
                 version: '1.0.0'
             },
             schemes: ['http'],

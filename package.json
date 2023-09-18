@@ -1,10 +1,10 @@
 {
-  "name": "api-gym-manager",
+  "name": "api-gym-management",
   "version": "1.0.1",
-  "description": "API for manager system gym",
+  "description": "API for gym management system",
   "main": "index.js",
   "author": "Douglas Santos",
-  "license": "MIT",
+  "license": "MIT, ",
   "scripts": {
     "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts",
     "build": "tsc",

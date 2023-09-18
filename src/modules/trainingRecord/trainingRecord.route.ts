@@ -1,11 +1,8 @@
 import {FastifyInstance} from "fastify";
 import {$ref} from "./trainingRecord.schema";
 import {
-    deleteTrainingRecordHandler,
-    getTrainingRecordHandler,
-    getTrainingRecordsHandler,
-    registerTrainingRecordHandler,
-    updateTrainingRecordHandler
+    deleteTrainingRecordHandler, getTrainingRecordHandler, getTrainingRecordsHandler,
+    registerTrainingRecordHandler, updateTrainingRecordHandler
 } from "./trainingRecord.controller";
 
 async function trainingRecordRoutes(server: FastifyInstance) {
@@ -57,7 +54,6 @@ async function trainingRecordRoutes(server: FastifyInstance) {
             response: {
                 201: $ref('createTrainingRecordSchema')
             }
-
         }
     }, registerTrainingRecordHandler);
 

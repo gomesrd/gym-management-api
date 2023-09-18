@@ -1,17 +1,10 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
-    CreateTrainingRecordInput,
-    DeleteTrainingRecord,
-    GetTrainingRecord,
-    TrainingRecordsQueryString,
+    CreateTrainingRecordInput, DeleteTrainingRecord, GetTrainingRecord, TrainingRecordsQueryString,
     UpdateTrainingRecord
 } from "./trainingRecord.schema";
 import {
-    createTrainingRecord,
-    deleteTrainingRecord,
-    findTrainingRecord,
-    findTrainingRecords,
-    updateTrainingRecord
+    createTrainingRecord, deleteTrainingRecord, findTrainingRecord, findTrainingRecords, updateTrainingRecord
 } from "./trainingRecord.service";
 
 
