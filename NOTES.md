@@ -12,7 +12,7 @@ npx prisma init --datasource-provider postgresql
 
 ### Migrate the schema
 
-**npx prisma migrate dev --name init**
+npx prisma migrate dev --name init
 
 ### PERSONAL TRAINER
 

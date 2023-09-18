@@ -46,7 +46,6 @@ Thumbs.db
 *.prisma
 
 # Env files
+.env
 .env.local
-.env.dev
-.env.prod
 
