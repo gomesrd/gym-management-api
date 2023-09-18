@@ -4,7 +4,7 @@
   "description": "API for gym management system",
   "main": "index.js",
   "author": "Douglas Santos",
-  "license": "MIT, ",
+  "license": "Private",
   "scripts": {
     "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts",
     "build": "tsc",

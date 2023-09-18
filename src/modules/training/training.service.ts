@@ -1,16 +1,10 @@
 import prisma from "../../utils/prisma";
 import {
-    CreateTrainingInput,
-    DeleteTraining,
-    GetTraining,
-    TrainingsQueryString,
-    UpdateTraining
+    CreateTrainingInput, DeleteTraining, GetTraining, TrainingsQueryString, UpdateTraining
 } from "./training.schema";
 import {Prisma} from "@prisma/client";
 
 export async function createTraining(input: CreateTrainingInput) {
-
-
     return prisma.training.createMany({
         data: input,
     });
@@ -22,7 +16,6 @@ export async function findManyTrainings(filters: TrainingsQueryString, data: any
 }) {
     const personal_trainer_id = (data.user_role === 'personal_trainer') ? data.user_id : filters.personal_trainer_id;
     const member_id = (data.user_role === 'member') ? data.user_id : filters.member_id;
-
     return prisma.training.findMany({
         where: {
             id: filters.id,
@@ -93,7 +86,6 @@ export async function updateTraining(data: UpdateTraining, params: GetTraining &
     user_role: string
 }) {
     const personal_trainer_id = (params.user_role !== 'admin') ? params.user_id : undefined;
-
     try {
         const updatedTraining = await prisma.training.update({
             where: {
@@ -119,7 +111,6 @@ export async function updateTraining(data: UpdateTraining, params: GetTraining &
         throw error;
     }
 }
-
 
 export async function deleteTraining(data: DeleteTraining) {
     return prisma.training.delete({

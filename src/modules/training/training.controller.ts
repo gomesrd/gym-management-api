@@ -1,17 +1,9 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
-    CreateTrainingInput,
-    DeleteTraining,
-    GetTraining,
-    TrainingsQueryString,
-    UpdateTraining
+    CreateTrainingInput, DeleteTraining, GetTraining, TrainingsQueryString, UpdateTraining
 } from "./training.schema";
 import {
-    createTraining,
-    deleteTraining,
-    findUniqueTraining,
-    findManyTrainings,
-    updateTraining
+    createTraining, deleteTraining, findUniqueTraining, findManyTrainings, updateTraining
 } from "./training.service";
 
 
@@ -43,7 +35,6 @@ export async function getManyTrainingsHandler(request: FastifyRequest<{
 export async function getUniqueTrainingHandler(request: FastifyRequest<{
     Params: GetTraining;
 }>) {
-
     return findUniqueTraining({
         ...request.params,
         user_id: request.user.id,
@@ -68,10 +59,8 @@ export async function updateTrainingHandler(request: FastifyRequest<{
 export async function deleteTrainingHandler(request: FastifyRequest<{
     Params: DeleteTraining;
 }>, reply: FastifyReply) {
-
     await deleteTraining({
         ...request.params
     });
-
     return reply.code(200).send('');
 }

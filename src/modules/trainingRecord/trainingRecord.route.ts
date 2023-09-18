@@ -1,7 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {$ref} from "./trainingRecord.schema";
 import {
-    deleteTrainingRecordHandler, getTrainingRecordHandler, getTrainingRecordsHandler,
+    deleteTrainingRecordHandler, getUniqueTrainingRecordHandler, getManyTrainingRecordsHandler,
     registerTrainingRecordHandler, updateTrainingRecordHandler
 } from "./trainingRecord.controller";
 
@@ -26,7 +26,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
                 }
             }
         }
-    }, getTrainingRecordsHandler);
+    }, getManyTrainingRecordsHandler);
 
     server.get('/:id', {
         preHandler: [server.authenticate],
@@ -43,7 +43,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
                 }
             }
         },
-    }, getTrainingRecordHandler);
+    }, getUniqueTrainingRecordHandler);
 
     server.post('', {
         preHandler: [server.authenticate, server.authorizationLimited],

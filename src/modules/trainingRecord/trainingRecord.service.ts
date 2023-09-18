@@ -10,13 +10,18 @@ export async function createTrainingRecord(input: CreateTrainingRecordInput) {
     });
 }
 
-export async function findTrainingRecords(filters: TrainingRecordsQueryString) {
+export async function findManyTrainingRecords(filters: TrainingRecordsQueryString, data: any & {
+    user_id: string,
+    user_role: string
+}) {
+    const personal_trainer_id = (data.user_role === 'personal_trainer') ? data.user_id : filters.personal_trainer_id;
+    const member_id = (data.user_role === 'member') ? data.user_id : filters.member_id;
     return prisma.trainingRecord.findMany({
         where: {
             id: filters.id,
             training_id: filters.training_id,
-            member_id: filters.member_id,
-            personal_trainer_id: filters.personal_trainer_id,
+            member_id: member_id,
+            personal_trainer_id: personal_trainer_id,
         },
         select: {
             id: true,
@@ -43,10 +48,17 @@ export async function findTrainingRecords(filters: TrainingRecordsQueryString) {
     });
 }
 
-export async function findTrainingRecord(data: GetTrainingRecord) {
+export async function findUniqueTrainingRecord(params: GetTrainingRecord, data: any & {
+    user_id: string,
+    user_role: string
+}) {
+    const personal_trainer_id = (data.user_role === 'personal_trainer') ? data.user_id : undefined;
+    const member_id = (data.user_role === 'member') ? data.user_id : undefined;
     return prisma.trainingRecord.findMany({
         where: {
-            id: data.id
+            id: params.id,
+            personal_trainer_id: personal_trainer_id,
+            member_id: member_id,
         },
         select: {
             id: true,

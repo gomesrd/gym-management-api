@@ -4,7 +4,8 @@ import {
     UpdateTrainingRecord
 } from "./trainingRecord.schema";
 import {
-    createTrainingRecord, deleteTrainingRecord, findTrainingRecord, findTrainingRecords, updateTrainingRecord
+    createTrainingRecord, deleteTrainingRecord, findUniqueTrainingRecord, findManyTrainingRecords,
+    updateTrainingRecord
 } from "./trainingRecord.service";
 
 
@@ -20,22 +21,28 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
     }
 }
 
-export async function getTrainingRecordsHandler(request: FastifyRequest<{
+export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
     Querystring: TrainingRecordsQueryString;
 }>) {
     try {
-        return findTrainingRecords({...request.query});
+        return findManyTrainingRecords({...request.query}, {
+            user_id: request.user.id,
+            user_role: request.user.role
+        });
     } catch (e) {
         console.log(e)
     }
 }
 
-export async function getTrainingRecordHandler(request: FastifyRequest<{
+export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
     Params: GetTrainingRecord;
 }>) {
 
-    return findTrainingRecord({
-        ...request.params,
+    return findUniqueTrainingRecord({
+        ...request.params
+    }, {
+        user_id: request.user.id,
+        user_role: request.user.role
     });
 }
 
