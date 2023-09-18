@@ -1,0 +1,30 @@
+{
+  "name": "api-gym-manager",
+  "version": "1.0.1",
+  "description": "API for manager system gym",
+  "main": "index.js",
+  "author": "Douglas Santos",
+  "license": "MIT",
+  "scripts": {
+    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@fastify/jwt": "^5.0.0",
+    "@prisma/client": "^5.3.0",
+    "fastify": "^4.22.2",
+    "fastify-swagger": "^5.2.0",
+    "fastify-zod": "^1.4.0",
+    "yarn": "^1.22.19",
+    "zod": "^3.22.2",
+    "zod-to-json-schema": "^3.21.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.5.9",
+    "prisma": "^5.3.0",
+    "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.2.2"
+  }
+}
