@@ -1,11 +1,8 @@
 import prisma from "../../utils/prisma";
 import {
-    CreatePersonalTrainerInput,
-    DeletePersonalTrainer, PersonalTrainerId,
-    UpdatePersonalTrainer
+    CreatePersonalTrainerInput, DeletePersonalTrainer, PersonalTrainerId, UpdatePersonalTrainer
 } from "./personalTrainer.schema";
 import {hashPassword} from "../../utils/hash";
-import {verifyUserRole} from "../auth/authorization";
 
 export async function createPersonalTrainer(input: CreatePersonalTrainerInput) {
     const {password, ...rest} = input;

@@ -18,7 +18,8 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
     }
     const body = request.body;
     try {
-        return createTrainingRecord(body);
+        const trainingRecord = await createTrainingRecord(body);
+        return reply.code(201).send(trainingRecord)
     } catch (e) {
         console.log(e)
         return reply.code(500).send(e)

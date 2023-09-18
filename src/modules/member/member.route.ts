@@ -1,9 +1,6 @@
 import {FastifyInstance} from "fastify";
 import {
-    deleteMemberHandler,
-    getUniqueMemberHandler,
-    getManyMembersHandler,
-    loginHandler,
+    deleteMemberHandler, getUniqueMemberHandler, getManyMembersHandler, loginHandler,
     registerMemberHandler, updateMemberHandler
 } from "./member.controller";
 import {$ref} from "./member.schema";

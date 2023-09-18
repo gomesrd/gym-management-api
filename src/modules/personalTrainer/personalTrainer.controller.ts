@@ -4,13 +4,9 @@ import {
     findManyPersonalTrainers, updatePersonalTrainer
 } from "./personalTrainer.service";
 import {
-    CreatePersonalTrainerInput,
-    DeletePersonalTrainer,
-    LoginInput,
-    PersonalTrainerId,
-    UpdatePersonalTrainer
+    CreatePersonalTrainerInput, DeletePersonalTrainer, LoginInput, PersonalTrainerId, UpdatePersonalTrainer
 } from "./personalTrainer.schema";
-import {confirmDeletedPersonalTrainer, invalidLoginMessage} from "./personalTrainer.mesages";
+import {invalidLoginMessage} from "./personalTrainer.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
 

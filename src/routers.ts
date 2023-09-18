@@ -19,5 +19,4 @@ export async function routers(server: FastifyInstance) {
     server.register(trainingRoutes, {prefix: '/trainings'});
     server.register(trainingRecordRoutes, {prefix: '/trainings-record'});
     server.register(healthCheck);
-
 }

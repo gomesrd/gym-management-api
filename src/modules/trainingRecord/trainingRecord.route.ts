@@ -52,7 +52,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
             body: $ref('createTrainingRecordSchema'),
             summary: 'Create a new training record',
             response: {
-                201: $ref('createTrainingRecordSchema')
+                201: $ref('TrainingRecordIdSchema')
             }
         }
     }, registerTrainingRecordHandler);

@@ -1,18 +1,8 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
-    createMember,
-    deleteMember,
-    findUniqueMember,
-    findMemberByEmail,
-    findManyMembers,
-    updateMember
+    createMember, deleteMember, findUniqueMember, findMemberByEmail, findManyMembers, updateMember
 } from "./member.service";
-import {
-    CreateMemberInput,
-    DeleteMember,
-    LoginInput, MemberId,
-    UpdateMember
-} from "./member.schema";
+import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
 import {confirmDeletedMember, invalidLoginMessage} from "./member.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
@@ -81,7 +71,6 @@ export async function updateMemberHandler(request: FastifyRequest<{
     Body: UpdateMember;
     Params: MemberId;
 }>) {
-    console.log(request.user)
     return updateMember(
         {
             ...request.body

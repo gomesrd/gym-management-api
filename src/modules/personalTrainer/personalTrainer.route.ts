@@ -1,10 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {
-    deletePersonalTrainerHandler, getManyPersonalTrainersHandler,
-    getUniquePersonalTrainerHandler,
-    loginHandler,
-    registerPersonalTrainerHandler,
-    updatePersonalTrainerHandler
+    deletePersonalTrainerHandler, getManyPersonalTrainersHandler, getUniquePersonalTrainerHandler,
+    loginHandler, registerPersonalTrainerHandler, updatePersonalTrainerHandler
 } from "./personalTrainer.controller";
 import {$ref} from "./personalTrainer.schema";
 
