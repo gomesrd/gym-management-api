@@ -5,7 +5,6 @@ export async function loginServer(server: FastifyInstance) {
     server.register(fjwt, {
         secret: 'rQPCnFcBDV84hPqTNGcHAzCKfFfJY3thFnUgHsCf',
     });
-
     server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
             try {
                 await request.jwtVerify()
@@ -14,4 +13,5 @@ export async function loginServer(server: FastifyInstance) {
             }
         }
     );
+
 }

@@ -1,4 +1,4 @@
-import {FastifyReply, FastifyRequest} from "fastify";
+import { FastifyReply, FastifyRequest} from "fastify";
 import {
     createPersonalTrainer, deletePersonalTrainer, findUniquePersonalTrainer, findPersonalTrainerByEmail,
     findManyPersonalTrainers, updatePersonalTrainer
@@ -8,7 +8,6 @@ import {
 } from "./personalTrainer.schema";
 import {invalidLoginMessage} from "./personalTrainer.mesages";
 import {verifyPassword} from "../../utils/hash";
-import {server} from "../../app";
 
 export async function registerPersonalTrainerHandler(request: FastifyRequest<{
     Body: CreatePersonalTrainerInput
@@ -40,9 +39,8 @@ export async function loginHandler(request: FastifyRequest<{
     )
     if (correctPassword) {
         const {password, salt, ...rest} = personalTrainer;
-        // const expiresIn = '1h';
-        const accessToken = server.jwt.sign(rest);
-        return {accessToken};
+        console.log(rest)
+        return {accessToken: request.jwt.sign(rest)};
     }
     return reply.code(401).send(invalidLoginMessage());
 }
@@ -57,7 +55,7 @@ export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
     });
 }
 
-export async function getManyPersonalTrainersHandler(request: FastifyRequest) {
+export async function getManyPersonalTrainersHandler() {
     try {
         return findManyPersonalTrainers();
     } catch (e) {

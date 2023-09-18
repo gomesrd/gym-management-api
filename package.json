@@ -4,15 +4,17 @@
   "description": "API for gym management system",
   "main": "index.js",
   "author": "Douglas Santos",
-  "license": "Private",
+  "license": "ISC",
   "scripts": {
-    "dev": "tsnd --respawn --transpile-only --exit-child src/app.ts",
-    "build": "tsc",
-    "start": "node dist/server.js"
+    "build": "prisma generate && tsc -p tsconfig.json",
+    "dev": "dotenv -e .env.local nodemon src/index.ts"
   },
   "dependencies": {
     "@fastify/jwt": "^5.0.0",
     "@prisma/client": "^5.3.0",
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
+    "envalid": "^7.3.1",
     "fastify": "^4.22.2",
     "fastify-swagger": "^5.2.0",
     "fastify-zod": "^1.4.0",
@@ -22,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.5.9",
+    "nodemon": "^3.0.1",
     "prisma": "^5.3.0",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",

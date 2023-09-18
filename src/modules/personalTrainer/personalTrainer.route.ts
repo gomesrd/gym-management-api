@@ -35,7 +35,7 @@ async function personalTrainerRoutes(server: FastifyInstance) {
     }, getUniquePersonalTrainerHandler);
 
     server.post('', {
-        preHandler: [server.authenticate, server.authorizationExclusive],
+        // preHandler: [server.authenticate, server.authorizationExclusive],
         schema: {
             tags: ['PersonalTrainer'],
             body: $ref('createPersonalTrainerSchema'),

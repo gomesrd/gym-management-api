@@ -1,4 +1,4 @@
-import prisma from "../../utils/prisma";
+import prisma from "../../config/prisma";
 import {
     CreatePersonalTrainerInput, DeletePersonalTrainer, PersonalTrainerId, UpdatePersonalTrainer
 } from "./personalTrainer.schema";

@@ -1,6 +1,10 @@
-import prisma from "../../utils/prisma";
+import prisma from "../../config/prisma";
 import {
-    CreateTrainingInput, DeleteTraining, GetTraining, TrainingsQueryString, UpdateTraining
+    CreateTrainingInput,
+    DeleteTraining,
+    GetTraining,
+    TrainingsQueryString,
+    UpdateTraining
 } from "./training.schema";
 import {Prisma} from "@prisma/client";
 
@@ -87,7 +91,7 @@ export async function updateTraining(data: UpdateTraining, params: GetTraining &
 }) {
     const personal_trainer_id = (params.user_role !== 'admin') ? params.user_id : undefined;
     try {
-        const updatedTraining = await prisma.training.update({
+        return await prisma.training.update({
             where: {
                 id: params.id,
                 personal_trainer_id: personal_trainer_id,
@@ -101,7 +105,6 @@ export async function updateTraining(data: UpdateTraining, params: GetTraining &
                 type_training: data.type_training,
             }
         });
-        return updatedTraining;
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === 'P2025') {

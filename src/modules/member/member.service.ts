@@ -1,4 +1,4 @@
-import prisma from "../../utils/prisma";
+import prisma from "../../config/prisma";
 import {CreateMemberInput, DeleteMember, MemberId, UpdateMember} from "./member.schema";
 import {hashPassword} from "../../utils/hash";
 

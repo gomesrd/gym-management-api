@@ -16,7 +16,6 @@ dist/
 
 # Maven
 target/
-dist/
 
 # JetBrains IDE
 .idea/
@@ -47,6 +46,7 @@ Thumbs.db
 *.prisma
 
 # Env files
-.env
 .env.local
+.env.dev
+.env.prod
 
