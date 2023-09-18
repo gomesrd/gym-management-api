@@ -5,7 +5,7 @@ import {
 } from "./trainingRecord.schema";
 
 export async function createTrainingRecord(input: CreateTrainingRecordInput) {
-    return prisma.trainingRecord.createMany({
+    return prisma.trainingRecord.create({
         data: input,
     });
 }

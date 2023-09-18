@@ -1,13 +1,12 @@
 import {FastifyInstance} from "fastify";
 import {
-    deletePersonalTrainerHandler,
+    deletePersonalTrainerHandler, getManyPersonalTrainersHandler,
     getUniquePersonalTrainerHandler,
     loginHandler,
     registerPersonalTrainerHandler,
     updatePersonalTrainerHandler
 } from "./personalTrainer.controller";
 import {$ref} from "./personalTrainer.schema";
-import {findManyPersonalTrainers} from "./personalTrainer.service";
 
 async function personalTrainerRoutes(server: FastifyInstance) {
     server.get('', {
@@ -22,7 +21,7 @@ async function personalTrainerRoutes(server: FastifyInstance) {
                 },
             },
         },
-    }, findManyPersonalTrainers);
+    }, getManyPersonalTrainersHandler);
 
     server.get('/:id', {
         preHandler: [server.authenticate, server.authorizationLimited],

@@ -50,11 +50,9 @@ const trainingRecordsQueryStringSchema = z.object({
     member_id: z.string().optional(),
 });
 
-const createTrainingRecord = z.object({
+const createTrainingRecordSchema = z.object({
     ...trainingRecordInput,
 });
-
-const createTrainingRecordSchema = z.array(createTrainingRecord);
 
 const updateTrainingRecordSchema = z.object({
     status_training: z.string().optional(),

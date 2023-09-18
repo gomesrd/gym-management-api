@@ -12,6 +12,10 @@ import {
 export async function registerTrainingRecordHandler(request: FastifyRequest<{
     Body: CreateTrainingRecordInput
 }>, reply: FastifyReply) {
+    const personalTrainerValidate = request.user.id === request.body.personal_trainer_id;
+    if (!personalTrainerValidate) {
+        return reply.code(403).send('You can only register trainings for yourself')
+    }
     const body = request.body;
     try {
         return createTrainingRecord(body);
