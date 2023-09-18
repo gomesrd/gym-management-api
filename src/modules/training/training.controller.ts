@@ -10,6 +10,11 @@ import {
 export async function registerTrainingHandler(request: FastifyRequest<{
     Body: CreateTrainingInput
 }>, reply: FastifyReply) {
+    const personalTrainerId = request.body.map((training) => training.personal_trainer_id)
+    const personalTrainerValidate = personalTrainerId.every((id) => id === request.user.id)
+    if (!personalTrainerValidate) {
+        return reply.code(403).send('You can only register trainings for yourself')
+    }
     const body = request.body;
     try {
         return createTraining(body);
