@@ -1,5 +1,32 @@
-import fjwt from '@fastify/jwt';
+import fjwt, {JWT} from '@fastify/jwt';
 import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
+
+declare module "@fastify/jwt" {
+    interface FastifyJWT {
+        user: {
+            "id": string;
+            "name": string;
+            "email": string;
+            "role": string;
+        }
+    }
+}
+
+
+declare module "fastify" {
+    export interface FastifyRequest {
+        jwt: JWT;
+    }
+
+    export interface FastifyInstance {
+        authenticate: any;
+        authorizationExclusive: any;
+        authorizationLimited: any;
+        authorizationMember: any;
+        admin: any;
+    }
+}
+
 
 export async function loginServer(server: FastifyInstance) {
     server.register(fjwt, {

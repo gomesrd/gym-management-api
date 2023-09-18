@@ -61,6 +61,20 @@ export async function updateTrainingHandler(request: FastifyRequest<{
 
 }
 
+export async function disableTrainingHandler(request: FastifyRequest<{
+    Body: UpdateTraining;
+    Params: GetTraining;
+}>) {
+    return updateTraining({
+        ...request.body
+    }, {
+        ...request.params,
+        user_id: request.user.id,
+        user_role: request.user.role
+    });
+
+}
+
 export async function deleteTrainingHandler(request: FastifyRequest<{
     Params: DeleteTraining;
 }>, reply: FastifyReply) {

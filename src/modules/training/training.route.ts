@@ -75,6 +75,23 @@ async function trainingRoutes(server: FastifyInstance) {
         }, updateTrainingHandler
     );
 
+    server.put('/:id', {
+            preHandler: [server.authenticate, server.authorizationLimited],
+            schema: {
+                tags: ['Training'],
+                summary: 'Disable a specific training',
+                params: {
+                    id: {type: 'string'},
+                },
+                body: $ref('updateTrainingSchema'),
+                response: {
+                    200: $ref('updateTrainingSchema')
+                },
+
+            }
+        }, updateTrainingHandler
+    );
+
     server.delete('/:id', {
             preHandler: [server.authenticate, server.authorizationExclusive],
             schema: {

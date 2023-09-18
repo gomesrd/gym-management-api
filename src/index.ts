@@ -12,5 +12,5 @@ setupServer()
         });
     })
     .catch((err) => {
-        console.error('Error loading SSM parameters', err);
+        console.error('Error: ', err);
     });

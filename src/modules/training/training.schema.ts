@@ -63,6 +63,7 @@ const updateTrainingSchema = z.object({
     fixed_day: z.string().optional(),
     single_date: z.string().optional(),
     start_time: z.string().optional(),
+    active: z.boolean().optional(),
     personal_trainer_id: z.string().optional(),
     modality_training: z.string().optional(),
     type_training: z.string().optional(),

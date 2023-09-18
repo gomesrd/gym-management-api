@@ -98,3 +98,10 @@ Wednesday - Quarta-feira
 Thursday - Quinta-feira
 Friday - Sexta-feira
 Saturday - Sábado
+
+
+
+## TODO
+Criar end point para "deletar" o member, alterando o status para inativo
+Criar end point para "deletar" o personal trainer, alterando o status para inativo
+Criar end point para "deletar" o training, alterando o status para inativo
