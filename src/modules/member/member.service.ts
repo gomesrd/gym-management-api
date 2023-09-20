@@ -13,12 +13,16 @@ export async function createMember(input: CreateMemberInput) {
 
 export async function findMemberByEmail(email: string) {
     return prisma.member.findUnique({
-        where: {email},
+        where: {
+            email,
+            active: true
+        },
     });
-
 }
 
-export async function findManyMembers() {
+export async function findManyMembers(data: any & {
+    user_role: string
+}) {
     return prisma.member.findMany({
         select: {
             id: true,
@@ -38,9 +42,11 @@ export async function findUniqueMember(data: MemberId & {
     user_id: string, user_role: string
 }) {
     const id = (data.user_role === 'admin' || 'personal_trainer') ? data.id : data.user_id;
+    const active = (data.user_role !== 'admin') ? true : undefined;
     return prisma.member.findUnique({
         where: {
-            id: id
+            id: id,
+            active: active
         },
         select: {
             id: true,
@@ -73,6 +79,21 @@ export async function updateMember(data: UpdateMember, params: MemberId & {
             birth_date: data.birth_date,
         }
     });
+}
+
+export async function disableMember(params: MemberId) {
+    try {
+        return await prisma.member.update({
+            where: {
+                id: params.id,
+            },
+            data: {
+                active: false,
+            }
+        });
+    } catch (error) {
+        throw error;
+    }
 }
 
 export async function deleteMember(params: DeleteMember & {

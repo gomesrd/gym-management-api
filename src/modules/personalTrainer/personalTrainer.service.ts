@@ -49,7 +49,6 @@ export async function findUniquePersonalTrainer(data: PersonalTrainerId & {
     });
 }
 
-
 export async function findManyPersonalTrainers(data: any & {
     user_role: string,
 }) {
@@ -111,7 +110,6 @@ export async function disablePersonalTrainer(params: PersonalTrainerId) {
 }
 
 export async function deletePersonalTrainer(data: DeletePersonalTrainer) {
-
     return prisma.personalTrainer.delete({
         where: {
             id: data.id
