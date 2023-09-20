@@ -51,6 +51,7 @@ const trainingsQueryStringSchema = z.object({
     id: z.string().optional(),
     member_id: z.string().optional(),
     personal_trainer_id: z.string().optional(),
+    active: z.boolean().optional(),
 });
 
 const createTraining = z.object({

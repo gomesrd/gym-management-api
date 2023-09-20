@@ -2,7 +2,7 @@ import {FastifyInstance} from "fastify";
 import {$ref} from "./training.schema";
 import {
     deleteTrainingHandler, getUniqueTrainingHandler, getManyTrainingsHandler, registerTrainingHandler,
-    updateTrainingHandler
+    updateTrainingHandler, disableTrainingHandler
 } from "./training.controller";
 
 async function trainingRoutes(server: FastifyInstance) {
@@ -75,7 +75,7 @@ async function trainingRoutes(server: FastifyInstance) {
         }, updateTrainingHandler
     );
 
-    server.put('/:id', {
+    server.put('/disable/:id', {
             preHandler: [server.authenticate, server.authorizationLimited],
             schema: {
                 tags: ['Training'],
@@ -85,11 +85,16 @@ async function trainingRoutes(server: FastifyInstance) {
                 },
                 body: $ref('updateTrainingSchema'),
                 response: {
-                    200: $ref('updateTrainingSchema')
+                    200: {
+                        type: 'object',
+                        properties: {
+                            message: {type: 'string', example: ''}
+                        }
+                    }
                 },
 
             }
-        }, updateTrainingHandler
+        }, disableTrainingHandler
     );
 
     server.delete('/:id', {
