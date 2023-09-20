@@ -1,7 +1,7 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
     createPersonalTrainer, deletePersonalTrainer, findUniquePersonalTrainer, findPersonalTrainerByEmail,
-    findManyPersonalTrainers, updatePersonalTrainer
+    findManyPersonalTrainers, updatePersonalTrainer, disablePersonalTrainer
 } from "./personalTrainer.service";
 import {
     CreatePersonalTrainerInput, DeletePersonalTrainer, LoginInput, PersonalTrainerId, UpdatePersonalTrainer
@@ -40,9 +40,8 @@ export async function loginHandler(request: FastifyRequest<{
     )
     if (correctPassword) {
         const {password, salt, ...rest} = personalTrainer;
-        // const expiresIn = '1h';
         const accessToken = server.jwt.sign(rest);
-        return {accessToken};
+        return reply.code(200).send({accessToken})
     }
     return reply.code(401).send(invalidLoginMessage());
 }
@@ -59,7 +58,11 @@ export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
 
 export async function getManyPersonalTrainersHandler(request: FastifyRequest) {
     try {
-        return findManyPersonalTrainers();
+        return findManyPersonalTrainers(
+            {
+                user_role: request.user.role
+            }
+        );
     } catch (e) {
         console.log(e)
     }
@@ -76,6 +79,16 @@ export async function updatePersonalTrainerHandler(request: FastifyRequest<{
         user_id: request.user.id,
         user_role: request.user.role
     });
+}
+
+export async function disablePersonalTrainerHandler(request: FastifyRequest<{
+    Body: UpdatePersonalTrainer;
+    Params: PersonalTrainerId;
+}>) {
+    return disablePersonalTrainer({
+            ...request.params
+        }
+    );
 }
 
 export async function deletePersonalTrainerHandler(request: FastifyRequest<{

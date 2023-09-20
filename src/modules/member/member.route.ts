@@ -1,7 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {
     deleteMemberHandler, getUniqueMemberHandler, getManyMembersHandler, loginHandler,
-    registerMemberHandler, updateMemberHandler
+    registerMemberHandler, updateMemberHandler, disableMemberHandler
 } from "./member.controller";
 import {$ref} from "./member.schema";
 
@@ -72,6 +72,27 @@ async function memberRoutes(server: FastifyInstance) {
                 }
             }
         }, updateMemberHandler
+    );
+
+    server.put('/disable/:id', {
+            preHandler: [server.authenticate, server.authorizationExclusive],
+            schema: {
+                tags: ['Training'],
+                summary: 'Disable a specific Member',
+                params: {
+                    id: {type: 'string'},
+                },
+                body: $ref('updateMemberSchema'),
+                response: {
+                    200: {
+                        type: 'object',
+                        properties: {
+                            message: {type: 'string', example: ''}
+                        }
+                    }
+                },
+            }
+        }, disableMemberHandler
     );
 
     server.delete('/:id', {

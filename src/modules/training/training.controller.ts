@@ -3,7 +3,7 @@ import {
     CreateTrainingInput, DeleteTraining, GetTraining, TrainingsQueryString, UpdateTraining
 } from "./training.schema";
 import {
-    createTraining, deleteTraining, findUniqueTraining, findManyTrainings, updateTraining
+    createTraining, deleteTraining, findUniqueTraining, findManyTrainings, updateTraining, disableTraining
 } from "./training.service";
 
 
@@ -54,6 +54,18 @@ export async function updateTrainingHandler(request: FastifyRequest<{
     return updateTraining({
         ...request.body
     }, {
+        ...request.params,
+        user_id: request.user.id,
+        user_role: request.user.role
+    });
+
+}
+
+export async function disableTrainingHandler(request: FastifyRequest<{
+    Body: UpdateTraining;
+    Params: GetTraining;
+}>) {
+    return disableTraining({
         ...request.params,
         user_id: request.user.id,
         user_role: request.user.role

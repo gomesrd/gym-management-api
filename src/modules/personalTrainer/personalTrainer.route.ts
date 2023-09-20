@@ -1,7 +1,12 @@
 import {FastifyInstance} from "fastify";
 import {
-    deletePersonalTrainerHandler, getManyPersonalTrainersHandler, getUniquePersonalTrainerHandler,
-    loginHandler, registerPersonalTrainerHandler, updatePersonalTrainerHandler
+    deletePersonalTrainerHandler,
+    disablePersonalTrainerHandler,
+    getManyPersonalTrainersHandler,
+    getUniquePersonalTrainerHandler,
+    loginHandler,
+    registerPersonalTrainerHandler,
+    updatePersonalTrainerHandler
 } from "./personalTrainer.controller";
 import {$ref} from "./personalTrainer.schema";
 
@@ -71,6 +76,28 @@ async function personalTrainerRoutes(server: FastifyInstance) {
                 }
             }
         }, updatePersonalTrainerHandler
+    );
+
+    server.put('/disable/:id', {
+            preHandler: [server.authenticate, server.authorizationExclusive],
+            schema: {
+                tags: ['Training'],
+                summary: 'Disable a specific Personal Trainer',
+                params: {
+                    id: {type: 'string'},
+                },
+                body: $ref('updatePersonalTrainerSchema'),
+                response: {
+                    200: {
+                        type: 'object',
+                        properties: {
+                            message: {type: 'string', example: ''}
+                        }
+                    }
+                },
+
+            }
+        }, disablePersonalTrainerHandler
     );
 
     server.delete('/:id', {

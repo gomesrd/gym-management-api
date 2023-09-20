@@ -1,17 +1,16 @@
-import fastify from 'fastify';
-import {routers} from "./routers";
-import {listenServer} from "./listen";
+import fastify, {FastifyInstance} from 'fastify';
+import {Env} from './config/env';
 
 export const server = fastify();
 
-async function main() {
-    await routers(server);
-    try {
-        listenServer();
-    } catch (err) {
-        console.error(err);
-        process.exit(1);
-    }
-}
+const setupServer = async (): Promise<{
+    server: FastifyInstance
+    env: Env
+}> => {
+    const env = require('./config/env').default;
+    const router = require('./infra/router').router;
+    await router(server);
+    return {server, env};
+};
 
-main().then(r => r);
+export default setupServer;

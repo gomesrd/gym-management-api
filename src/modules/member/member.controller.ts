@@ -1,9 +1,15 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
-    createMember, deleteMember, findUniqueMember, findMemberByEmail, findManyMembers, updateMember
+    createMember,
+    deleteMember,
+    findUniqueMember,
+    findMemberByEmail,
+    findManyMembers,
+    updateMember,
+    disableMember
 } from "./member.service";
 import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
-import {confirmDeletedMember, invalidLoginMessage} from "./member.mesages";
+import {invalidLoginMessage} from "./member.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
 
@@ -61,7 +67,9 @@ export async function getUniqueMemberHandler(request: FastifyRequest<{
 
 export async function getManyMembersHandler(request: FastifyRequest) {
     try {
-        return findManyMembers();
+        return findManyMembers({
+            user_id: request.user.id,
+        });
     } catch (e) {
         console.log(e)
     }
@@ -80,6 +88,15 @@ export async function updateMemberHandler(request: FastifyRequest<{
             user_id: request.user.id,
             user_role: request.user.role
         });
+}
+
+export async function disableMemberHandler(request: FastifyRequest<{
+    Body: UpdateMember;
+    Params: MemberId
+}>) {
+    return disableMember({
+        ...request.params
+    });
 }
 
 export async function deleteMemberHandler(request: FastifyRequest<{

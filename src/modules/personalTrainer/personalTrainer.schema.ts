@@ -84,6 +84,7 @@ const updatePersonalTrainerSchema = z.object({
     name: z.string().optional(),
     phone: z.string().optional(),
     occupation: z.string().optional(),
+    active: z.boolean().optional(),
 });
 
 export type CreatePersonalTrainerInput = z.infer<typeof createPersonalTrainerSchema>
