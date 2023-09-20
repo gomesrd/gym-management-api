@@ -14,7 +14,10 @@ export async function createPersonalTrainer(input: CreatePersonalTrainerInput) {
 
 export async function findPersonalTrainerByEmail(email: string) {
     return prisma.personalTrainer.findUnique({
-        where: {email},
+        where: {
+            email,
+            active: true
+        },
     });
 }
 
@@ -23,10 +26,12 @@ export async function findUniquePersonalTrainer(data: PersonalTrainerId & {
     user_role: string
 }) {
     const id = (data.user_role !== 'admin') ? data.user_id : data.id;
+    const active = (data.user_role !== 'admin') ? true : undefined;
 
     return prisma.personalTrainer.findUnique({
         where: {
-            id: id
+            id: id,
+            active: active
         },
         select: {
             id: true,
@@ -45,8 +50,15 @@ export async function findUniquePersonalTrainer(data: PersonalTrainerId & {
 }
 
 
-export async function findManyPersonalTrainers() {
+export async function findManyPersonalTrainers(data: any & {
+    user_role: string,
+}) {
+    const active = (data.user_role !== 'admin') ? true : undefined;
+
     return prisma.personalTrainer.findMany({
+        where: {
+            active: active
+        },
         select: {
             id: true,
             name: true,
@@ -81,6 +93,21 @@ export async function updatePersonalTrainer(data: UpdatePersonalTrainer, params:
             phone: data.phone,
         }
     });
+}
+
+export async function disablePersonalTrainer(params: PersonalTrainerId) {
+    try {
+        return await prisma.personalTrainer.update({
+            where: {
+                id: params.id,
+            },
+            data: {
+                active: false,
+            }
+        });
+    } catch (error) {
+        throw error;
+    }
 }
 
 export async function deletePersonalTrainer(data: DeletePersonalTrainer) {
