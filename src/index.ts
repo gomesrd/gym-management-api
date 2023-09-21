@@ -8,7 +8,7 @@ setupServer()
                 console.error(err);
                 process.exit(1);
             }
-            console.log(`Server ready at http://${env.HOST}:${env.PORT}  `);
+            console.log(`Server ready at http://${env.HOST}:${env.PORT}`);
         });
     })
     .catch((err) => {
