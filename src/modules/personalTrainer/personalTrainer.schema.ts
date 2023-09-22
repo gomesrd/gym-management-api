@@ -21,6 +21,7 @@ const personalTrainerCore = {
     }).email(),
     phone: z.string(),
     role: z.string().optional(),
+    active: z.boolean().optional(),
 }
 
 const passwordPersonalTrainer = {

@@ -43,6 +43,7 @@ export async function findUniquePersonalTrainer(data: PersonalTrainerId & {
             password: false,
             salt: false,
             role: false,
+            active: true,
             created_at: true,
             updated_at: true,
         }
@@ -61,10 +62,10 @@ export async function findManyPersonalTrainers(data: any & {
         select: {
             id: true,
             name: true,
+            phone: true,
             cpf: false,
             occupation: false,
             email: false,
-            phone: true,
             password: false,
             salt: false,
             role: false,

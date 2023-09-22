@@ -52,6 +52,11 @@ const trainingsQueryStringSchema = z.object({
     member_id: z.string().optional(),
     personal_trainer_id: z.string().optional(),
     active: z.boolean().optional(),
+    fixed_day: z.string().optional(),
+    single_date: z.string().optional(),
+    start_time: z.string().optional(),
+    modality_training: z.string().optional(),
+    type_training: z.string().optional(),
 });
 
 const createTraining = z.object({

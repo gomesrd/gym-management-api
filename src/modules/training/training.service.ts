@@ -28,6 +28,11 @@ export async function findManyTrainings(filters: TrainingsQueryString, data: any
             member_id: member_id,
             personal_trainer_id: personal_trainer_id,
             active: active,
+            fixed_day: filters.fixed_day,
+            single_date: filters.single_date,
+            start_time: filters.start_time,
+            modality_training: filters.modality_training,
+            type_training: filters.type_training,
         },
         select: {
             id: true,
