@@ -65,7 +65,6 @@ export async function getUniqueMemberHandler(request: FastifyRequest<{
 }
 
 export async function getManyMembersHandler(request: FastifyRequest) {
-  console.log(request)
 
   try {
     return findManyMembers({
