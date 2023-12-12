@@ -7,7 +7,7 @@ import {$ref} from "./member.schema";
 
 async function memberRoutes(server: FastifyInstance) {
   server.get('', {
-    preHandler: [server.authenticate, server.authorizationExclusive],
+    preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
       tags: ['Member'],
       summary: 'Get all members',
