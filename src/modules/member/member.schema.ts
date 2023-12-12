@@ -3,85 +3,100 @@ import {buildJsonSchemas} from 'fastify-zod'
 import {emailInvalid, emailRequired, passwordInvalid, passwordRequired} from "./member.mesages";
 
 const memberId = {
-    id: z.string()
+  id: z.string()
 }
 
 const memberDate = {
-    created_at: z.date(),
-    updated_at: z.date(),
+  created_at: z.date(),
+  updated_at: z.date(),
+};
+
+const memberAddress = {
+  address: z.string(),
+  address_number: z.string(),
+  address_complement: z.string().optional(),
+  address_neighborhood: z.string(),
+  city: z.string(),
+  state: z.string(),
+  country: z.string().optional(),
+  zip_code: z.string(),
 };
 
 const memberCore = {
-    name: z.string(),
-    birth_date: z.string(),
-    email: z.string({
-        required_error: emailRequired(),
-        invalid_type_error: emailInvalid(),
-    }).email(),
-    phone: z.string(),
+  name: z.string(),
+  cpf: z.string(),
+  birth_date: z.string(),
+  email: z.string(
+    {
+      required_error: emailRequired(),
+      invalid_type_error: emailInvalid()
+    }
+  ),
+  phone: z.string(),
+  ...memberAddress
 };
 
 const memberResume = {
-    name: z.string(),
-    phone: z.string().optional(),
+  name: z.string(),
+  phone: z.string().optional(),
 };
 
 const memberFindUnique = {
-    ...memberId,
-    ...memberCore,
-    ...memberDate,
+  ...memberId,
+  ...memberCore,
+  ...memberDate,
 };
 
 const memberFindMany = {
-    ...memberId,
-    ...memberResume
+  ...memberId,
+  ...memberResume
 };
 
 const memberPassword = {
-    password: z.string({
-        required_error: passwordRequired(),
-        invalid_type_error: passwordInvalid()
-    })
+  password: z.string({
+    required_error: passwordRequired(),
+    invalid_type_error: passwordInvalid()
+  })
 };
 
 const createMemberSchema = z.object({
-    ...memberCore,
-    ...memberPassword,
+  ...memberCore,
+  ...memberPassword,
 });
 
 const createMemberResponseSchema = z.object({
-    ...memberId
+  ...memberId
 });
 
 const MemberIdSchema = z.object({
-    ...memberId
+  ...memberId
 });
 
 const MemberResponseSchema = z.object({
-    ...memberFindUnique
+  ...memberFindUnique
 });
 
 const MembersResponseSchema = z.object({
-    ...memberFindMany
+  ...memberFindMany
 });
 
 const loginSchema = z.object({
-    email: z.string({
-        required_error: emailRequired(),
-        invalid_type_error: emailInvalid()
-    }).email(),
-    password: z.string()
+  email: z.string({
+    required_error: emailRequired(),
+    invalid_type_error: emailInvalid()
+  }).email(),
+  password: z.string()
 });
 
 const loginResponseSchema = z.object({
-    accessToken: z.string(),
+  accessToken: z.string(),
 });
 
 const updateMemberSchema = z.object({
-    email: z.string().email().optional(),
-    name: z.string().optional(),
-    phone: z.string().optional(),
-    birth_date: z.string().optional(),
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  phone: z.string().optional(),
+  birth_date: z.string().optional(),
 });
 
 export type CreateMemberInput = z.infer<typeof createMemberSchema>
@@ -91,12 +106,12 @@ export type MemberId = z.infer<typeof MemberIdSchema>;
 export type UpdateMember = z.infer<typeof updateMemberSchema>;
 
 export const {schemas: memberSchemas, $ref} = buildJsonSchemas({
-    createMemberSchema,
-    createMemberResponseSchema,
-    loginSchema,
-    loginResponseSchema,
-    MemberResponseSchema,
-    MemberIdSchema,
-    MembersResponseSchema,
-    updateMemberSchema,
+  createMemberSchema,
+  createMemberResponseSchema,
+  loginSchema,
+  loginResponseSchema,
+  MemberResponseSchema,
+  MemberIdSchema,
+  MembersResponseSchema,
+  updateMemberSchema,
 }, {$id: "memberSchemas"});

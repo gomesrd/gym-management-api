@@ -31,16 +31,16 @@ export async function findManyTrainings(filters: TrainingsQueryString, data: any
             fixed_day: filters.fixed_day,
             single_date: filters.single_date,
             start_time: filters.start_time,
-            modality_training: filters.modality_training,
-            type_training: filters.type_training,
+            modality: filters.modality,
+            type: filters.type,
         },
         select: {
             id: true,
             fixed_day: true,
             single_date: true,
             start_time: true,
-            modality_training: true,
-            type_training: true,
+            modality: true,
+            type: true,
             personal_trainer_id: false,
             member_id: false,
             member: {
@@ -76,8 +76,8 @@ export async function findUniqueTraining(params: GetTraining & { user_id: string
             fixed_day: true,
             single_date: true,
             start_time: true,
-            modality_training: true,
-            type_training: true,
+            modality: true,
+            type: true,
             member: {
                 select: {
                     name: true,
@@ -112,8 +112,8 @@ export async function updateTraining(data: UpdateTraining, params: GetTraining &
                 fixed_day: data.fixed_day,
                 single_date: data.single_date,
                 personal_trainer_id: data.personal_trainer_id,
-                modality_training: data.modality_training,
-                type_training: data.type_training,
+                modality: data.modality,
+                type: data.type,
             }
         });
     } catch (error) {

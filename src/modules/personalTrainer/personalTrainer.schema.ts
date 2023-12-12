@@ -11,9 +11,21 @@ const personalTrainerDate = {
     updated_at: z.date(),
 };
 
+const personalTrainerAddress = {
+    address: z.string(),
+    address_number: z.string(),
+    address_complement: z.string().optional(),
+    address_neighborhood: z.string(),
+    city: z.string(),
+    state: z.string(),
+    country: z.string().optional(),
+    zip_code: z.string(),
+};
+
 const personalTrainerCore = {
     name: z.string(),
     cpf: z.string(),
+    birth_date: z.string(),
     occupation: z.string(),
     email: z.string({
         required_error: 'Email is required',
@@ -21,7 +33,7 @@ const personalTrainerCore = {
     }).email(),
     phone: z.string(),
     role: z.string().optional(),
-    active: z.boolean().optional(),
+    ...personalTrainerAddress,
 }
 
 const passwordPersonalTrainer = {

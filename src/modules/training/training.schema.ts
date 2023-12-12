@@ -14,8 +14,8 @@ const trainingInput = {
     fixed_day: z.string().optional(),
     single_date: z.string().optional(),
     start_time: z.string(),
-    modality_training: z.string(),
-    type_training: z.string(),
+    modality: z.string(),
+    type: z.string(),
     personal_trainer_id: z.string(),
     member_id: z.string(),
 };
@@ -25,8 +25,8 @@ const trainingResume = {
     fixed_day: z.string(),
     single_date: z.string().optional(),
     start_time: z.string(),
-    modality_training: z.string(),
-    type_training: z.string(),
+    modality: z.string(),
+    type: z.string(),
     personal_trainer: z.object({
         name: z.string(),
         id: z.string().optional(),
@@ -55,8 +55,8 @@ const trainingsQueryStringSchema = z.object({
     fixed_day: z.string().optional(),
     single_date: z.string().optional(),
     start_time: z.string().optional(),
-    modality_training: z.string().optional(),
-    type_training: z.string().optional(),
+    modality: z.string().optional(),
+    type: z.string().optional(),
 });
 
 const createTraining = z.object({
@@ -71,8 +71,8 @@ const updateTrainingSchema = z.object({
     start_time: z.string().optional(),
     active: z.boolean().optional(),
     personal_trainer_id: z.string().optional(),
-    modality_training: z.string().optional(),
-    type_training: z.string().optional(),
+    modality: z.string().optional(),
+    type: z.string().optional(),
 });
 
 const TrainingIdSchema = z.object({

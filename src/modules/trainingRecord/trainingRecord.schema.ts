@@ -10,7 +10,7 @@ const trainingRecordDateCreated = {
 };
 
 const trainingRecordInput = {
-    type_training: z.string(),
+    type: z.string(),
     status_training: z.string(),
     training_id: z.string(),
     personal_trainer_id: z.string(),
@@ -19,7 +19,7 @@ const trainingRecordInput = {
 
 const trainingRecordResume = {
     ...trainingRecordId,
-    type_training: z.string(),
+    type: z.string(),
     status_training: z.string(),
     training_id: z.string(),
     personal_trainer: z.object({

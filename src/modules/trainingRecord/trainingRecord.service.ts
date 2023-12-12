@@ -25,7 +25,7 @@ export async function findManyTrainingRecords(filters: TrainingRecordsQueryStrin
         },
         select: {
             id: true,
-            type_training: true,
+            type: true,
             status_training: true,
             training_id: true,
             personal_trainer_id: false,
@@ -62,7 +62,7 @@ export async function findUniqueTrainingRecord(params: GetTrainingRecord, data: 
         },
         select: {
             id: true,
-            type_training: true,
+            type: true,
             status_training: true,
             training_id: true,
             personal_trainer_id: false,

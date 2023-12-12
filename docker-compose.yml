@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  postgres:
+    image: "postgres:11"
+    container_name: "gym_postgres"
+    ports:
+      - "54320:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 15059471
+      POSTGRES_DB: postgres
