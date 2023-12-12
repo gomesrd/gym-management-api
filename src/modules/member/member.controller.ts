@@ -46,9 +46,10 @@ export async function loginHandler(request: FastifyRequest<{
   )
 
   if (correctPassword) {
-    const {password, salt, ...rest} = member;
-
-    return {accessToken: server.jwt.sign(rest)};
+    const {password, salt, id, name} = member;
+    const dataMember = {id, name};
+    const expiresIn = 60 * 120;
+    return {accessToken: server.jwt.sign(dataMember, {expiresIn})};
   }
 
   return reply.code(401).send(invalidLoginMessage());
