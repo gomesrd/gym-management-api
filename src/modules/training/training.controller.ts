@@ -1,83 +1,93 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
-    CreateTrainingInput, DeleteTraining, GetTraining, TrainingsQueryString, UpdateTraining
+  CreateTrainingInput, DeleteTraining, GetTraining, TrainingsQueryString, UpdateTraining
 } from "./training.schema";
 import {
-    createTraining, deleteTraining, findUniqueTraining, findManyTrainings, updateTraining, disableTraining
+  createTraining, deleteTraining, findUniqueTraining, findManyTrainings, updateTraining, disableTraining
 } from "./training.service";
 
 
 export async function registerTrainingHandler(request: FastifyRequest<{
-    Body: CreateTrainingInput
+  Body: CreateTrainingInput
 }>, reply: FastifyReply) {
-    const personalTrainerId = request.body.map((training) => training.personal_trainer_id)
-    const personalTrainerValidate = personalTrainerId.every((id) => id === request.user.id)
-    if (!personalTrainerValidate) {
-        return reply.code(403).send('You can only register trainings for yourself')
+
+  const personalTrainerId = request.body.map((training) => training.personal_trainer_id)
+  const personalTrainerValidate = personalTrainerId.every((id) => id === request.user.id)
+
+
+  if (!personalTrainerValidate) {
+    return reply.code(403).send('You can only register trainings for yourself')
+  }
+  const body = request.body;
+  try {
+    const training = await createTraining(body);
+
+    return training
+  } catch (e: any) {
+    console.log(e)
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Training already exists'
+      })
     }
-    const body = request.body;
-    try {
-        return createTraining(body);
-    } catch (e) {
-        console.log(e)
-        return reply.code(500).send(e)
-    }
+    return reply.code(500).send('Something went wrong')
+  }
 }
 
 export async function getManyTrainingsHandler(request: FastifyRequest<{
-    Querystring: TrainingsQueryString;
+  Querystring: TrainingsQueryString;
 }>) {
-    try {
-        return findManyTrainings({...request.query}, {
-            user_id: request.user.id,
-            user_role: request.user.role
-        });
-    } catch (e) {
-        console.log(e)
-    }
+  try {
+    return findManyTrainings({...request.query}, {
+      user_id: request.user.id,
+      user_role: request.user.role
+    });
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 export async function getUniqueTrainingHandler(request: FastifyRequest<{
-    Params: GetTraining;
+  Params: GetTraining;
 }>) {
-    return findUniqueTraining({
-        ...request.params,
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
+  return findUniqueTraining({
+    ...request.params,
+    user_id: request.user.id,
+    user_role: request.user.role
+  });
 }
 
 export async function updateTrainingHandler(request: FastifyRequest<{
-    Body: UpdateTraining;
-    Params: GetTraining;
+  Body: UpdateTraining;
+  Params: GetTraining;
 }>) {
-    return updateTraining({
-        ...request.body
-    }, {
-        ...request.params,
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
+  return updateTraining({
+    ...request.body
+  }, {
+    ...request.params,
+    user_id: request.user.id,
+    user_role: request.user.role
+  });
 
 }
 
 export async function disableTrainingHandler(request: FastifyRequest<{
-    Body: UpdateTraining;
-    Params: GetTraining;
+  Body: UpdateTraining;
+  Params: GetTraining;
 }>) {
-    return disableTraining({
-        ...request.params,
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
+  return disableTraining({
+    ...request.params,
+    user_id: request.user.id,
+    user_role: request.user.role
+  });
 
 }
 
 export async function deleteTrainingHandler(request: FastifyRequest<{
-    Params: DeleteTraining;
+  Params: DeleteTraining;
 }>, reply: FastifyReply) {
-    await deleteTraining({
-        ...request.params
-    });
-    return reply.code(200).send('');
+  await deleteTraining({
+    ...request.params
+  });
+  return reply.code(200).send('');
 }

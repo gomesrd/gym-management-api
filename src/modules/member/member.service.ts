@@ -6,6 +6,7 @@ export async function createMember(input: CreateMemberInput) {
   const {password, ...rest} = input;
   const {hash, salt} = hashPassword(password);
 
+
   return prisma.member.create({
     data: {...rest, salt, password: hash},
   });
@@ -48,6 +49,7 @@ export async function findManyMembers(data: any & {
       training_record: false,
     }
   });
+
 }
 
 export async function findUniqueMember(data: MemberId & {

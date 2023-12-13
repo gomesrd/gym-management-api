@@ -40,9 +40,9 @@ export async function loginHandler(request: FastifyRequest<{
   )
   if (correctPassword) {
     const {id, name, role} = personalTrainer;
-    const rest = {id, name, role};
-    const expiresIn = 60 * 120;
-    const accessToken = server.jwt.sign(rest, {expiresIn});
+    const personalTrainerData = {id, name, role};
+    // const expiresIn = 60 * 120;
+    const accessToken = server.jwt.sign(personalTrainerData);
 
     return reply.code(200).send({accessToken});
   }
