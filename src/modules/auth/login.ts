@@ -23,7 +23,7 @@ declare module "fastify" {
         authorizationExclusive: any;
         authorizationLimited: any;
         authorizationMember: any;
-        admin: any;
+        Admin: any;
     }
 }
 

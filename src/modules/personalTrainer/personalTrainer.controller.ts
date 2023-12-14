@@ -1,7 +1,7 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
   createPersonalTrainer, deletePersonalTrainer, findUniquePersonalTrainer, findPersonalTrainerByEmail,
-  findManyPersonalTrainers, updatePersonalTrainer, disablePersonalTrainer
+  findManyPersonalTrainers, updatePersonalTrainer
 } from "./personalTrainer.service";
 import {
   CreatePersonalTrainerInput, DeletePersonalTrainer, LoginInput, PersonalTrainerId, UpdatePersonalTrainer
@@ -14,12 +14,17 @@ export async function registerPersonalTrainerHandler(request: FastifyRequest<{
   Body: CreatePersonalTrainerInput
 }>, reply: FastifyReply) {
   const body = request.body;
+  //const userId = request.user.id;
   try {
     const personalTrainer = await createPersonalTrainer(body);
     return reply.code(201).send(personalTrainer)
-  } catch (e) {
-    console.log(e)
-    return reply.code(500).send(e)
+  } catch (e: any) {
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Personal trainer already exists'
+      })
+    }
+    return reply.code(500).send('Something went wrong')
   }
 }
 
@@ -52,20 +57,16 @@ export async function loginHandler(request: FastifyRequest<{
 export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
   Params: PersonalTrainerId;
 }>) {
+  const userId = request.user.id;
+
   return findUniquePersonalTrainer({
-    ...request.params,
-    user_id: request.user.id,
-    user_role: request.user.role
-  });
+    ...request.params
+  }, userId)
 }
 
-export async function getManyPersonalTrainersHandler(request: FastifyRequest) {
+export async function getManyPersonalTrainersHandler() {
   try {
-    return findManyPersonalTrainers(
-      {
-        user_role: request.user.role
-      }
-    );
+    return findManyPersonalTrainers();
   } catch (e) {
     console.log(e)
   }
@@ -75,24 +76,14 @@ export async function updatePersonalTrainerHandler(request: FastifyRequest<{
   Body: UpdatePersonalTrainer;
   Params: PersonalTrainerId;
 }>) {
+  const userId = request.user.id;
   return updatePersonalTrainer({
     ...request.body,
   }, {
     ...request.params,
-    user_id: request.user.id,
-    user_role: request.user.role
-  });
+  }, userId);
 }
 
-export async function disablePersonalTrainerHandler(request: FastifyRequest<{
-  Body: UpdatePersonalTrainer;
-  Params: PersonalTrainerId;
-}>) {
-  return disablePersonalTrainer({
-      ...request.params
-    }
-  );
-}
 
 export async function deletePersonalTrainerHandler(request: FastifyRequest<{
   Params: DeletePersonalTrainer;

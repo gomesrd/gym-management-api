@@ -12,14 +12,16 @@ const memberDate = {
 };
 
 const memberAddress = {
-  address: z.string(),
-  address_number: z.string(),
-  address_complement: z.string().optional(),
-  address_neighborhood: z.string(),
-  city: z.string(),
-  state: z.string(),
-  country: z.string().optional(),
-  zip_code: z.string(),
+  address: z.object({
+    address: z.string(),
+    address_number: z.string(),
+    address_complement: z.string().optional(),
+    address_neighborhood: z.string(),
+    city: z.string(),
+    state: z.string(),
+    country: z.string().optional(),
+    zip_code: z.string(),
+  }),
 };
 
 const memberCore = {
@@ -33,7 +35,7 @@ const memberCore = {
     }
   ),
   phone: z.string(),
-  ...memberAddress
+  ...memberAddress,
 };
 
 const memberResume = {

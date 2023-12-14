@@ -2,64 +2,68 @@ import {z} from "zod";
 import {buildJsonSchemas} from "fastify-zod";
 
 const trainingRecordId = {
-    id: z.string()
+  id: z.string()
 }
 
 const trainingRecordDateCreated = {
-    updated_at: z.date(),
+  updated_at: z.date(),
 };
 
 const trainingRecordInput = {
-    type: z.string(),
-    status_training: z.string(),
-    training_id: z.string(),
-    personal_trainer_id: z.string(),
-    member_id: z.string(),
+  type: z.enum(['Plan', 'Singular', 'Replacement']),
+  status: z.enum(['Reschedule', 'Realized', 'Foul']),
+  training_id: z.string(),
+  personal_trainer_id: z.string(),
+  member_id: z.string(),
 };
 
 const trainingRecordResume = {
-    ...trainingRecordId,
-    type: z.string(),
-    status_training: z.string(),
-    training_id: z.string(),
-    personal_trainer: z.object({
-        name: z.string(),
-        id: z.string().optional(),
+  ...trainingRecordId,
+  type: z.enum(['Plan', 'Singular', 'Replacement']),
+  status: z.enum(['Reschedule', 'Realized', 'Foul']),
+  training_id: z.string(),
+  personal_trainer: z.object({
+    user: z.object({
+      name: z.string(),
+      id: z.string().optional(),
     }),
-    member: z.object({
-        name: z.string(),
-        id: z.string().optional(),
+  }),
+  member: z.object({
+    user: z.object({
+      name: z.string(),
+      id: z.string().optional(),
     }),
-    created_at: z.date(),
+  }),
+  created_at: z.date(),
 };
 
 const trainingRecordFindUniqueSchema = z.object({
-    ...trainingRecordResume,
-    ...trainingRecordDateCreated
+  ...trainingRecordResume,
+  ...trainingRecordDateCreated
 });
 
 const trainingRecordFindManyScheme = z.object({
-    ...trainingRecordResume,
+  ...trainingRecordResume,
 });
 
 
 const trainingRecordsQueryStringSchema = z.object({
-    id: z.string().optional(),
-    training_id: z.string().optional(),
-    personal_trainer_id: z.string().optional(),
-    member_id: z.string().optional(),
+  id: z.string().optional(),
+  training_id: z.string().optional(),
+  personal_trainer_id: z.string().optional(),
+  member_id: z.string().optional(),
 });
 
 const createTrainingRecordSchema = z.object({
-    ...trainingRecordInput,
+  ...trainingRecordInput,
 });
 
 const updateTrainingRecordSchema = z.object({
-    status_training: z.string().optional(),
+  status: z.enum(['Reschedule', 'Realized', 'Foul']),
 });
 
 const TrainingRecordIdSchema = z.object({
-    ...trainingRecordId
+  ...trainingRecordId
 });
 
 export type CreateTrainingRecordInput = z.infer<typeof createTrainingRecordSchema>;
@@ -70,10 +74,10 @@ export type TrainingRecordsQueryString = z.infer<typeof trainingRecordsQueryStri
 
 
 export const {schemas: trainingRecordSchemas, $ref} = buildJsonSchemas({
-    createTrainingRecordSchema,
-    trainingRecordFindManyScheme,
-    trainingRecordFindUniqueSchema,
-    TrainingRecordIdSchema,
-    updateTrainingRecordSchema,
-    trainingRecordsQueryStringSchema,
+  createTrainingRecordSchema,
+  trainingRecordFindManyScheme,
+  trainingRecordFindUniqueSchema,
+  TrainingRecordIdSchema,
+  updateTrainingRecordSchema,
+  trainingRecordsQueryStringSchema,
 }, {$id: "TrainingRecordSchemas"});

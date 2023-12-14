@@ -5,8 +5,7 @@ import {
   findUniqueMember,
   findMemberByEmail,
   findManyMembers,
-  updateMember,
-  disableMember
+  updateMember
 } from "./member.service";
 import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
 import {invalidLoginMessage} from "./member.mesages";
@@ -46,7 +45,7 @@ export async function loginHandler(request: FastifyRequest<{
   )
 
   if (correctPassword) {
-    const {password, salt, id, name} = member;
+    const {id, name} = member;
     const dataMember = {id, name};
     const expiresIn = 60 * 120;
     return {accessToken: server.jwt.sign(dataMember, {expiresIn})};
@@ -89,15 +88,6 @@ export async function updateMemberHandler(request: FastifyRequest<{
       user_id: request.user.id,
       user_role: request.user.role
     });
-}
-
-export async function disableMemberHandler(request: FastifyRequest<{
-  Body: UpdateMember;
-  Params: MemberId
-}>) {
-  return disableMember({
-    ...request.params
-  });
 }
 
 export async function deleteMemberHandler(request: FastifyRequest<{
