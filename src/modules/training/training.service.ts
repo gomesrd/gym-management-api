@@ -7,6 +7,9 @@ import {
   UpdateTraining
 } from "./training.schema";
 import {Prisma} from "@prisma/client";
+import {queryUserRole} from "../../utils/permissions.service";
+import {parseFiltersTraining} from "../../utils/parseFilters";
+import {Filters} from "../../utils/common.schema";
 
 export async function createTraining(input: CreateTrainingInput) {
 
@@ -15,20 +18,17 @@ export async function createTraining(input: CreateTrainingInput) {
   });
 }
 
-export async function findManyTrainings(filters: TrainingsQueryString, data: any & {
-  user_id: string,
-  user_role: string
-}) {
-  const personal_trainer_id = (data.user_role === 'personal_trainer') ? data.user_id : filters.personal_trainer_id;
-  const member_id = (data.user_role === 'member') ? data.user_id : filters.member_id;
-  const deleted = (data.user_role !== 'Admin') ? false : filters.deleted;
+export async function findManyTrainings(filters: Filters, userId: string) {
+
+  const userRole = await queryUserRole(userId);
+  const applyFilters = await parseFiltersTraining(filters, userRole, userId);
+
 
   return prisma.training.findMany({
     where: {
-      id: filters.id,
-      member_id: member_id,
-      personal_trainer_id: personal_trainer_id,
-      deleted: deleted,
+      member_id: applyFilters.member_id,
+      personal_trainer_id: applyFilters.personal_trainer_id,
+      deleted: applyFilters.deleted,
       fixed_day: filters.fixed_day,
       single_date: filters.single_date,
       start_time: filters.start_time,
@@ -80,7 +80,7 @@ export async function findManyTrainings(filters: TrainingsQueryString, data: any
   });
 }
 
-export async function findUniqueTraining(params: GetTraining & { user_id: string, user_role: string }) {
+export async function findUniqueTraining(params: GetTraining, userId: string) {
   const personal_trainer_id = (params.user_role === 'personal_trainer') ? params.user_id : undefined;
   const member_id = (params.user_role === 'member') ? params.user_id : undefined;
   const deleted = (params.user_role !== 'Admin') ? true : undefined;
@@ -137,11 +137,8 @@ export async function findUniqueTraining(params: GetTraining & { user_id: string
   });
 }
 
-export async function updateTraining(data: UpdateTraining, params: GetTraining & {
-  user_id: string,
-  user_role: string
-}) {
-  const personal_trainer_id = (params.user_role !== 'Admin') ? params.user_id : undefined;
+export async function updateTraining(data: UpdateTraining, params: GetTraining, userId: string) {
+  const personal_trainer_id = (params.user_role !== 'Admin') ? userId : undefined;
   try {
     return await prisma.training.update({
       where: {
@@ -167,7 +164,7 @@ export async function updateTraining(data: UpdateTraining, params: GetTraining &
   }
 }
 
-export async function deleteTraining(data: DeleteTraining) {
+export async function deleteTraining(data: DeleteTraining, userId: string) {
   return prisma.training.delete({
     where: {
       id: data.id,

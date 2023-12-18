@@ -1,10 +1,19 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
-  createPersonalTrainer, deletePersonalTrainer, findUniquePersonalTrainer, findPersonalTrainerByEmail,
-  findManyPersonalTrainers, updatePersonalTrainer
+  createPersonalTrainer,
+  deletePersonalTrainer,
+  findManyPersonalTrainers,
+  findPersonalTrainerByEmail,
+  findUniquePersonalTrainer,
+  updatePersonalTrainer
 } from "./personalTrainer.service";
 import {
-  CreatePersonalTrainerInput, DeletePersonalTrainer, LoginInput, PersonalTrainerId, UpdatePersonalTrainer
+  CreatePersonalTrainerInput,
+  DeletePersonalTrainer,
+  LoginInput,
+  PersonalTrainerId,
+  PersonalTrainersManyResponse,
+  UpdatePersonalTrainer
 } from "./personalTrainer.schema";
 import {invalidLoginMessage} from "./personalTrainer.mesages";
 import {verifyPassword} from "../../utils/hash";
@@ -64,11 +73,12 @@ export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
   }, userId)
 }
 
-export async function getManyPersonalTrainersHandler() {
+export async function getManyPersonalTrainersHandler(): Promise<PersonalTrainersManyResponse | undefined> {
   try {
-    return findManyPersonalTrainers();
+    return await findManyPersonalTrainers();
   } catch (e) {
     console.log(e)
+    return undefined;
   }
 }
 

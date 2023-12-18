@@ -55,10 +55,14 @@ const passwordPersonalTrainer = {
 const personalTrainerResume = {
   id: z.string(),
   name: z.string(),
-  deleted: z.boolean(),
+  deleted: z.boolean().nullable(),
   personal_trainer: z.object({
     occupation: z.enum(['Personal_Trainer', 'Physiotherapist']),
-  }),
+  }).nullable(),
+};
+
+const personalTrainerCount = {
+  count: z.number()
 };
 
 const personalTrainerFindUnique = {
@@ -68,7 +72,9 @@ const personalTrainerFindUnique = {
 };
 
 const personalTrainerFindMany = {
-  ...personalTrainerResume,
+  data: z.array(z.object({
+    ...personalTrainerResume,
+  }))
 };
 
 const createPersonalTrainerSchema = z.object({
@@ -90,7 +96,8 @@ const PersonalTrainerUniqueResponseSchema = z.object({
 });
 
 const PersonalTrainersManyResponseSchema = z.object({
-  ...personalTrainerFindMany
+  ...personalTrainerCount,
+  ...personalTrainerFindMany,
 });
 
 const loginSchema = z.object({
@@ -117,6 +124,8 @@ export type DeletePersonalTrainer = z.infer<typeof PersonalTrainerIdSchema>;
 export type LoginInput = z.infer<typeof loginSchema>
 export type PersonalTrainerId = z.infer<typeof PersonalTrainerIdSchema>;
 export type UpdatePersonalTrainer = z.infer<typeof updatePersonalTrainerSchema>;
+export type PersonalTrainerUniqueResponse = z.infer<typeof PersonalTrainerUniqueResponseSchema>;
+export type PersonalTrainersManyResponse = z.infer<typeof PersonalTrainersManyResponseSchema>;
 
 export const {schemas: personalTrainerSchemas, $ref} = buildJsonSchemas({
   createPersonalTrainerSchema,

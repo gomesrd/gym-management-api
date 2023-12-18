@@ -16,10 +16,7 @@ async function personalTrainerRoutes(server: FastifyInstance) {
       tags: ['PersonalTrainer'],
       summary: 'Get all Personal Trainers',
       response: {
-        200: {
-          type: 'array',
-          items: $ref('PersonalTrainersManyResponseSchema')
-        },
+        200: $ref('PersonalTrainersManyResponseSchema'),
       },
     },
   }, getManyPersonalTrainersHandler);

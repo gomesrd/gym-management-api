@@ -1,6 +1,8 @@
 import prisma from "../../config/prisma";
-import {CreateMemberInput, DeleteMember, MemberId, UpdateMember} from "./member.schema";
+import {CreateMemberInput, DeleteMember, Filters, MemberId, UpdateMember} from "./member.schema";
 import {hashPassword} from "../../utils/hash";
+import {queryUserRole} from "../../utils/permissions.service";
+import {parseFiltersCommon} from "../../utils/parseFilters";
 
 export async function createMember(input: CreateMemberInput) {
   const {
@@ -32,13 +34,24 @@ export async function findMemberByEmail(email: string) {
   return prisma.user.findUnique({
     where: {
       email,
-      deleted: true
+      deleted: false
     },
   });
 }
 
-export async function findManyMembers() {
-  return prisma.user.findMany({
+export async function findManyMembers(filters: Filters) {
+  const applyFilters = await parseFiltersCommon(filters);
+
+  const membersCount = await prisma.user.count({
+    where: {
+      deleted: applyFilters.deleted
+    }
+  });
+
+  const members = await prisma.user.findMany({
+    where: {
+      deleted: applyFilters.deleted
+    },
     select: {
       id: true,
       name: true,
@@ -49,22 +62,25 @@ export async function findManyMembers() {
       phone: false,
       password: false,
       salt: false,
-      deleted: false,
+      deleted: true,
       created_at: false,
       updated_at: false,
     }
   });
+
+  return {
+    count: membersCount,
+    data: members
+  };
+
 }
 
-export async function findUniqueMember(data: MemberId & {
-  user_id: string, user_role: string
-}) {
-  const id = (data.user_role === 'Admin' || 'personal_trainer') ? data.id : data.user_id;
-  const deleted = (data.user_role !== 'Admin') ? false : undefined;
+export async function findUniqueMember(data: MemberId, userId: string) {
+  const userRole = await queryUserRole(userId);
+  const id = (userRole === 'Admin') ? userId : data.id;
   return prisma.user.findUnique({
     where: {
       id: id,
-      deleted: deleted
     },
     select: {
       id: true,
@@ -94,11 +110,32 @@ export async function findUniqueMember(data: MemberId & {
   });
 }
 
-export async function updateMember(data: UpdateMember, params: MemberId & {
-  user_id: string, user_role: string
-}) {
-  if (params.user_role !== 'Admin' && params.user_id !== params.id) {
-    return Promise.reject('You do not have permission to realize this action');
+export async function findUniqueMemberResume(data: MemberId, userId: string) {
+  return prisma.user.findUnique({
+    where: {
+      id: data.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      cpf: false,
+      birth_date: true,
+      email: true,
+      phone: true,
+      password: false,
+      salt: false,
+      deleted: true,
+      created_at: true,
+      updated_at: true,
+    }
+  });
+}
+
+export async function updateMember(data: UpdateMember, params: MemberId, userId: string) {
+  const userRole = await queryUserRole(userId);
+
+  if (userRole !== 'Admin' && userId !== params.id) {
+    return Promise.reject({message: 'You do not have permission to realize this action', status: 403});
   }
   return prisma.user.update({
     where: {
@@ -113,11 +150,11 @@ export async function updateMember(data: UpdateMember, params: MemberId & {
   });
 }
 
-export async function deleteMember(params: DeleteMember & {
-  user_id: string, user_role: string
-}) {
-  if (params.user_role !== 'Admin' && params.user_id !== params.id) {
-    return Promise.reject('You do not have permission to realize this action');
+export async function deleteMember(params: DeleteMember, userId: string) {
+  const userRole = await queryUserRole(userId);
+
+  if (userRole !== 'Admin' && userId !== params.id) {
+    return Promise.reject({message: 'You do not have permission to realize this action', code: 403});
   }
   return prisma.user.update({
     where: {

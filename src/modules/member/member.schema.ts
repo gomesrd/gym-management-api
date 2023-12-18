@@ -35,23 +35,41 @@ const memberCore = {
     }
   ),
   phone: z.string(),
-  ...memberAddress,
+  deleted: z.boolean(),
 };
 
 const memberResume = {
+  id: z.string(),
   name: z.string(),
   phone: z.string().optional(),
+  deleted: z.boolean(),
+};
+
+const memberCount = {
+  count: z.number()
+};
+
+const memberFindUniqueResume = {
+  id: z.string(),
+  name: z.string(),
+  birth_date: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  deleted: z.boolean(),
+  ...memberDate
 };
 
 const memberFindUnique = {
   ...memberId,
   ...memberCore,
+  ...memberAddress,
   ...memberDate,
 };
 
 const memberFindMany = {
-  ...memberId,
-  ...memberResume
+  data: z.array(z.object({
+    ...memberResume
+  }))
 };
 
 const memberPassword = {
@@ -63,6 +81,7 @@ const memberPassword = {
 
 const createMemberSchema = z.object({
   ...memberCore,
+  ...memberAddress,
   ...memberPassword,
 });
 
@@ -79,8 +98,18 @@ const MemberResponseSchema = z.object({
 });
 
 const MembersResponseSchema = z.object({
+  ...memberCount,
   ...memberFindMany
 });
+
+const MemberResumeResponseSchema = z.object({
+  ...memberFindUniqueResume
+});
+
+const filtersSchema = z.object({
+  deleted: z.string().default('true')
+});
+
 
 const loginSchema = z.object({
   email: z.string({
@@ -106,6 +135,7 @@ export type DeleteMember = z.infer<typeof MemberIdSchema>;
 export type LoginInput = z.infer<typeof loginSchema>
 export type MemberId = z.infer<typeof MemberIdSchema>;
 export type UpdateMember = z.infer<typeof updateMemberSchema>;
+export type Filters = z.infer<typeof filtersSchema>;
 
 export const {schemas: memberSchemas, $ref} = buildJsonSchemas({
   createMemberSchema,
@@ -116,4 +146,6 @@ export const {schemas: memberSchemas, $ref} = buildJsonSchemas({
   MemberIdSchema,
   MembersResponseSchema,
   updateMemberSchema,
+  filtersSchema,
+  MemberResumeResponseSchema
 }, {$id: "memberSchemas"});

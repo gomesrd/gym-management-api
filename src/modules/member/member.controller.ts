@@ -5,9 +5,9 @@ import {
   findUniqueMember,
   findMemberByEmail,
   findManyMembers,
-  updateMember
+  updateMember, findUniqueMemberResume
 } from "./member.service";
-import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
+import {CreateMemberInput, DeleteMember, Filters, LoginInput, MemberId, UpdateMember} from "./member.schema";
 import {invalidLoginMessage} from "./member.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
@@ -57,18 +57,30 @@ export async function loginHandler(request: FastifyRequest<{
 export async function getUniqueMemberHandler(request: FastifyRequest<{
   Params: MemberId;
 }>) {
+  const userId = request.user.id;
+
   return findUniqueMember({
     ...request.params,
-    user_id: request.user.id,
-    user_role: request.user.role
-  });
+  }, userId);
 }
 
-export async function getManyMembersHandler(request: FastifyRequest) {
+export async function getUniqueMemberHandlerResume(request: FastifyRequest<{
+  Params: MemberId;
+}>) {
+  const userId = request.user.id;
 
+  return findUniqueMemberResume({
+    ...request.params,
+  }, userId);
+}
+
+export async function getManyMembersHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>) {
+  const filters = request.query;
   try {
     return findManyMembers({
-      user_id: request.user.id,
+      ...filters
     });
   } catch (e) {
     console.log(e)
@@ -79,24 +91,22 @@ export async function updateMemberHandler(request: FastifyRequest<{
   Body: UpdateMember;
   Params: MemberId;
 }>) {
+  const userId = request.user.id;
   return updateMember(
     {
       ...request.body
     },
     {
       ...request.params,
-      user_id: request.user.id,
-      user_role: request.user.role
-    });
+    }, userId);
 }
 
 export async function deleteMemberHandler(request: FastifyRequest<{
   Params: DeleteMember;
 }>, reply: FastifyReply) {
+  const userId = request.user.id;
   await deleteMember({
     ...request.params,
-    user_id: request.user.id,
-    user_role: request.user.role
-  });
+  }, userId);
   return reply.code(200).send('');
 }

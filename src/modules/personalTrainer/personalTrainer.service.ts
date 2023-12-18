@@ -90,8 +90,20 @@ export async function findUniquePersonalTrainer(data: PersonalTrainerId,
 }
 
 export async function findManyPersonalTrainers() {
+  const countOfPersonalTrainers = await prisma.user.count({
+    where: {
+      personal_trainer: {
+        isNot: null,
+      },
+    },
+  });
 
-  return prisma.user.findMany({
+  const personalTrainers = await prisma.user.findMany({
+    where: {
+      personal_trainer: {
+        isNot: null
+      }
+    },
     select: {
       id: true,
       name: true,
@@ -101,8 +113,13 @@ export async function findManyPersonalTrainers() {
         }
       },
       deleted: true,
-    }
+    },
   });
+
+  return {
+    data: personalTrainers,
+    count: countOfPersonalTrainers,
+  };
 }
 
 export async function updatePersonalTrainer(data: UpdatePersonalTrainer, params: PersonalTrainerId,

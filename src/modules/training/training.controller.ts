@@ -3,7 +3,6 @@ import {
   CreateTrainingInput,
   DeleteTraining,
   GetTraining,
-  TrainingsQueryString,
   UpdateTraining
 } from "./training.schema";
 import {
@@ -13,6 +12,7 @@ import {
   findUniqueTraining,
   updateTraining
 } from "./training.service";
+import {Filters} from "../../utils/common.schema";
 
 
 export async function registerTrainingHandler(request: FastifyRequest<{
@@ -41,13 +41,11 @@ export async function registerTrainingHandler(request: FastifyRequest<{
 }
 
 export async function getManyTrainingsHandler(request: FastifyRequest<{
-  Querystring: TrainingsQueryString;
+  Querystring: Filters;
 }>) {
   try {
-    return findManyTrainings({...request.query}, {
-      user_id: request.user.id,
-      user_role: request.user.role
-    });
+    const userId = request.user.id;
+    return findManyTrainings({...request.query}, userId);
   } catch (e) {
     console.log(e)
   }
@@ -56,32 +54,34 @@ export async function getManyTrainingsHandler(request: FastifyRequest<{
 export async function getUniqueTrainingHandler(request: FastifyRequest<{
   Params: GetTraining;
 }>) {
+  const userId = request.user.id;
+
   return findUniqueTraining({
-    ...request.params,
-    user_id: request.user.id,
-    user_role: request.user.role
-  });
+    ...request.params
+  }, userId);
 }
 
 export async function updateTrainingHandler(request: FastifyRequest<{
   Body: UpdateTraining;
   Params: GetTraining;
 }>) {
+  const userId = request.user.id;
+
   return updateTraining({
     ...request.body
   }, {
     ...request.params,
-    user_id: request.user.id,
-    user_role: request.user.role
-  });
+  }, userId);
 
 }
 
 export async function deleteTrainingHandler(request: FastifyRequest<{
   Params: DeleteTraining;
 }>, reply: FastifyReply) {
+  const userId = request.user.id;
+
   await deleteTraining({
     ...request.params
-  });
+  }, userId);
   return reply.code(200).send('');
 }
