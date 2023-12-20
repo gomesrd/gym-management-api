@@ -7,10 +7,11 @@ import {
   findManyMembers,
   updateMember, findUniqueMemberResume
 } from "./member.service";
-import {CreateMemberInput, DeleteMember, Filters, LoginInput, MemberId, UpdateMember} from "./member.schema";
+import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
 import {invalidLoginMessage} from "./member.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
+import {Filters} from "../../utils/common.schema";
 
 export async function registerMemberHandler(request: FastifyRequest<{
   Body: CreateMemberInput
@@ -78,10 +79,11 @@ export async function getManyMembersHandler(request: FastifyRequest<{
   Querystring: Filters;
 }>) {
   const filters = request.query;
+  const userId = request.user.id;
   try {
     return findManyMembers({
       ...filters
-    });
+    }, userId);
   } catch (e) {
     console.log(e)
   }

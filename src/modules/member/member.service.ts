@@ -1,8 +1,9 @@
 import prisma from "../../config/prisma";
-import {CreateMemberInput, DeleteMember, Filters, MemberId, UpdateMember} from "./member.schema";
+import {CreateMemberInput, DeleteMember, MemberId, UpdateMember} from "./member.schema";
 import {hashPassword} from "../../utils/hash";
 import {queryUserRole} from "../../utils/permissions.service";
-import {parseFiltersCommon} from "../../utils/parseFilters";
+import {parseFiltersCommon, parseFiltersPermission} from "../../utils/parseFilters";
+import {Filters} from "../../utils/common.schema";
 
 export async function createMember(input: CreateMemberInput) {
   const {
@@ -39,17 +40,29 @@ export async function findMemberByEmail(email: string) {
   });
 }
 
-export async function findManyMembers(filters: Filters) {
-  const applyFilters = await parseFiltersCommon(filters);
+export async function findManyMembers(filters: Filters, userId: string) {
+  const applyFilters = await parseFiltersCommon(filters, userId);
 
   const membersCount = await prisma.user.count({
     where: {
+      name: {
+        contains: filters.name,
+        mode: 'insensitive',
+      },
+      cpf: filters.cpf,
+      email: filters.email,
       deleted: applyFilters.deleted
     }
   });
 
   const members = await prisma.user.findMany({
     where: {
+      name: {
+        contains: filters.name,
+        mode: 'insensitive',
+      },
+      cpf: filters.cpf,
+      email: filters.email,
       deleted: applyFilters.deleted
     },
     select: {
@@ -76,11 +89,11 @@ export async function findManyMembers(filters: Filters) {
 }
 
 export async function findUniqueMember(data: MemberId, userId: string) {
-  const userRole = await queryUserRole(userId);
-  const id = (userRole === 'Admin') ? userId : data.id;
+  const applyFilters = await parseFiltersPermission(userId, data.id);
+
   return prisma.user.findUnique({
     where: {
-      id: id,
+      id: applyFilters.user_id,
     },
     select: {
       id: true,

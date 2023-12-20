@@ -182,10 +182,9 @@ model MemberPlan {
   @@map("member_plan")
 }
 
-// TODO - Criar filtros para personal trainer
-// TODO - Criar filtros para members
 // TODO - Criar relatório de treinos (count de treinos realizados, faltas, etc)
 // TODO - Criar paginação
 // TODO - Criar validação para cpf
 // TODO - Criar buscar por nome
 // TODO - Criar endpoints Planos
+// TODO - Criar DATA E COUNT para trainings e trainings records

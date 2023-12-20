@@ -3,6 +3,7 @@ import {CreatePersonalTrainerInput, PersonalTrainerId, UpdatePersonalTrainer} fr
 import {hashPassword} from "../../utils/hash";
 import {queryUserRole} from "../../utils/permissions.service";
 import {Filters} from "../../utils/common.schema";
+import {parseFiltersPermission} from "../../utils/parseFilters";
 
 export async function createPersonalTrainer(input: CreatePersonalTrainerInput) {
   const {
@@ -47,15 +48,12 @@ export async function findPersonalTrainerByEmail(email: string) {
 
 export async function findUniquePersonalTrainer(data: PersonalTrainerId,
                                                 userId: string) {
-
-  const userRole = await queryUserRole(userId);
-  const id = (userRole !== 'Admin') ? userId : data.id;
-  const deleted = (userRole !== 'Admin') ? false : undefined;
+  const applyFilters = await parseFiltersPermission(userId, data.id);
 
   return prisma.user.findUnique({
     where: {
-      id: id,
-      deleted: deleted
+      id: applyFilters.user_id,
+      deleted: applyFilters.deleted
     },
     select: {
       id: true,
@@ -93,8 +91,10 @@ export async function findUniquePersonalTrainer(data: PersonalTrainerId,
 export async function findManyPersonalTrainers(filters: Filters) {
   const countOfPersonalTrainers = await prisma.user.count({
     where: {
-      id: filters.id,
-      name: filters.name,
+      name: {
+        contains: filters.name,
+        mode: 'insensitive',
+      },
       cpf: filters.cpf,
       email: filters.email,
       personal_trainer: {
@@ -105,10 +105,15 @@ export async function findManyPersonalTrainers(filters: Filters) {
 
   const personalTrainers = await prisma.user.findMany({
     where: {
-      id: filters.id,
+      name: {
+        contains: filters.name,
+        mode: 'insensitive',
+      },
+      cpf: filters.cpf,
+      email: filters.email,
       personal_trainer: {
         is: {occupation: filters.occupation} || {not: null}
-      }
+      },
     },
     select: {
       id: true,
