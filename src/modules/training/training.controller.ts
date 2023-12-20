@@ -92,6 +92,6 @@ export async function deleteTrainingHandler(request: FastifyRequest<{
 
   await deleteTraining({
     ...request.params
-  }, userId);
+  });
   return reply.code(200).send('');
 }

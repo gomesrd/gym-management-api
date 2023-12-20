@@ -17,24 +17,30 @@ const trainingRecordInput = {
   member_id: z.string(),
 };
 
+const trainingRecordCount = {
+  count: z.number()
+};
+
 const trainingRecordResume = {
-  ...trainingRecordId,
-  type: z.enum(['Plan', 'Singular', 'Replacement']),
-  status: z.enum(['Reschedule', 'Realized', 'Foul']),
-  training_id: z.string(),
-  personal_trainer: z.object({
-    user: z.object({
-      name: z.string(),
-      id: z.string().optional(),
+  data: z.array(z.object({
+    ...trainingRecordId,
+    type: z.enum(['Plan', 'Singular', 'Replacement']),
+    status: z.enum(['Reschedule', 'Realized', 'Foul']),
+    training_id: z.string(),
+    personal_trainer: z.object({
+      user: z.object({
+        name: z.string(),
+        id: z.string().optional(),
+      }),
     }),
-  }),
-  member: z.object({
-    user: z.object({
-      name: z.string(),
-      id: z.string().optional(),
+    member: z.object({
+      user: z.object({
+        name: z.string(),
+        id: z.string().optional(),
+      }),
     }),
-  }),
-  created_at: z.date(),
+    created_at: z.date(),
+  })),
 };
 
 const trainingRecordFindUniqueSchema = z.object({
@@ -43,6 +49,7 @@ const trainingRecordFindUniqueSchema = z.object({
 });
 
 const trainingRecordFindManyScheme = z.object({
+  ...trainingRecordCount,
   ...trainingRecordResume,
 });
 

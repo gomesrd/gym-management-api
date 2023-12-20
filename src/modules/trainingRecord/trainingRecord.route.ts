@@ -20,10 +20,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
         }
       },
       response: {
-        200: {
-          type: 'array',
-          items: $ref('trainingRecordFindManyScheme')
-        }
+        200: $ref('trainingRecordFindManyScheme')
       }
     }
   }, getManyTrainingRecordsHandler);

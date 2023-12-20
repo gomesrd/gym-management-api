@@ -3,11 +3,9 @@ import {
   CreateTrainingInput,
   DeleteTraining,
   GetTraining,
-  TrainingsQueryString,
   UpdateTraining
 } from "./training.schema";
 import {Prisma} from "@prisma/client";
-import {queryUserRole} from "../../utils/permissions.service";
 import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
 import {Filters} from "../../utils/common.schema";
 
@@ -19,10 +17,9 @@ export async function createTraining(input: CreateTrainingInput) {
 }
 
 export async function findManyTrainings(filters: Filters, userId: string) {
-
   const applyFilters = await parseFiltersTraining(filters, userId);
 
-  return prisma.training.findMany({
+  const trainingsCount = await prisma.training.count({
     where: {
       member_id: applyFilters.member_id,
       personal_trainer_id: applyFilters.personal_trainer_id,
@@ -32,6 +29,27 @@ export async function findManyTrainings(filters: Filters, userId: string) {
       start_time: filters.start_time,
       modality: filters.modality,
       type: filters.type,
+      created_at: {
+        gte: filters.created_at_gte,
+        lte: filters.created_at_lte,
+      },
+    }
+  });
+
+  const trainings = await prisma.training.findMany({
+    where: {
+      member_id: applyFilters.member_id,
+      personal_trainer_id: applyFilters.personal_trainer_id,
+      deleted: applyFilters.deleted,
+      fixed_day: filters.fixed_day,
+      single_date: filters.single_date,
+      start_time: filters.start_time,
+      modality: filters.modality,
+      type: filters.type,
+      created_at: {
+        gte: filters.created_at_gte,
+        lte: filters.created_at_lte,
+      },
     },
     select: {
       id: true,
@@ -76,6 +94,11 @@ export async function findManyTrainings(filters: Filters, userId: string) {
       },
     }
   });
+
+  return {
+    count: trainingsCount,
+    data: trainings,
+  }
 }
 
 export async function findUniqueTraining(params: GetTraining, userId: string) {
@@ -161,7 +184,7 @@ export async function updateTraining(data: UpdateTraining, params: GetTraining, 
   }
 }
 
-export async function deleteTraining(data: DeleteTraining, userId: string) {
+export async function deleteTraining(data: DeleteTraining) {
   return prisma.training.delete({
     where: {
       id: data.id,

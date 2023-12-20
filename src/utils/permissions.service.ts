@@ -40,7 +40,7 @@ export async function personalTrainerValidate(userId: string, personalTrainerId:
   const personalTrainerValidate = userId === personalTrainerId;
   const memberValidate = userId === memberId;
 
-  if (personalTrainerValidate) {
+  if (!personalTrainerValidate) {
     return ('You can\'t register trainings for another personal trainer')
   }
 

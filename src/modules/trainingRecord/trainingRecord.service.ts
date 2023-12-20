@@ -1,9 +1,8 @@
 import prisma from "../../config/prisma";
 import {
   CreateTrainingRecordInput, DeleteTrainingRecord, GetTrainingRecord,
-  TrainingRecordsQueryString, UpdateTrainingRecord
+  UpdateTrainingRecord
 } from "./trainingRecord.schema";
-import {queryUserRole} from "../../utils/permissions.service";
 import {Filters} from "../../utils/common.schema";
 import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
 
@@ -16,12 +15,31 @@ export async function createTrainingRecord(input: CreateTrainingRecordInput) {
 export async function findManyTrainingRecords(filters: Filters, userId: string) {
   const applyFilters = await parseFiltersTraining(filters, userId);
 
-  return prisma.trainingRecord.findMany({
+  const trainingRecordsCount = await prisma.trainingRecord.count({
     where: {
-      id: filters.id,
       training_id: filters.training_id,
       member_id: applyFilters.member_id,
       personal_trainer_id: applyFilters.personal_trainer_id,
+      status: filters.status,
+      type: filters.type,
+      created_at: {
+        gte: filters.created_at_gte,
+        lte: filters.created_at_lte,
+      },
+    }
+  });
+
+  const trainingRecordes = await prisma.trainingRecord.findMany({
+    where: {
+      training_id: filters.training_id,
+      member_id: applyFilters.member_id,
+      personal_trainer_id: applyFilters.personal_trainer_id,
+      status: filters.status,
+      type: filters.type,
+      created_at: {
+        gte: filters.created_at_gte,
+        lte: filters.created_at_lte,
+      },
     },
     select: {
       id: true,
@@ -66,6 +84,12 @@ export async function findManyTrainingRecords(filters: Filters, userId: string) 
       updated_at: false
     }
   });
+
+  return {
+    count: trainingRecordsCount,
+    data: trainingRecordes,
+  }
+
 }
 
 export async function findUniqueTrainingRecord(params: GetTrainingRecord, userId: string) {

@@ -11,12 +11,12 @@ services:
       POSTGRES_PASSWORD: 15059471
       POSTGRES_DB: postgres
 
-  postgres-prod:
-    image: "postgres:11"
-    container_name: "gym_postgres_prod"
-    ports:
-      - "54320:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 15059471
-      POSTGRES_DB: postgres
+#  postgres-prod:
+#    image: "postgres:11"
+#    container_name: "gym_postgres_prod"
+#    ports:
+#      - "54320:5432"
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: 15059471
+#      POSTGRES_DB: postgres

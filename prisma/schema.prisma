@@ -182,6 +182,7 @@ model MemberPlan {
   @@map("member_plan")
 }
 
+// TODO - Implementar integração com cognito ou firebase
 // TODO - Criar relatório de treinos (count de treinos realizados, faltas, etc)
 // TODO - Criar paginação
 // TODO - Criar validação para cpf

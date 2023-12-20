@@ -18,6 +18,7 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
   const personalTrainerId = request.body.personal_trainer_id;
   const memberId = request.body.member_id;
 
+  console.log(userId, personalTrainerId, memberId)
   const invalidRequest = await personalTrainerValidate(userId, personalTrainerId, memberId);
   if (invalidRequest) {
     return reply.code(403).send(invalidRequest)
