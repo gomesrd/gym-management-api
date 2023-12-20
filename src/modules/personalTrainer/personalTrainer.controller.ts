@@ -18,6 +18,7 @@ import {
 import {invalidLoginMessage} from "./personalTrainer.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
+import {Filters} from "../member/member.schema";
 
 export async function registerPersonalTrainerHandler(request: FastifyRequest<{
   Body: CreatePersonalTrainerInput
@@ -73,9 +74,12 @@ export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
   }, userId)
 }
 
-export async function getManyPersonalTrainersHandler(): Promise<PersonalTrainersManyResponse | undefined> {
+export async function getManyPersonalTrainersHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>): Promise<PersonalTrainersManyResponse | undefined> {
+  const filters = request.query
   try {
-    return await findManyPersonalTrainers();
+    return await findManyPersonalTrainers(filters);
   } catch (e) {
     console.log(e)
     return undefined;

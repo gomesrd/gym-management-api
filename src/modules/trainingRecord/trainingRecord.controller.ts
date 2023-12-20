@@ -7,16 +7,21 @@ import {
   createTrainingRecord, deleteTrainingRecord, findUniqueTrainingRecord, findManyTrainingRecords,
   updateTrainingRecord
 } from "./trainingRecord.service";
+import {personalTrainerValidate} from "../../utils/permissions.service";
 
 
 export async function registerTrainingRecordHandler(request: FastifyRequest<{
   Body: CreateTrainingRecordInput
 }>, reply: FastifyReply) {
-  const personalTrainerValidate = request.user.id === request.body.personal_trainer_id;
-  if (!personalTrainerValidate) {
-    return reply.code(403).send('You can only register trainings for yourself')
-  }
   const body = request.body;
+  const userId = request.user.id;
+  const personalTrainerId = request.body.personal_trainer_id;
+  const memberId = request.body.member_id;
+
+  const invalidRequest = await personalTrainerValidate(userId, personalTrainerId, memberId);
+  if (invalidRequest) {
+    return reply.code(403).send(invalidRequest)
+  }
   try {
     const trainingRecord = await createTrainingRecord(body);
     return reply.code(201).send(trainingRecord)
@@ -29,11 +34,9 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
 export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
   Querystring: TrainingRecordsQueryString;
 }>) {
+  const userId = request.user.id;
   try {
-    return findManyTrainingRecords({...request.query}, {
-      user_id: request.user.id,
-      user_role: request.user.role
-    });
+    return findManyTrainingRecords({...request.query}, userId);
   } catch (e) {
     console.log(e)
   }
@@ -42,13 +45,11 @@ export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
 export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
   Params: GetTrainingRecord;
 }>) {
+  const userId = request.user.id;
 
   return findUniqueTrainingRecord({
     ...request.params
-  }, {
-    user_id: request.user.id,
-    user_role: request.user.role
-  });
+  }, userId);
 }
 
 export async function updateTrainingRecordHandler(request: FastifyRequest<{
@@ -57,8 +58,7 @@ export async function updateTrainingRecordHandler(request: FastifyRequest<{
 }>) {
   return updateTrainingRecord({
     ...request.body
-  }, {...request.params,});
-
+  }, {...request.params})
 }
 
 export async function deleteTrainingRecordHandler(request: FastifyRequest<{

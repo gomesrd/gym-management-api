@@ -8,7 +8,7 @@ import {
 } from "./training.schema";
 import {Prisma} from "@prisma/client";
 import {queryUserRole} from "../../utils/permissions.service";
-import {parseFiltersTraining} from "../../utils/parseFilters";
+import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
 import {Filters} from "../../utils/common.schema";
 
 export async function createTraining(input: CreateTrainingInput) {
@@ -20,9 +20,7 @@ export async function createTraining(input: CreateTrainingInput) {
 
 export async function findManyTrainings(filters: Filters, userId: string) {
 
-  const userRole = await queryUserRole(userId);
-  const applyFilters = await parseFiltersTraining(filters, userRole, userId);
-
+  const applyFilters = await parseFiltersTraining(filters, userId);
 
   return prisma.training.findMany({
     where: {
@@ -81,16 +79,14 @@ export async function findManyTrainings(filters: Filters, userId: string) {
 }
 
 export async function findUniqueTraining(params: GetTraining, userId: string) {
-  const personal_trainer_id = (params.user_role === 'personal_trainer') ? params.user_id : undefined;
-  const member_id = (params.user_role === 'member') ? params.user_id : undefined;
-  const deleted = (params.user_role !== 'Admin') ? true : undefined;
+  const applyFilters = await parseFiltersPermission(userId);
 
   return prisma.training.findMany({
     where: {
       id: params.id,
-      personal_trainer_id: personal_trainer_id,
-      member_id: member_id,
-      deleted: deleted,
+      personal_trainer_id: applyFilters.personal_trainer_id,
+      member_id: applyFilters.member_id,
+      deleted: applyFilters.deleted,
     },
     select: {
       id: true,
@@ -138,12 +134,13 @@ export async function findUniqueTraining(params: GetTraining, userId: string) {
 }
 
 export async function updateTraining(data: UpdateTraining, params: GetTraining, userId: string) {
-  const personal_trainer_id = (params.user_role !== 'Admin') ? userId : undefined;
+  const applyFilters = await parseFiltersPermission(userId);
+
   try {
     return await prisma.training.update({
       where: {
         id: params.id,
-        personal_trainer_id: personal_trainer_id,
+        personal_trainer_id: applyFilters.personal_trainer_id,
       },
       data: {
         start_time: data.start_time,

@@ -2,6 +2,7 @@ import prisma from "../../config/prisma";
 import {CreatePersonalTrainerInput, PersonalTrainerId, UpdatePersonalTrainer} from "./personalTrainer.schema";
 import {hashPassword} from "../../utils/hash";
 import {queryUserRole} from "../../utils/permissions.service";
+import {Filters} from "../../utils/common.schema";
 
 export async function createPersonalTrainer(input: CreatePersonalTrainerInput) {
   const {
@@ -89,19 +90,24 @@ export async function findUniquePersonalTrainer(data: PersonalTrainerId,
   });
 }
 
-export async function findManyPersonalTrainers() {
+export async function findManyPersonalTrainers(filters: Filters) {
   const countOfPersonalTrainers = await prisma.user.count({
     where: {
+      id: filters.id,
+      name: filters.name,
+      cpf: filters.cpf,
+      email: filters.email,
       personal_trainer: {
-        isNot: null,
+        is: {occupation: filters.occupation} || {not: null}
       },
-    },
+    }
   });
 
   const personalTrainers = await prisma.user.findMany({
     where: {
+      id: filters.id,
       personal_trainer: {
-        isNot: null
+        is: {occupation: filters.occupation} || {not: null}
       }
     },
     select: {
@@ -116,8 +122,16 @@ export async function findManyPersonalTrainers() {
     },
   });
 
+  const simplifiedResult = personalTrainers.map((user) => ({
+    id: user.id,
+    name: user.name,
+    deleted: user.deleted,
+    occupation: user.personal_trainer?.occupation,
+  }));
+
+
   return {
-    data: personalTrainers,
+    data: simplifiedResult,
     count: countOfPersonalTrainers,
   };
 }

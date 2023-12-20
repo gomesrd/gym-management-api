@@ -35,3 +35,16 @@ export async function verifyPermissionPersonalTrainer(id: string) {
 export async function verifyPermissionMember(id: string) {
   return verifyUserRole(id, [Role.Member, Role.Admin]);
 }
+
+export async function personalTrainerValidate(userId: string, personalTrainerId: string, memberId: string) {
+  const personalTrainerValidate = userId === personalTrainerId;
+  const memberValidate = userId === memberId;
+
+  if (personalTrainerValidate) {
+    return ('You can\'t register trainings for another personal trainer')
+  }
+
+    if (memberValidate) {
+    return ('You can\'t register training as a personal trainer and member')
+  }
+}

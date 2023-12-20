@@ -64,14 +64,24 @@ export async function getUniqueTrainingHandler(request: FastifyRequest<{
 export async function updateTrainingHandler(request: FastifyRequest<{
   Body: UpdateTraining;
   Params: GetTraining;
-}>) {
+}>, reply: FastifyReply) {
   const userId = request.user.id;
 
-  return updateTraining({
-    ...request.body
-  }, {
-    ...request.params,
-  }, userId);
+  try {
+    return await updateTraining({
+      ...request.body
+    }, {
+      ...request.params,
+    }, userId);
+  } catch (e: any) {
+    console.log(e)
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Training already exists'
+      })
+    }
+    return reply.code(500).send('Something went wrong')
+  }
 
 }
 

@@ -42,8 +42,6 @@ Thumbs.db
 *.mov
 *.wmv
 
-# Prisma files
-*.prisma
 
 # Env files
 .env

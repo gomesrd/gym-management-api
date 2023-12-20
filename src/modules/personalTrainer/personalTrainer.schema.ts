@@ -56,9 +56,7 @@ const personalTrainerResume = {
   id: z.string(),
   name: z.string(),
   deleted: z.boolean().nullable(),
-  personal_trainer: z.object({
-    occupation: z.enum(['Personal_Trainer', 'Physiotherapist']),
-  }).nullable(),
+  occupation: z.enum(['Personal_Trainer', 'Physiotherapist']).optional(),
 };
 
 const personalTrainerCount = {
