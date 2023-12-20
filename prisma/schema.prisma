@@ -45,15 +45,20 @@ enum Days {
   Sunday
 }
 
-enum TypePlan {
+enum Recurrence {
   Monthly
   Quarterly
   Semiannual
   Annual
 }
 
+enum Participant {
+  Singular
+  Pair
+}
+
 model User {
-  id               String           @id @default(uuid()) @db.Uuid
+  id               String           @id @unique @default(uuid()) @db.Uuid
   name             String           @db.VarChar()
   cpf              String           @unique @db.VarChar()
   role             Role             @default(Member)
@@ -74,7 +79,7 @@ model User {
 }
 
 model UserAddres {
-  id                   String  @id @default(uuid()) @db.Uuid
+  id                   String  @id @unique @default(uuid()) @db.Uuid
   address              String  @db.VarChar()
   address_number       String  @db.VarChar()
   address_complement   String? @db.VarChar()
@@ -89,9 +94,9 @@ model UserAddres {
 }
 
 model PersonalTrainer {
-  id              String           @id @default(uuid()) @db.Uuid
+  id              String           @id @unique @default(uuid()) @db.Uuid
   user_id         String           @unique @default(uuid()) @db.Uuid
-  occupation      Occupation       @default(Personal_Trainer)
+  occupation      Occupation[]     @default([Personal_Trainer])
   training        Training[]
   training_record TrainingRecord[]
   user            User             @relation(fields: [user_id], references: [id])
@@ -100,19 +105,20 @@ model PersonalTrainer {
 }
 
 model Member {
-  id              String           @id @default(uuid()) @db.Uuid
+  id              String           @id @unique @default(uuid()) @db.Uuid
   user_id         String           @unique @default(uuid()) @db.Uuid
+  user            User             @relation(fields: [user_id], references: [id])
   training        Training[]
   training_record TrainingRecord[]
-  user            User             @relation(fields: [user_id], references: [id])
+  MemberPlan      MemberPlan[]
 
   @@map("member")
 }
 
 model Training {
-  id                  String           @id @default(uuid()) @db.Uuid
+  id                  String           @id @unique @default(uuid()) @db.Uuid
   fixed_day           Days?
-  single_date         String?          @db.VarChar() // If it separate or replacement
+  single_date         DateTime? // If it singular or replacement
   start_time          String           @db.VarChar()
   modality            Modality         @default(Pilates)
   type                TrainingType     @default(Plan)
@@ -130,7 +136,7 @@ model Training {
 }
 
 model TrainingRecord {
-  id                  String          @id @default(uuid()) @db.Uuid
+  id                  String          @id @unique @default(uuid()) @db.Uuid
   type                TrainingType    @default(Plan)
   status              Status          @default(Realized)
   training_id         String          @db.Uuid
@@ -145,25 +151,41 @@ model TrainingRecord {
   @@map("training_record")
 }
 
+model Plan {
+  id          String       @id @unique @default(uuid()) @db.Uuid
+  name        String       @db.VarChar()
+  modalitie   Modality     @default(Pilates)
+  recurrence  Recurrence   @default(Quarterly)
+  participant Participant  @default(Singular)
+  isActive    Boolean      @default(true)
+  price       Float
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  MemberPlan  MemberPlan[]
+
+  @@map("plan")
+}
+
 model MemberPlan {
   id         String   @id @default(uuid()) @db.Uuid
-  type       TypePlan @default(Quarterly)
   member_id  String   @db.Uuid
+  startDate  DateTime @default(now())
+  endDate    DateTime
+  isActive   Boolean  @default(true)
+  price      Float
+  plan_id    String   @db.Uuid
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   member     Member   @relation(fields: [member_id], references: [user_id])
-  startDate  DateTime
-  endDate    DateTime
-  isActive   Boolean @default(true)
-  price      Float
+  plan       Plan     @relation(fields: [plan_id], references: [id])
 
   @@map("member_plan")
 }
 
-// TODO - Criar tabela planos
 // TODO - Criar filtros para personal trainer
 // TODO - Criar filtros para members
 // TODO - Criar relatório de treinos (count de treinos realizados, faltas, etc)
 // TODO - Criar paginação
 // TODO - Criar validação para cpf
 // TODO - Criar buscar por nome
+// TODO - Criar endpoints Planos
