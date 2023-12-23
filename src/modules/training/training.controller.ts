@@ -1,97 +1,93 @@
-import {FastifyReply, FastifyRequest} from "fastify";
+import {FastifyInstance} from "fastify";
+import {$ref} from "./training.schema";
 import {
-  CreateTrainingInput,
-  DeleteTraining,
-  GetTraining,
-  UpdateTraining
-} from "./training.schema";
-import {
-  createTraining,
-  deleteTraining,
-  findManyTrainings,
-  findUniqueTraining,
-  updateTraining
+  deleteTrainingHandler, getUniqueTrainingHandler, getManyTrainingsHandler, registerTrainingHandler,
+  updateTrainingHandler
 } from "./training.service";
-import {Filters} from "../../utils/common.schema";
 
-
-export async function registerTrainingHandler(request: FastifyRequest<{
-  Body: CreateTrainingInput
-}>, reply: FastifyReply) {
-
-  const personalTrainerId = request.body.map((training) => training.personal_trainer_id)
-  const personalTrainerValidate = personalTrainerId.every((id) => id === request.user.id)
-
-
-  if (!personalTrainerValidate) {
-    return reply.code(403).send('You can only register trainings for yourself')
-  }
-  const body = request.body;
-  try {
-    return await createTraining(body)
-  } catch (e: any) {
-    console.log(e)
-    if (e.code === 'P2002') {
-      return reply.code(400).send({
-        message: 'Training already exists'
-      })
+async function trainingRoutes(server: FastifyInstance) {
+  server.get('', {
+    preHandler: [server.authenticate],
+    schema: {
+      tags: ['Training'],
+      summary: 'Get all trainings',
+      querystring: {
+        type: 'object',
+        properties: {
+          id: {type: 'string'},
+          member_id: {type: 'string'},
+          personal_trainer_id: {type: 'string'},
+        }
+      },
+      response: {
+        200: $ref('trainingFindManyScheme')
+      }
     }
-    return reply.code(500).send('Something went wrong')
-  }
-}
+  }, getManyTrainingsHandler);
 
-export async function getManyTrainingsHandler(request: FastifyRequest<{
-  Querystring: Filters;
-}>) {
-  try {
-    const userId = request.user.id;
-    return findManyTrainings({...request.query}, userId);
-  } catch (e) {
-    console.log(e)
-  }
-}
+  server.get('/:id', {
+    preHandler: [server.authenticate],
+    schema: {
+      tags: ['Training'],
+      summary: 'Get a specific training',
+      params: {
+        id: {type: 'string'},
+      },
+      response: {
+        200: $ref('trainingFindUniqueSchema')
+      }
+    },
+  }, getUniqueTrainingHandler);
 
-export async function getUniqueTrainingHandler(request: FastifyRequest<{
-  Params: GetTraining;
-}>) {
-  const userId = request.user.id;
+  server.post('', {
+    preHandler: [server.authenticate, server.authorizationLimited],
+    schema: {
+      tags: ['Training'],
+      body: $ref('createTrainingSchema'),
+      summary: 'Create a new training',
+      response: {
+          201: $ref('createTrainingSchema')
+      }
 
-  return findUniqueTraining({
-    ...request.params
-  }, userId);
-}
-
-export async function updateTrainingHandler(request: FastifyRequest<{
-  Body: UpdateTraining;
-  Params: GetTraining;
-}>, reply: FastifyReply) {
-  const userId = request.user.id;
-
-  try {
-    return await updateTraining({
-      ...request.body
-    }, {
-      ...request.params,
-    }, userId);
-  } catch (e: any) {
-    console.log(e)
-    if (e.code === 'P2002') {
-      return reply.code(400).send({
-        message: 'Training already exists'
-      })
     }
-    return reply.code(500).send('Something went wrong')
-  }
+  }, registerTrainingHandler);
 
+  server.put('/:id', {
+      preHandler: [server.authenticate, server.authorizationLimited],
+      schema: {
+        tags: ['Training'],
+        summary: 'Update a specific training',
+        params: {
+          id: {type: 'string'},
+        },
+        body: $ref('updateTrainingSchema'),
+        response: {
+          200: $ref('updateTrainingSchema')
+        },
+
+      }
+    }, updateTrainingHandler
+  );
+
+  server.delete('/:id', {
+      preHandler: [server.authenticate, server.authorizationExclusive],
+      schema: {
+        tags: ['Training'],
+        summary: 'Delete a specific training',
+        params: {
+          id: {type: 'string'},
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              message: {type: 'string', example: ''}
+            }
+          }
+        }
+      }
+    }, deleteTrainingHandler
+  );
 }
 
-export async function deleteTrainingHandler(request: FastifyRequest<{
-  Params: DeleteTraining;
-}>, reply: FastifyReply) {
-  const userId = request.user.id;
-
-  await deleteTraining({
-    ...request.params
-  });
-  return reply.code(200).send('');
-}
+export default trainingRoutes;

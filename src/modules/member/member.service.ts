@@ -1,180 +1,115 @@
-import prisma from "../../config/prisma";
-import {CreateMemberInput, DeleteMember, MemberId, UpdateMember} from "./member.schema";
-import {hashPassword} from "../../utils/hash";
-import {queryUserRole} from "../../utils/permissions.service";
-import {parseFiltersCommon, parseFiltersPermission} from "../../utils/parseFilters";
+import {FastifyReply, FastifyRequest} from "fastify";
+import {
+  createMember,
+  deleteMember,
+  findUniqueMember,
+  findMemberByEmail,
+  findManyMembers,
+  updateMember, findUniqueMemberResume
+} from "./member.repository";
+import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
+import {invalidLoginMessage} from "./member.mesages";
+import {verifyPassword} from "../../utils/hash";
+import {server} from "../../app";
 import {Filters} from "../../utils/common.schema";
+import {queryUserRole} from "../../utils/permissions.service";
 
-export async function createMember(input: CreateMemberInput) {
-  const {
-    password, cpf, email, birth_date, address,
-    phone, name
-  } = input;
-  const {hash, salt} = hashPassword(password);
-
-  return prisma.user.create({
-    data: {
-      name,
-      cpf,
-      birth_date,
-      email,
-      phone,
-      salt,
-      password: hash,
-      address: {
-        create: address,
-      },
-      member: {
-        create: {}
-      }
-    },
-  });
+export async function registerMemberHandler(request: FastifyRequest<{
+  Body: CreateMemberInput
+}>, reply: FastifyReply) {
+  const body = request.body;
+  try {
+    const member = await createMember(body);
+    return reply.code(201).send(member)
+  } catch (e) {
+    return reply.code(500).send(e)
+  }
 }
 
-export async function findMemberByEmail(email: string) {
-  return prisma.user.findUnique({
-    where: {
-      email,
-      deleted: false
-    },
-  });
-}
 
-export async function findManyMembers(filters: Filters, userId: string) {
-  const applyFilters = await parseFiltersCommon(filters, userId);
+export async function loginHandler(request: FastifyRequest<{
+  Body: LoginInput
+}>, reply: FastifyReply) {
+  const body = request.body;
 
-  const membersCount = await prisma.user.count({
-    where: {
-      name: {
-        contains: filters.name,
-        mode: 'insensitive',
-      },
-      cpf: filters.cpf,
-      email: filters.email,
-      deleted: applyFilters.deleted
+  const member = await findMemberByEmail(body.email);
+
+  if (!member) {
+    return reply.code(401).send(invalidLoginMessage())
+  }
+
+  const correctPassword = verifyPassword(
+    {
+      candidatePassword: body.password,
+      salt: member.salt,
+      hash: member.password
     }
-  });
+  )
 
-  const members = await prisma.user.findMany({
-    where: {
-      name: {
-        contains: filters.name,
-        mode: 'insensitive',
-      },
-      cpf: filters.cpf,
-      email: filters.email,
-      deleted: applyFilters.deleted
-    },
-    select: {
-      id: true,
-      name: true,
-      cpf: false,
-      address: false,
-      birth_date: false,
-      email: false,
-      phone: false,
-      password: false,
-      salt: false,
-      deleted: true,
-      created_at: false,
-      updated_at: false,
-    }
-  });
+  if (correctPassword) {
+    const {id, name} = member;
+    const dataMember = {id, name};
+    const expiresIn = 60 * 120;
+    return {accessToken: server.jwt.sign(dataMember, {expiresIn})};
+  }
 
-  return {
-    count: membersCount,
-    data: members
-  };
-
+  return reply.code(401).send(invalidLoginMessage());
 }
 
-export async function findUniqueMember(data: MemberId, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId, data.id);
+export async function getUniqueMemberHandler(request: FastifyRequest<{
+  Params: MemberId;
+}>) {
+  const userId = request.user.id;
+  const memberId = request.params.id
 
-  return prisma.user.findUnique({
-    where: {
-      id: applyFilters.user_id,
-    },
-    select: {
-      id: true,
-      name: true,
-      cpf: true,
-      address: {
-        select: {
-          address: true,
-          address_number: true,
-          address_complement: true,
-          address_neighborhood: true,
-          city: true,
-          state: true,
-          country: true,
-          zip_code: true,
-        },
-      },
-      birth_date: true,
-      email: true,
-      phone: true,
-      password: false,
-      salt: false,
-      deleted: true,
-      created_at: true,
-      updated_at: true,
-    }
-  });
+  return findUniqueMember(memberId, userId);
 }
 
-export async function findUniqueMemberResume(data: MemberId, userId: string) {
-  return prisma.user.findUnique({
-    where: {
-      id: data.id,
-    },
-    select: {
-      id: true,
-      name: true,
-      cpf: false,
-      birth_date: true,
-      email: true,
-      phone: true,
-      password: false,
-      salt: false,
-      deleted: true,
-      created_at: true,
-      updated_at: true,
-    }
-  });
+export async function getUniqueMemberHandlerResume(request: FastifyRequest<{
+  Params: MemberId;
+}>) {
+  const memberId = request.params.id
+
+  return findUniqueMemberResume(memberId);
 }
 
-export async function updateMember(data: UpdateMember, params: MemberId, userId: string) {
+export async function getManyMembersHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>) {
+  const filters = request.query;
+  const userId = request.user.id;
+
+  try {
+    return findManyMembers(filters, userId);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function updateMemberHandler(request: FastifyRequest<{
+  Body: UpdateMember;
+  Params: MemberId;
+}>) {
+  const userId = request.user.id;
+  const dataUpdate = request.body;
+  const memberId = request.params.id
   const userRole = await queryUserRole(userId);
 
-  if (userRole !== 'Admin' && userId !== params.id) {
+  if (userRole !== 'Admin' && userId !== memberId) {
     return Promise.reject({message: 'You do not have permission to realize this action', status: 403});
   }
-  return prisma.user.update({
-    where: {
-      id: params.id
-    },
-    data: {
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      birth_date: data.birth_date,
-    }
-  });
+  return updateMember(
+    dataUpdate,
+    memberId,
+  );
 }
 
-export async function deleteMember(params: DeleteMember, userId: string) {
-  const userRole = await queryUserRole(userId);
-
-  if (userRole !== 'Admin' && userId !== params.id) {
-    return Promise.reject({message: 'You do not have permission to realize this action', code: 403});
-  }
-  return prisma.user.update({
-    where: {
-      id: params.id,
-    },
-    data: {
-      deleted: true,
-    }
-  });
+export async function deleteMemberHandler(request: FastifyRequest<{
+  Params: DeleteMember;
+}>, reply: FastifyReply) {
+  const userId = request.user.id;
+  await deleteMember({
+    ...request.params,
+  }, userId);
+  return reply.code(200).send('');
 }

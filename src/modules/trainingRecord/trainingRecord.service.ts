@@ -1,166 +1,74 @@
-import prisma from "../../config/prisma";
+import {FastifyReply, FastifyRequest} from "fastify";
 import {
-  CreateTrainingRecordInput, DeleteTrainingRecord, GetTrainingRecord,
+  CreateTrainingRecordInput, DeleteTrainingRecord, GetTrainingRecord, TrainingRecordsQueryString,
   UpdateTrainingRecord
 } from "./trainingRecord.schema";
-import {Filters} from "../../utils/common.schema";
-import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
+import {
+  createTrainingRecord, deleteTrainingRecord, findUniqueTrainingRecord, findManyTrainingRecords,
+  updateTrainingRecord
+} from "./trainingRecord.repository";
+import {personalTrainerValidate} from "../../utils/permissions.service";
 
-export async function createTrainingRecord(input: CreateTrainingRecordInput) {
-  return prisma.trainingRecord.create({
-    data: input,
-  });
-}
 
-export async function findManyTrainingRecords(filters: Filters, userId: string) {
-  const applyFilters = await parseFiltersTraining(filters, userId);
+export async function registerTrainingRecordHandler(request: FastifyRequest<{
+  Body: CreateTrainingRecordInput
+}>, reply: FastifyReply) {
+  const body = request.body;
+  const userId = request.user.id;
+  const personalTrainerId = request.body.personal_trainer_id;
+  const memberId = request.body.member_id;
 
-  const trainingRecordsCount = await prisma.trainingRecord.count({
-    where: {
-      training_id: filters.training_id,
-      member_id: applyFilters.member_id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      status: filters.status,
-      type: filters.type,
-      created_at: {
-        gte: filters.created_at_gte,
-        lte: filters.created_at_lte,
-      },
-    }
-  });
-
-  const trainingRecordes = await prisma.trainingRecord.findMany({
-    where: {
-      training_id: filters.training_id,
-      member_id: applyFilters.member_id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      status: filters.status,
-      type: filters.type,
-      created_at: {
-        gte: filters.created_at_gte,
-        lte: filters.created_at_lte,
-      },
-    },
-    select: {
-      id: true,
-      type: true,
-      status: true,
-      training_id: true,
-      personal_trainer_id: false,
-      member_id: false,
-      personal_trainer: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: false,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        }
-      },
-      member: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: false,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        }
-      },
-      created_at: true,
-      updated_at: false
-    }
-  });
-
-  return {
-    count: trainingRecordsCount,
-    data: trainingRecordes,
+  console.log(userId, personalTrainerId, memberId)
+  const invalidRequest = await personalTrainerValidate(userId, personalTrainerId, memberId);
+  if (invalidRequest) {
+    return reply.code(403).send(invalidRequest)
   }
-
+  try {
+    const trainingRecord = await createTrainingRecord(body);
+    return reply.code(201).send(trainingRecord)
+  } catch (e) {
+    console.log(e)
+    return reply.code(500).send(e)
+  }
 }
 
-export async function findUniqueTrainingRecord(params: GetTrainingRecord, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId);
+export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
+  Querystring: TrainingRecordsQueryString;
+}>) {
+  const userId = request.user.id;
+  try {
+    return findManyTrainingRecords({...request.query}, userId);
+  } catch (e) {
+    console.log(e)
+  }
+}
 
-  return prisma.trainingRecord.findMany({
-    where: {
-      id: params.id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      member_id: applyFilters.member_id,
-    },
-    select: {
-      id: true,
-      type: true,
-      status: true,
-      training_id: true,
-      personal_trainer_id: false,
-      member_id: false,
-      personal_trainer: {
-        select: {
-          user_id: true,
-          user: {
-            select: {
-              id: false,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        }
-      },
-      member: {
-        select: {
-          user_id: true,
-          user: {
-            select: {
-              id: false,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        }
-      },
-      created_at: true,
-      updated_at: true,
-    }
+export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
+  Params: GetTrainingRecord;
+}>) {
+  const userId = request.user.id;
+
+  return findUniqueTrainingRecord({
+    ...request.params
+  }, userId);
+}
+
+export async function updateTrainingRecordHandler(request: FastifyRequest<{
+  Body: UpdateTrainingRecord;
+  Params: GetTrainingRecord;
+}>) {
+  return updateTrainingRecord({
+    ...request.body
+  }, {...request.params})
+}
+
+export async function deleteTrainingRecordHandler(request: FastifyRequest<{
+  Params: DeleteTrainingRecord;
+}>, reply: FastifyReply) {
+
+  await deleteTrainingRecord({
+    ...request.params
   });
-}
 
-export async function updateTrainingRecord(data: UpdateTrainingRecord, params: GetTrainingRecord) {
-  return prisma.trainingRecord.update({
-    where: {
-      id: params.id
-    },
-    data: {
-      status: data.status,
-    }
-  });
-}
-
-export async function deleteTrainingRecord(data: DeleteTrainingRecord) {
-  return prisma.trainingRecord.delete({
-    where: {
-      id: data.id,
-    }
-  })
+  return reply.code(200).send('');
 }

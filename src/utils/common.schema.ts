@@ -20,5 +20,14 @@ const filtersSchema = z.object({
   type: z.enum(['Plan', 'Singular', 'Replacement']).optional(),
 });
 
+export const DaysOfWeek = z.enum([
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+]);
 
 export type Filters = z.infer<typeof filtersSchema>;

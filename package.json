@@ -6,7 +6,7 @@
   "author": "Douglas Santos",
   "license": "ISC",
   "scripts": {
-    "build": "prisma generate && tsc -p tsconfig.json",
+    "build": "dotenv -e .env.$NODE_ENV prisma generate && tsc -p tsconfig.json",
     "start": "dotenv -e .env.$NODE_ENV node dist/index.js",
     "dev": "dotenv -e .env.$NODE_ENV nodemon src/index.ts",
     "migrate": "prisma migrate deploy"

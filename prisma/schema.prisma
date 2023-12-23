@@ -52,12 +52,12 @@ enum Recurrence {
   Annual
 }
 
-enum Participant {
+enum MemberAmount {
   Singular
   Pair
 }
 
-model User {
+model Users {
   id               String           @id @unique @default(uuid()) @db.Uuid
   name             String           @db.VarChar()
   cpf              String           @unique @db.VarChar()
@@ -69,16 +69,15 @@ model User {
   salt             String           @db.Text
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
-  user_address_id  String           @db.Uuid
   deleted          Boolean?         @default(false) @db.Boolean()
-  address          UserAddres       @relation(fields: [user_address_id], references: [id])
   personal_trainer PersonalTrainer?
   member           Member?
+  users_address    UsersAddress?
 
-  @@map("user")
+  @@map("users")
 }
 
-model UserAddres {
+model UsersAddress {
   id                   String  @id @unique @default(uuid()) @db.Uuid
   address              String  @db.VarChar()
   address_number       String  @db.VarChar()
@@ -88,18 +87,19 @@ model UserAddres {
   state                String  @db.VarChar()
   country              String? @default("Brazil") @db.VarChar()
   zip_code             String  @db.VarChar()
-  user                 User[]
+  user_address_id      String  @unique @db.Uuid
+  user                 Users   @relation(fields: [user_address_id], references: [id])
 
-  @@map("user_address")
+  @@map("users_address")
 }
 
 model PersonalTrainer {
   id              String           @id @unique @default(uuid()) @db.Uuid
   user_id         String           @unique @default(uuid()) @db.Uuid
-  occupation      Occupation[]     @default([Personal_Trainer])
+  occupation      Occupation       @default(Personal_Trainer)
   training        Training[]
   training_record TrainingRecord[]
-  user            User             @relation(fields: [user_id], references: [id])
+  user            Users            @relation(fields: [user_id], references: [id])
 
   @@map("personal_trainer")
 }
@@ -107,7 +107,7 @@ model PersonalTrainer {
 model Member {
   id              String           @id @unique @default(uuid()) @db.Uuid
   user_id         String           @unique @default(uuid()) @db.Uuid
-  user            User             @relation(fields: [user_id], references: [id])
+  user            Users            @relation(fields: [user_id], references: [id])
   training        Training[]
   training_record TrainingRecord[]
   MemberPlan      MemberPlan[]
@@ -152,16 +152,17 @@ model TrainingRecord {
 }
 
 model Plan {
-  id          String       @id @unique @default(uuid()) @db.Uuid
-  name        String       @db.VarChar()
-  modalitie   Modality     @default(Pilates)
-  recurrence  Recurrence   @default(Quarterly)
-  participant Participant  @default(Singular)
-  isActive    Boolean      @default(true)
-  price       Float
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
-  MemberPlan  MemberPlan[]
+  id              String       @id @unique @default(uuid()) @db.Uuid
+  name            String       @db.VarChar()
+  modalitie       Modality     @default(Pilates)
+  recurrence      Recurrence   @default(Quarterly)
+  member_amount   MemberAmount @default(Singular)
+  training_amount Int
+  isActive        Boolean      @default(true)
+  price           Float
+  created_at      DateTime     @default(now())
+  updated_at      DateTime     @updatedAt
+  MemberPlan      MemberPlan[]
 
   @@map("plan")
 }
@@ -189,3 +190,8 @@ model MemberPlan {
 // TODO - Criar buscar por nome
 // TODO - Criar endpoints Planos
 // TODO - Criar DATA E COUNT para trainings e trainings records
+// TODO - Incluir nos arquivos route os parametros aceitos em cada endpoint (busca por id, name, cpf, etc)
+// TODO - Organizar toda a estrutura dos schemas (schemas genêricos)
+// TODO - Validar se o personal trainer não está criando um registro de treino como membro
+// TODO - Validar se o treino no registro de treino pertence ao member e ao personal trainer
+// TODO - Criar possibilidade de transferência de treino para outro personal trainer

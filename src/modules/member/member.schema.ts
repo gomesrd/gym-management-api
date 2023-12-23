@@ -12,7 +12,7 @@ const memberDate = {
 };
 
 const memberAddress = {
-  address: z.object({
+  users_address: z.object({
     address: z.string(),
     address_number: z.string(),
     address_complement: z.string().optional(),
@@ -35,7 +35,6 @@ const memberCore = {
     }
   ),
   phone: z.string(),
-  deleted: z.boolean(),
 };
 
 const memberResume = {

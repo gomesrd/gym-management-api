@@ -1,193 +1,97 @@
-import prisma from "../../config/prisma";
+import {FastifyReply, FastifyRequest} from "fastify";
 import {
   CreateTrainingInput,
   DeleteTraining,
   GetTraining,
   UpdateTraining
 } from "./training.schema";
-import {Prisma} from "@prisma/client";
-import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
+import {
+  createTraining,
+  deleteTraining,
+  findManyTrainings,
+  findUniqueTraining,
+  updateTraining
+} from "./training.repository";
 import {Filters} from "../../utils/common.schema";
 
-export async function createTraining(input: CreateTrainingInput) {
 
-  return prisma.training.createMany({
-    data: input,
-  });
-}
+export async function registerTrainingHandler(request: FastifyRequest<{
+  Body: CreateTrainingInput
+}>, reply: FastifyReply) {
+  const body = request.body;
+  const personalTrainerId = body.map((training) => training.personal_trainer_id)
+  const personalTrainerValidate = personalTrainerId.every((id) => id === request.user.id)
 
-export async function findManyTrainings(filters: Filters, userId: string) {
-  const applyFilters = await parseFiltersTraining(filters, userId);
 
-  const trainingsCount = await prisma.training.count({
-    where: {
-      member_id: applyFilters.member_id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      deleted: applyFilters.deleted,
-      fixed_day: filters.fixed_day,
-      single_date: filters.single_date,
-      start_time: filters.start_time,
-      modality: filters.modality,
-      type: filters.type,
-      created_at: {
-        gte: filters.created_at_gte,
-        lte: filters.created_at_lte,
-      },
-    }
-  });
-
-  const trainings = await prisma.training.findMany({
-    where: {
-      member_id: applyFilters.member_id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      deleted: applyFilters.deleted,
-      fixed_day: filters.fixed_day,
-      single_date: filters.single_date,
-      start_time: filters.start_time,
-      modality: filters.modality,
-      type: filters.type,
-      created_at: {
-        gte: filters.created_at_gte,
-        lte: filters.created_at_lte,
-      },
-    },
-    select: {
-      id: true,
-      fixed_day: true,
-      single_date: true,
-      start_time: true,
-      modality: true,
-      type: true,
-      personal_trainer_id: false,
-      member_id: false,
-      member: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        }
-      },
-      personal_trainer: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        },
-      },
-    }
-  });
-
-  return {
-    count: trainingsCount,
-    data: trainings,
+  if (!personalTrainerValidate) {
+    return reply.code(403).send('You can only register trainings for yourself')
   }
-}
-
-export async function findUniqueTraining(params: GetTraining, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId);
-
-  return prisma.training.findMany({
-    where: {
-      id: params.id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      member_id: applyFilters.member_id,
-      deleted: applyFilters.deleted,
-    },
-    select: {
-      id: true,
-      fixed_day: true,
-      single_date: true,
-      start_time: true,
-      modality: true,
-      type: true,
-      member: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        }
-      },
-      personal_trainer: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
-            }
-          }
-        }
-      },
-      created_at: true,
-      updated_at: true,
-    }
-  });
-}
-
-export async function updateTraining(data: UpdateTraining, params: GetTraining, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId);
 
   try {
-    return await prisma.training.update({
-      where: {
-        id: params.id,
-        personal_trainer_id: applyFilters.personal_trainer_id,
-      },
-      data: {
-        start_time: data.start_time,
-        fixed_day: data.fixed_day,
-        single_date: data.single_date,
-        personal_trainer_id: data.personal_trainer_id,
-        modality: data.modality,
-        type: data.type,
-      }
-    });
-  } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        throw new Error('Training not found');
-      }
+    return await createTraining(body)
+  } catch (e: any) {
+    console.log(e)
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Training already exists'
+      })
     }
-    throw error;
+    return reply.code(500).send('Something went wrong')
   }
 }
 
-export async function deleteTraining(data: DeleteTraining) {
-  return prisma.training.delete({
-    where: {
-      id: data.id,
+export async function getManyTrainingsHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>) {
+  try {
+    const userId = request.user.id;
+    return findManyTrainings({...request.query}, userId);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function getUniqueTrainingHandler(request: FastifyRequest<{
+  Params: GetTraining;
+}>) {
+  const userId = request.user.id;
+
+  return findUniqueTraining({
+    ...request.params
+  }, userId);
+}
+
+export async function updateTrainingHandler(request: FastifyRequest<{
+  Body: UpdateTraining;
+  Params: GetTraining;
+}>, reply: FastifyReply) {
+  const userId = request.user.id;
+
+  try {
+    return await updateTraining({
+      ...request.body
+    }, {
+      ...request.params,
+    }, userId);
+  } catch (e: any) {
+    console.log(e)
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Training already exists'
+      })
     }
-  })
+    return reply.code(500).send('Something went wrong')
+  }
+
+}
+
+export async function deleteTrainingHandler(request: FastifyRequest<{
+  Params: DeleteTraining;
+}>, reply: FastifyReply) {
+  const userId = request.user.id;
+
+  await deleteTraining({
+    ...request.params
+  });
+  return reply.code(200).send('');
 }

@@ -1,9 +1,9 @@
 import {FastifyInstance} from "fastify";
-import personalTrainerRoutes from "../modules/personalTrainer/personalTrainer.route";
+import personalTrainerRoutes from "../modules/personalTrainer/personalTrainer.controller";
 import {healthCheck} from "./health-check";
-import memberRoutes from "../modules/member/member.route";
-import trainingRoutes from "../modules/training/training.route";
-import trainingRecordRoutes from "../modules/trainingRecord/trainingRecord.route";
+import memberRoutes from "../modules/member/member.controller";
+import trainingRoutes from "../modules/training/training.controller";
+import trainingRecordRoutes from "../modules/trainingRecord/trainingRecord.controller";
 
 export async function router(server: FastifyInstance) {
     server.register(personalTrainerRoutes, {prefix: '/personal-trainers'});

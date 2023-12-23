@@ -2,7 +2,7 @@ import {Role} from '@prisma/client';
 import prisma from "../config/prisma";
 
 export async function queryUserRole(id: string) {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.users.findUnique({
     where: {
       id: id,
     },

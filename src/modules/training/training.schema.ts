@@ -1,5 +1,6 @@
 import {z} from "zod";
 import {buildJsonSchemas} from "fastify-zod";
+import {DaysOfWeek} from "../../utils/common.schema";
 
 const trainingId = {
   id: z.string()
@@ -11,8 +12,8 @@ const trainingDate = {
 };
 
 const trainingInput = {
-  fixed_day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']).optional(),
-  single_date: z.string().optional(),
+  fixed_day: DaysOfWeek.nullable(),
+  single_date: z.date().nullable().optional(),
   start_time: z.string(),
   modality: z.enum(['Pilates', 'Functional']),
   type: z.enum(['Plan', 'Singular', 'Replacement']),
@@ -22,23 +23,23 @@ const trainingInput = {
 
 const trainingResume = {
   ...trainingId,
-  fixed_day: z.string(),
-  single_date: z.string().optional(),
+  fixed_day: DaysOfWeek.nullable(),
+  single_date: z.date().nullable(),
   start_time: z.string(),
   modality: z.enum(['Pilates', 'Functional']),
   type: z.enum(['Plan', 'Singular', 'Replacement']),
   personal_trainer: z.object({
     user: z.object({
-      name: z.string(),
+      name: z.string().optional(),
       id: z.string().optional(),
-    }),
-  }),
+    }).optional(),
+  }).optional(),
   member: z.object({
     user: z.object({
-      name: z.string(),
+      name: z.string().optional(),
       id: z.string().optional(),
-    }),
-  }),
+    }).optional(),
+  }).optional(),
 };
 
 const trainingFindUniqueSchema = z.object({
@@ -46,8 +47,17 @@ const trainingFindUniqueSchema = z.object({
   ...trainingDate
 });
 
+const trainingCount = {
+  count: z.number()
+};
+
 const trainingFindManyScheme = z.object({
-  ...trainingResume,
+  ...trainingCount,
+  data: z.array(
+    z.object({
+      ...trainingResume
+    })
+  ),
 });
 
 
@@ -88,6 +98,7 @@ export type DeleteTraining = z.infer<typeof TrainingIdSchema>;
 export type GetTraining = z.infer<typeof TrainingIdSchema>;
 export type UpdateTraining = z.infer<typeof updateTrainingSchema>;
 export type TrainingsQueryString = z.infer<typeof trainingsQueryStringSchema>;
+export type FindManyTraining = z.infer<typeof trainingFindManyScheme>;
 
 
 export const {schemas: trainingSchemas, $ref} = buildJsonSchemas({

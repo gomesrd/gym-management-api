@@ -1,176 +1,109 @@
-import prisma from "../../config/prisma";
-import {CreatePersonalTrainerInput, PersonalTrainerId, UpdatePersonalTrainer} from "./personalTrainer.schema";
-import {hashPassword} from "../../utils/hash";
-import {queryUserRole} from "../../utils/permissions.service";
-import {Filters} from "../../utils/common.schema";
-import {parseFiltersPermission} from "../../utils/parseFilters";
+import {FastifyReply, FastifyRequest} from "fastify";
+import {
+  createPersonalTrainer,
+  deletePersonalTrainer,
+  findManyPersonalTrainers,
+  findPersonalTrainerByEmail,
+  findUniquePersonalTrainer,
+  updatePersonalTrainer
+} from "./personalTrainer.repository";
+import {
+  CreatePersonalTrainerInput,
+  DeletePersonalTrainer,
+  LoginInput,
+  PersonalTrainerId,
+  PersonalTrainersManyResponse,
+  UpdatePersonalTrainer
+} from "./personalTrainer.schema";
+import {invalidLoginMessage} from "./personalTrainer.mesages";
+import {verifyPassword} from "../../utils/hash";
+import {server} from "../../app";
+import {Filters} from "../member/member.schema";
 
-export async function createPersonalTrainer(input: CreatePersonalTrainerInput) {
-  const {
-    password, cpf, email, phone, name, personal_trainer: {occupation},
-    role, birth_date, address
-  } = input;
-  const {hash, salt} = hashPassword(password);
-
-  return prisma.user.create({
-    data: {
-      name,
-      cpf,
-      birth_date,
-      email,
-      phone,
-      role,
-      salt,
-      password: hash,
-      address: {
-        create: address,
-      },
-      personal_trainer: {
-        create: {
-          occupation,
-        }
-      },
-      member: {
-        create: {}
-      }
-    },
-  });
-}
-
-export async function findPersonalTrainerByEmail(email: string) {
-  return prisma.user.findUnique({
-    where: {
-      email,
-      deleted: false
-    },
-  });
-}
-
-export async function findUniquePersonalTrainer(data: PersonalTrainerId,
-                                                userId: string) {
-  const applyFilters = await parseFiltersPermission(userId, data.id);
-
-  return prisma.user.findUnique({
-    where: {
-      id: applyFilters.user_id,
-      deleted: applyFilters.deleted
-    },
-    select: {
-      id: true,
-      name: true,
-      cpf: true,
-      birth_date: true,
-      email: true,
-      phone: true,
-      address: {
-        select: {
-          address: true,
-          address_number: true,
-          address_complement: true,
-          address_neighborhood: true,
-          country: true,
-          city: true,
-          state: true,
-          zip_code: true,
-        }
-      },
-      personal_trainer: {
-        select: {
-          occupation: true,
-        }
-      },
-      password: false,
-      salt: false,
-      role: false,
-      created_at: true,
-      updated_at: true,
-    }
-  });
-}
-
-export async function findManyPersonalTrainers(filters: Filters) {
-  const countOfPersonalTrainers = await prisma.user.count({
-    where: {
-      name: {
-        contains: filters.name,
-        mode: 'insensitive',
-      },
-      cpf: filters.cpf,
-      email: filters.email,
-      personal_trainer: {
-        is: {occupation: filters.occupation} || {not: null}
-      },
-    }
-  });
-
-  const personalTrainers = await prisma.user.findMany({
-    where: {
-      name: {
-        contains: filters.name,
-        mode: 'insensitive',
-      },
-      cpf: filters.cpf,
-      email: filters.email,
-      personal_trainer: {
-        is: {occupation: filters.occupation} || {not: null}
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-      personal_trainer: {
-        select: {
-          occupation: true,
-        }
-      },
-      deleted: true,
-    },
-  });
-
-  const simplifiedResult = personalTrainers.map((user) => ({
-    id: user.id,
-    name: user.name,
-    deleted: user.deleted,
-    occupation: user.personal_trainer?.occupation,
-  }));
-
-
-  return {
-    data: simplifiedResult,
-    count: countOfPersonalTrainers,
-  };
-}
-
-export async function updatePersonalTrainer(data: UpdatePersonalTrainer, params: PersonalTrainerId,
-                                            userId: string) {
-  const userRole = await queryUserRole(userId);
-  if (userRole !== 'Admin' && userId !== params.id) {
-    return Promise.reject('You can only update your own data');
-  }
-
-  return prisma.user.update({
-    where: {
-      id: params.id
-    },
-    data: {
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-    }
-  });
-}
-
-export async function deletePersonalTrainer(params: PersonalTrainerId) {
+export async function registerPersonalTrainerHandler(request: FastifyRequest<{
+  Body: CreatePersonalTrainerInput
+}>, reply: FastifyReply) {
+  const body = request.body;
+  //const userId = request.user.id;
   try {
-    return await prisma.user.update({
-      where: {
-        id: params.id,
-      },
-      data: {
-        deleted: true,
-      }
-    });
-  } catch (error) {
-    throw error;
+    const personalTrainer = await createPersonalTrainer(body);
+    return reply.code(201).send(personalTrainer)
+  } catch (e: any) {
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Personal trainer already exists'
+      })
+    }
+    return reply.code(500).send('Something went wrong')
   }
+}
+
+export async function loginHandler(request: FastifyRequest<{
+  Body: LoginInput
+}>, reply: FastifyReply) {
+  const body = request.body;
+  const personalTrainer = await findPersonalTrainerByEmail(body.email);
+  if (!personalTrainer) {
+    return reply.code(401).send(invalidLoginMessage())
+  }
+  const correctPassword = verifyPassword(
+    {
+      candidatePassword: body.password,
+      salt: personalTrainer.salt,
+      hash: personalTrainer.password
+    }
+  )
+  if (correctPassword) {
+    const {id, name, role} = personalTrainer;
+    const personalTrainerData = {id, name, role};
+    // const expiresIn = 60 * 120;
+    const accessToken = server.jwt.sign(personalTrainerData);
+
+    return reply.code(200).send({accessToken});
+  }
+  return reply.code(401).send(invalidLoginMessage());
+}
+
+export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
+  Params: PersonalTrainerId;
+}>) {
+  const userId = request.user.id;
+
+  return findUniquePersonalTrainer({
+    ...request.params
+  }, userId)
+}
+
+export async function getManyPersonalTrainersHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>): Promise<PersonalTrainersManyResponse | undefined> {
+  const filters = request.query
+  try {
+    return await findManyPersonalTrainers(filters);
+  } catch (e) {
+    console.log(e)
+    return undefined;
+  }
+}
+
+export async function updatePersonalTrainerHandler(request: FastifyRequest<{
+  Body: UpdatePersonalTrainer;
+  Params: PersonalTrainerId;
+}>) {
+  const userId = request.user.id;
+  return updatePersonalTrainer({
+    ...request.body,
+  }, {
+    ...request.params,
+  }, userId);
+}
+
+
+export async function deletePersonalTrainerHandler(request: FastifyRequest<{
+  Params: DeletePersonalTrainer;
+}>, reply: FastifyReply) {
+  await deletePersonalTrainer({
+    ...request.params
+  });
+  return reply.code(200).send('');
 }
