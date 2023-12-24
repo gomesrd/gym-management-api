@@ -1,7 +1,6 @@
 import prisma from "../../config/prisma";
-import {CreateMemberInput, DeleteMember, MemberId, UpdateMember} from "./member.schema";
+import {CreateMemberInput, UpdateMember} from "./member.schema";
 import {hashPassword} from "../../utils/hash";
-import {queryUserRole} from "../../utils/permissions.service";
 import {parseFiltersCommon, parseFiltersPermission} from "../../utils/parseFilters";
 import {Filters} from "../../utils/common.schema";
 
@@ -162,15 +161,11 @@ export async function updateMember(data: UpdateMember, memberId: string) {
   });
 }
 
-export async function deleteMember(params: DeleteMember, userId: string) {
-  const userRole = await queryUserRole(userId);
+export async function deleteMember(memberId: string) {
 
-  if (userRole !== 'Admin' && userId !== params.id) {
-    return Promise.reject({message: 'You do not have permission to realize this action', code: 403});
-  }
   return prisma.users.update({
     where: {
-      id: params.id,
+      id: memberId,
     },
     data: {
       deleted: true,

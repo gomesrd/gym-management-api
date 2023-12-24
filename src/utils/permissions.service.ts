@@ -25,15 +25,15 @@ export async function verifyUserRole(id: string, allowedRoles: Role[]) {
 }
 
 export async function verifyPermissionAdmin(id: string) {
-  return verifyUserRole(id, [Role.Admin]);
+  return verifyUserRole(id, [Role.admin]);
 }
 
 export async function verifyPermissionPersonalTrainer(id: string) {
-  return verifyUserRole(id, [Role.Employee, Role.Admin]);
+  return verifyUserRole(id, [Role.employee, Role.admin]);
 }
 
 export async function verifyPermissionMember(id: string) {
-  return verifyUserRole(id, [Role.Member, Role.Admin]);
+  return verifyUserRole(id, [Role.member, Role.admin]);
 }
 
 export async function personalTrainerValidate(userId: string, personalTrainerId: string, memberId: string) {
@@ -46,5 +46,13 @@ export async function personalTrainerValidate(userId: string, personalTrainerId:
 
     if (memberValidate) {
     return ('You can\'t register training as a personal trainer and member')
+  }
+}
+
+export async function verifyPermissionActionOnlyMember (userId: string, memberId: string) {
+  const userRole = await queryUserRole(userId);
+
+  if (userRole !== Role.admin && userId !== memberId) {
+    return Promise.reject({message: 'You do not have permission to realize this action', code: 403});
   }
 }

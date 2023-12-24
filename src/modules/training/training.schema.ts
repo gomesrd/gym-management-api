@@ -1,6 +1,6 @@
 import {z} from "zod";
 import {buildJsonSchemas} from "fastify-zod";
-import {DaysOfWeek} from "../../utils/common.schema";
+import {daysOfWeek, trainingModalities, trainingTypes} from "../../utils/common.schema";
 
 const trainingId = {
   id: z.string()
@@ -12,22 +12,29 @@ const trainingDate = {
 };
 
 const trainingInput = {
-  fixed_day: DaysOfWeek.nullable(),
+  fixed_day: daysOfWeek.nullable(),
   single_date: z.date().nullable().optional(),
   start_time: z.string(),
-  modality: z.enum(['Pilates', 'Functional']),
-  type: z.enum(['Plan', 'Singular', 'Replacement']),
+  modality: trainingModalities.optional(),
+  type: z.enum(['plan', 'singular', 'replacement']),
   personal_trainer_id: z.string(),
   member_id: z.string(),
+  training_replacement_id: z.string().optional(),
 };
+
+const trainingInputReplacement = z.object({
+  training_id: z.string(),
+  member_id: z.string(),
+  realized: z.boolean(),
+})
 
 const trainingResume = {
   ...trainingId,
-  fixed_day: DaysOfWeek.nullable(),
+  fixed_day: daysOfWeek.nullable(),
   single_date: z.date().nullable(),
   start_time: z.string(),
-  modality: z.enum(['Pilates', 'Functional']),
-  type: z.enum(['Plan', 'Singular', 'Replacement']),
+  modality: trainingModalities,
+  type: trainingTypes,
   personal_trainer: z.object({
     user: z.object({
       name: z.string().optional(),
@@ -61,18 +68,6 @@ const trainingFindManyScheme = z.object({
 });
 
 
-const trainingsQueryStringSchema = z.object({
-  id: z.string().optional(),
-  member_id: z.string().optional(),
-  personal_trainer_id: z.string().optional(),
-  deleted: z.boolean().optional(),
-  fixed_day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']).optional(),
-  single_date: z.string().optional(),
-  start_time: z.string().optional(),
-  modality: z.enum(['Pilates', 'Functional']),
-  type: z.enum(['Plan', 'Singular', 'Replacement']),
-});
-
 const createTraining = z.object({
   ...trainingInput,
 });
@@ -80,13 +75,13 @@ const createTraining = z.object({
 const createTrainingSchema = z.array(createTraining);
 
 const updateTrainingSchema = z.object({
-  fixed_day: z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']).optional(),
+  fixed_day: daysOfWeek.optional(),
   single_date: z.string().optional(),
   start_time: z.string().optional(),
   active: z.boolean().optional(),
   personal_trainer_id: z.string().optional(),
-  modality: z.enum(['Pilates', 'Functional']),
-  type: z.enum(['Plan', 'Singular', 'Replacement']),
+  modality: trainingModalities,
+  type: trainingTypes,
 });
 
 const TrainingIdSchema = z.object({
@@ -94,10 +89,10 @@ const TrainingIdSchema = z.object({
 });
 
 export type CreateTrainingInput = z.infer<typeof createTrainingSchema>;
+export type CreateTrainingReplacement = z.infer<typeof trainingInputReplacement>;
 export type DeleteTraining = z.infer<typeof TrainingIdSchema>;
 export type GetTraining = z.infer<typeof TrainingIdSchema>;
 export type UpdateTraining = z.infer<typeof updateTrainingSchema>;
-export type TrainingsQueryString = z.infer<typeof trainingsQueryStringSchema>;
 export type FindManyTraining = z.infer<typeof trainingFindManyScheme>;
 
 
@@ -107,5 +102,4 @@ export const {schemas: trainingSchemas, $ref} = buildJsonSchemas({
   trainingFindUniqueSchema,
   TrainingIdSchema,
   updateTrainingSchema,
-  trainingsQueryStringSchema,
 }, {$id: "TrainingSchemas"});

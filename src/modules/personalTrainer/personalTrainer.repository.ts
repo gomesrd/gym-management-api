@@ -144,7 +144,7 @@ export async function findManyPersonalTrainers(filters: Filters) {
 export async function updatePersonalTrainer(data: UpdatePersonalTrainer, params: PersonalTrainerId,
                                             userId: string) {
   const userRole = await queryUserRole(userId);
-  if (userRole !== 'Admin' && userId !== params.id) {
+  if (userRole !== 'admin' && userId !== params.id) {
     return Promise.reject('You can only update your own data');
   }
 

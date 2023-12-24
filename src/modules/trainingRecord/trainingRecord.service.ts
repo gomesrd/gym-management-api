@@ -8,6 +8,7 @@ import {
   updateTrainingRecord
 } from "./trainingRecord.repository";
 import {personalTrainerValidate} from "../../utils/permissions.service";
+import {updateTrainingReplacement} from "../training/training.repository";
 
 
 export async function registerTrainingRecordHandler(request: FastifyRequest<{
@@ -15,14 +16,21 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
 }>, reply: FastifyReply) {
   const body = request.body;
   const userId = request.user.id;
-  const personalTrainerId = request.body.personal_trainer_id;
-  const memberId = request.body.member_id;
+  const personalTrainerId = body.personal_trainer_id;
+  const memberId = body.member_id;
+  const trainingReplacementId = body.training_replacement_id;
+  const realizedReplacement = body.realized;
+  const trainingType = body.type;
 
-  console.log(userId, personalTrainerId, memberId)
   const invalidRequest = await personalTrainerValidate(userId, personalTrainerId, memberId);
   if (invalidRequest) {
     return reply.code(403).send(invalidRequest)
   }
+
+  if (trainingType === 'replacement') {
+    await updateTrainingReplacement(trainingReplacementId, realizedReplacement);
+  }
+
   try {
     const trainingRecord = await createTrainingRecord(body);
     return reply.code(201).send(trainingRecord)

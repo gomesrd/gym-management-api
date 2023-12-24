@@ -1,14 +1,15 @@
 import {Filters} from "./common.schema";
 import {queryUserRole} from "./permissions.service";
+import {Role} from "@prisma/client";
 
 export async function parseFiltersCommon(filters: Filters, userId: string) {
   const userRole = await queryUserRole(userId);
   let parseDeleted = undefined;
 
-  if (userRole !== 'Admin') {
+  if (userRole !== Role.admin) {
     parseDeleted = false;
   }
-  if (filters?.deleted === 'true' || filters?.deleted === 'false' && userRole === 'Admin') {
+  if (filters?.deleted === 'true' || filters?.deleted === 'false' && userRole === Role.admin) {
     parseDeleted = filters?.deleted === 'true';
   }
   return {
@@ -19,8 +20,8 @@ export async function parseFiltersCommon(filters: Filters, userId: string) {
 
 export async function parseFiltersTraining(filters: Filters, userId: string) {
   const userRole = await queryUserRole(userId);
-  const personal_trainer_id = (userRole === 'Employee') ? userId : filters.personal_trainer_id;
-  const member_id = (userRole === 'Member') ? userId : filters.member_id;
+  const personal_trainer_id = (userRole === Role.employee) ? userId : filters.personal_trainer_id;
+  const member_id = (userRole === Role.member) ? userId : filters.member_id;
   let parseDeleted = undefined;
 
 
@@ -37,10 +38,10 @@ export async function parseFiltersTraining(filters: Filters, userId: string) {
 
 export async function parseFiltersPermission(userId: string, paramsId?: string) {
   const userRole = await queryUserRole(userId);
-  const user_id = (userRole !== 'Admin') ? userId : paramsId;
-  const personal_trainer_id = (userRole === 'Employee') ? userId : undefined;
-  const member_id = (userRole === 'Member') ? userId : undefined;
-  const deleted = (userRole !== 'Admin') ? false : undefined;
+  const user_id = (userRole !== Role.admin) ? userId : paramsId;
+  const personal_trainer_id = (userRole === Role.employee) ? userId : undefined;
+  const member_id = (userRole === Role.member) ? userId : undefined;
+  const deleted = (userRole !== Role.admin) ? false : undefined;
 
   return {
     user_id,

@@ -1,6 +1,6 @@
 import prisma from "../../config/prisma";
 import {
-  CreateTrainingInput,
+  CreateTrainingInput, CreateTrainingReplacement,
   DeleteTraining, FindManyTraining,
   GetTraining,
   UpdateTraining
@@ -11,8 +11,33 @@ import {Filters} from "../../utils/common.schema";
 
 export async function createTraining(input: CreateTrainingInput) {
 
-  return prisma.training.createMany({
+  return prisma.training.createMany(
+    {
+      data: input
+    }
+  )
+}
+
+
+export async function createTrainingReplacement(input: CreateTrainingReplacement) {
+
+  return prisma.trainingReplacement.create({
     data: input
+  });
+}
+
+export async function updateTrainingReplacement(
+  trainingReplacementId: string | undefined,
+  realized: boolean | undefined
+) {
+
+  return prisma.trainingReplacement.update({
+    where: {
+      id: trainingReplacementId,
+    },
+    data: {
+      realized: realized,
+    }
   });
 }
 
@@ -54,7 +79,7 @@ export async function findManyTrainings(filters: Filters, userId: string): Promi
       personal_trainer_id: false,
       member_id: false,
       member: {
-        include:{
+        include: {
           user: {
             select: {
               id: true,

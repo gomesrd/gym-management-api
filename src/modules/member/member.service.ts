@@ -12,7 +12,7 @@ import {invalidLoginMessage} from "./member.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
 import {Filters} from "../../utils/common.schema";
-import {queryUserRole} from "../../utils/permissions.service";
+import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
 
 export async function registerMemberHandler(request: FastifyRequest<{
   Body: CreateMemberInput
@@ -93,11 +93,8 @@ export async function updateMemberHandler(request: FastifyRequest<{
   const userId = request.user.id;
   const dataUpdate = request.body;
   const memberId = request.params.id
-  const userRole = await queryUserRole(userId);
+  await verifyPermissionActionOnlyMember(userId, memberId);
 
-  if (userRole !== 'Admin' && userId !== memberId) {
-    return Promise.reject({message: 'You do not have permission to realize this action', status: 403});
-  }
   return updateMember(
     dataUpdate,
     memberId,
@@ -108,8 +105,8 @@ export async function deleteMemberHandler(request: FastifyRequest<{
   Params: DeleteMember;
 }>, reply: FastifyReply) {
   const userId = request.user.id;
-  await deleteMember({
-    ...request.params,
-  }, userId);
+  const memberId = request.params.id;
+  await verifyPermissionActionOnlyMember(userId, memberId);
+  await deleteMember(memberId);
   return reply.code(200).send('');
 }

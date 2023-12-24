@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import {buildJsonSchemas} from 'fastify-zod'
 import {emailInvalid, emailRequired, passwordInvalid, passwordRequired} from "./personalTrainer.mesages";
+import {personalTrainerOccupation} from "../../utils/common.schema";
 
 export type OccupationT = 'Personal_Trainer' | 'Physiotherapist';
 
@@ -36,13 +37,13 @@ const personalTrainerCore = {
   }).email(),
   phone: z.string(),
   personal_trainer: z.object({
-    occupation: z.enum(['Personal_Trainer', 'Physiotherapist']),
+    occupation: personalTrainerOccupation,
   }),
   ...personalTrainerAddress
 }
 
 const PersonalTrainerRole = {
-  role: z.enum(['Admin', 'Employee', 'Member']),
+  role: z.enum(['admin', 'employee', 'member']),
 }
 
 const passwordPersonalTrainer = {
@@ -56,7 +57,7 @@ const personalTrainerResume = {
   id: z.string(),
   name: z.string(),
   deleted: z.boolean().nullable(),
-  occupation: z.enum(['Personal_Trainer', 'Physiotherapist']).optional(),
+  occupation: personalTrainerOccupation.optional(),
 };
 
 const personalTrainerCount = {

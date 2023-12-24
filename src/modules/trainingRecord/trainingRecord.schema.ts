@@ -1,5 +1,6 @@
 import {z} from "zod";
 import {buildJsonSchemas} from "fastify-zod";
+import {trainingStatus, trainingTypes} from "../../utils/common.schema";
 
 const trainingRecordId = {
   id: z.string()
@@ -10,11 +11,13 @@ const trainingRecordDateCreated = {
 };
 
 const trainingRecordInput = {
-  type: z.enum(['Plan', 'Singular', 'Replacement']),
-  status: z.enum(['Reschedule', 'Realized', 'Foul']),
+  type: trainingTypes,
+  status: trainingStatus,
   training_id: z.string(),
   personal_trainer_id: z.string(),
   member_id: z.string(),
+  training_replacement_id: z.string().optional(),
+  realized: z.boolean().optional()
 };
 
 const trainingRecordCount = {
@@ -23,8 +26,8 @@ const trainingRecordCount = {
 
 const trainingRecordResume = {
   ...trainingRecordId,
-  type: z.enum(['Plan', 'Singular', 'Replacement']),
-  status: z.enum(['Reschedule', 'Realized', 'Foul']),
+  type: trainingTypes,
+  status: trainingStatus,
   training_id: z.string(),
   personal_trainer: z.object({
     user: z.object({
@@ -67,7 +70,7 @@ const createTrainingRecordSchema = z.object({
 });
 
 const updateTrainingRecordSchema = z.object({
-  status: z.enum(['Reschedule', 'Realized', 'Foul']),
+  status: trainingStatus,
 });
 
 const TrainingRecordIdSchema = z.object({

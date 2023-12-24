@@ -8,60 +8,59 @@ datasource db {
 }
 
 enum Modality {
-  Pilates
-  Functional
+  pilates
+  functional
 }
 
 enum TrainingType {
-  Plan
-  Singular
-  Replacement
+  plan
+  singular
+  replacement
 }
 
 enum Status {
-  Reschedule
-  Realized
-  Foul
+  realized
+  foul
 }
 
 enum Role {
-  Admin
-  Employee
-  Member
+  admin
+  employee
+  member
 }
 
 enum Occupation {
-  Personal_Trainer
-  Physiotherapist
+  physical_educator
+  physiotherapist
 }
 
 enum Days {
-  Monday
-  Tuesday
-  Wednesday
-  Thursday
-  Friday
-  Saturday
-  Sunday
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+  sunday
 }
 
 enum Recurrence {
-  Monthly
-  Quarterly
-  Semiannual
-  Annual
+  monthly
+  quarterly
+  semiannual
+  annual
 }
 
 enum MemberAmount {
-  Singular
-  Pair
+  singular
+  pair
 }
 
 model Users {
   id               String           @id @unique @default(uuid()) @db.Uuid
   name             String           @db.VarChar()
   cpf              String           @unique @db.VarChar()
-  role             Role             @default(Member)
+  role             Role             @default(member)
   birth_date       String           @db.VarChar()
   email            String           @unique @db.VarChar()
   phone            String           @db.VarChar()
@@ -96,7 +95,7 @@ model UsersAddress {
 model PersonalTrainer {
   id              String           @id @unique @default(uuid()) @db.Uuid
   user_id         String           @unique @default(uuid()) @db.Uuid
-  occupation      Occupation       @default(Personal_Trainer)
+  occupation      Occupation       @default(physical_educator)
   training        Training[]
   training_record TrainingRecord[]
   user            Users            @relation(fields: [user_id], references: [id])
@@ -105,31 +104,33 @@ model PersonalTrainer {
 }
 
 model Member {
-  id              String           @id @unique @default(uuid()) @db.Uuid
-  user_id         String           @unique @default(uuid()) @db.Uuid
-  user            Users            @relation(fields: [user_id], references: [id])
-  training        Training[]
-  training_record TrainingRecord[]
-  MemberPlan      MemberPlan[]
+  id                  String                @id @unique @default(uuid()) @db.Uuid
+  user_id             String                @unique @default(uuid()) @db.Uuid
+  user                Users                 @relation(fields: [user_id], references: [id])
+  training            Training[]
+  training_record     TrainingRecord[]
+  MemberPlan          MemberPlan[]
+  TrainingReplacement TrainingReplacement[]
 
   @@map("member")
 }
 
 model Training {
-  id                  String           @id @unique @default(uuid()) @db.Uuid
+  id                  String                @id @unique @default(uuid()) @db.Uuid
   fixed_day           Days?
   single_date         DateTime? // If it singular or replacement
-  start_time          String           @db.VarChar()
-  modality            Modality         @default(Pilates)
-  type                TrainingType     @default(Plan)
-  deleted             Boolean?         @default(false) @db.Boolean()
-  created_at          DateTime         @default(now())
-  updated_at          DateTime         @updatedAt
-  member_id           String           @db.Uuid
-  personal_trainer_id String           @db.Uuid
-  member              Member           @relation(fields: [member_id], references: [user_id])
-  personal_trainer    PersonalTrainer  @relation(fields: [personal_trainer_id], references: [user_id])
+  start_time          String                @db.VarChar()
+  modality            Modality              @default(pilates)
+  type                TrainingType          @default(plan)
+  deleted             Boolean?              @default(false) @db.Boolean()
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @updatedAt
+  member_id           String                @db.Uuid
+  personal_trainer_id String                @db.Uuid
+  member              Member                @relation(fields: [member_id], references: [user_id])
+  personal_trainer    PersonalTrainer       @relation(fields: [personal_trainer_id], references: [user_id])
   training_record     TrainingRecord[]
+  TrainingReplacement TrainingReplacement[]
 
   @@unique(fields: [start_time, fixed_day, personal_trainer_id], name: "training_unique")
   @@map("training")
@@ -137,8 +138,8 @@ model Training {
 
 model TrainingRecord {
   id                  String          @id @unique @default(uuid()) @db.Uuid
-  type                TrainingType    @default(Plan)
-  status              Status          @default(Realized)
+  type                TrainingType    @default(plan)
+  status              Status          @default(realized)
   training_id         String          @db.Uuid
   personal_trainer_id String          @db.Uuid
   member_id           String          @db.Uuid
@@ -151,12 +152,25 @@ model TrainingRecord {
   @@map("training_record")
 }
 
+model TrainingReplacement {
+  id          String   @id @unique @default(uuid()) @db.Uuid
+  realized    Boolean? @default(false) @db.Boolean()
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  member_id   String   @db.Uuid
+  training_id String   @db.Uuid
+  training    Training @relation(fields: [training_id], references: [id])
+  member      Member   @relation(fields: [member_id], references: [user_id])
+
+  @@map("training_replacement")
+}
+
 model Plan {
   id              String       @id @unique @default(uuid()) @db.Uuid
   name            String       @db.VarChar()
-  modalitie       Modality     @default(Pilates)
-  recurrence      Recurrence   @default(Quarterly)
-  member_amount   MemberAmount @default(Singular)
+  modalitie       Modality     @default(pilates)
+  recurrence      Recurrence   @default(quarterly)
+  member_amount   MemberAmount @default(singular)
   training_amount Int
   isActive        Boolean      @default(true)
   price           Float
