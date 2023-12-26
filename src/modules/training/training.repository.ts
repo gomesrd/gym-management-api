@@ -11,6 +11,8 @@ import {Filters} from "../../utils/common.schema";
 
 export async function createTraining(input: CreateTrainingInput) {
 
+  const {} = input;
+
   return prisma.training.createMany(
     {
       data: input

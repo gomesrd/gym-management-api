@@ -27,12 +27,11 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
     return reply.code(403).send(invalidRequest)
   }
 
-  if (trainingType === 'replacement') {
-    await updateTrainingReplacement(trainingReplacementId, realizedReplacement);
-  }
-
   try {
     const trainingRecord = await createTrainingRecord(body);
+    if (trainingType === 'replacement') {
+      await updateTrainingReplacement(trainingReplacementId, realizedReplacement);
+    }
     return reply.code(201).send(trainingRecord)
   } catch (e) {
     console.log(e)

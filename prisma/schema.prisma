@@ -209,3 +209,6 @@ model MemberPlan {
 // TODO - Validar se o personal trainer não está criando um registro de treino como membro
 // TODO - Validar se o treino no registro de treino pertence ao member e ao personal trainer
 // TODO - Criar possibilidade de transferência de treino para outro personal trainer
+// TODO - Adicionar validação para verificar se o registro do treino está sendo salvo para o member correto
+// TODO - Criar endpoint para buscar as informações de training-replacement (getAll, getById)
+// TODO - Criar regra de negócio para verificar se o número de aulas do mês ultrapassa a quantidade de aula que o aluno tem direito

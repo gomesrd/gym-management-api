@@ -17,7 +17,7 @@ const trainingRecordInput = {
   personal_trainer_id: z.string(),
   member_id: z.string(),
   training_replacement_id: z.string().optional(),
-  realized: z.boolean().optional()
+  realized: z.boolean().optional().default(true)
 };
 
 const trainingRecordCount = {

@@ -7,8 +7,15 @@ import {Filters} from "../../utils/common.schema";
 import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
 
 export async function createTrainingRecord(input: CreateTrainingRecordInput) {
+  const {training_id, personal_trainer_id, status, type, member_id} = input;
   return prisma.trainingRecord.create({
-    data: input,
+    data: {
+      training_id,
+      personal_trainer_id,
+      status,
+      type,
+      member_id,
+    },
   });
 }
 
