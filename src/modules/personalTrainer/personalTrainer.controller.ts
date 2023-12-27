@@ -1,101 +1,95 @@
-import {FastifyReply, FastifyRequest} from "fastify";
+import {FastifyInstance} from "fastify";
 import {
-    createPersonalTrainer, deletePersonalTrainer, findUniquePersonalTrainer, findPersonalTrainerByEmail,
-    findManyPersonalTrainers, updatePersonalTrainer, disablePersonalTrainer
+  deletePersonalTrainerHandler,
+  getManyPersonalTrainersHandler,
+  getUniquePersonalTrainerHandler,
+  loginHandler,
+  registerPersonalTrainerHandler,
+  updatePersonalTrainerHandler
 } from "./personalTrainer.service";
 import {
-    CreatePersonalTrainerInput, DeletePersonalTrainer, LoginInput, PersonalTrainerId, UpdatePersonalTrainer
+  $ref,
+  personalTrainerIdSchema,
+  queryAllPersonalTrainersSchema
 } from "./personalTrainer.schema";
-import {invalidLoginMessage} from "./personalTrainer.mesages";
-import {verifyPassword} from "../../utils/hash";
-import {server} from "../../app";
+import {personalTrainerRoutesPath, personalTrainerSummary, tags} from "../../utils/enums";
+import {responseDeleteSchema, responseIdSchema} from "../../utils/common.schema";
 
-export async function registerPersonalTrainerHandler(request: FastifyRequest<{
-    Body: CreatePersonalTrainerInput
-}>, reply: FastifyReply) {
-    const body = request.body;
-    try {
-        const personalTrainer = await createPersonalTrainer(body);
-        return reply.code(201).send(personalTrainer)
-    } catch (e) {
-        console.log(e)
-        return reply.code(500).send(e)
-    }
-}
 
-export async function loginHandler(request: FastifyRequest<{
-    Body: LoginInput
-}>, reply: FastifyReply) {
-    const body = request.body;
-    const personalTrainer = await findPersonalTrainerByEmail(body.email);
-    if (!personalTrainer) {
-        return reply.code(401).send(invalidLoginMessage())
+async function personalTrainerRoutes(server: FastifyInstance) {
+  server.get(personalTrainerRoutesPath.findAll, {
+    preHandler: [server.authenticate, server.authorizationExclusive],
+    schema: {
+      tags: [tags.personalTrainer],
+      summary: personalTrainerSummary.findAll,
+      querystring: queryAllPersonalTrainersSchema,
+      response: {
+        200: $ref('PersonalTrainersManyResponseSchema'),
+      },
+    },
+  }, getManyPersonalTrainersHandler);
+
+  server.get(personalTrainerRoutesPath.findById, {
+    preHandler: [server.authenticate, server.authorizationLimited],
+    schema: {
+      tags: [tags.personalTrainer],
+      summary: personalTrainerSummary.findById,
+      params: personalTrainerIdSchema,
+      response: {
+        200: $ref('PersonalTrainerUniqueResponseSchema')
+      }
+    },
+  }, getUniquePersonalTrainerHandler);
+
+  server.post(personalTrainerRoutesPath.register, {
+    preHandler: [server.authenticate, server.authorizationExclusive],
+    schema: {
+      tags: [tags.personalTrainer],
+      summary: personalTrainerSummary.register,
+      body: $ref('createPersonalTrainerSchema'),
+      response: {
+        201: responseIdSchema
+      }
     }
-    const correctPassword = verifyPassword(
-        {
-            candidatePassword: body.password,
-            salt: personalTrainer.salt,
-            hash: personalTrainer.password
+  }, registerPersonalTrainerHandler);
+
+  server.post(personalTrainerRoutesPath.login, {
+    schema: {
+      tags: [tags.personalTrainer],
+      summary: personalTrainerSummary.login,
+      body: $ref('loginSchema'),
+      response: {
+        200: $ref('loginResponseSchema')
+      }
+    }
+  }, loginHandler);
+
+  server.put(personalTrainerRoutesPath.update, {
+      preHandler: [server.authenticate, server.authorizationLimited],
+      schema: {
+        tags: [tags.personalTrainer],
+        summary: personalTrainerSummary.update,
+        params: personalTrainerIdSchema,
+        body: $ref('updatePersonalTrainerSchema'),
+        response: {
+          200: $ref('updatePersonalTrainerSchema')
         }
-    )
-    if (correctPassword) {
-        const {password, salt, ...rest} = personalTrainer;
-        const accessToken = server.jwt.sign(rest);
-        return reply.code(200).send({accessToken})
-    }
-    return reply.code(401).send(invalidLoginMessage());
-}
+      }
+    }, updatePersonalTrainerHandler
+  );
 
-export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
-    Params: PersonalTrainerId;
-}>) {
-    return findUniquePersonalTrainer({
-        ...request.params,
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
-}
-
-export async function getManyPersonalTrainersHandler(request: FastifyRequest) {
-    try {
-        return findManyPersonalTrainers(
-            {
-                user_role: request.user.role
-            }
-        );
-    } catch (e) {
-        console.log(e)
-    }
-}
-
-export async function updatePersonalTrainerHandler(request: FastifyRequest<{
-    Body: UpdatePersonalTrainer;
-    Params: PersonalTrainerId;
-}>) {
-    return updatePersonalTrainer({
-        ...request.body,
-    }, {
-        ...request.params,
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
-}
-
-export async function disablePersonalTrainerHandler(request: FastifyRequest<{
-    Body: UpdatePersonalTrainer;
-    Params: PersonalTrainerId;
-}>) {
-    return disablePersonalTrainer({
-            ...request.params
+  server.delete(personalTrainerRoutesPath.delete, {
+      preHandler: [server.authenticate, server.authorizationExclusive],
+      schema: {
+        tags: [tags.personalTrainer],
+        summary: personalTrainerSummary.delete,
+        params: personalTrainerIdSchema,
+        response: {
+          200: responseDeleteSchema
         }
-    );
+      }
+    }, deletePersonalTrainerHandler
+  );
 }
 
-export async function deletePersonalTrainerHandler(request: FastifyRequest<{
-    Params: DeletePersonalTrainer;
-}>, reply: FastifyReply) {
-    await deletePersonalTrainer({
-        ...request.params
-    });
-    return reply.code(200).send('');
-}
+export default personalTrainerRoutes;

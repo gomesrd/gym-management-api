@@ -1,105 +1,93 @@
 import {z} from 'zod';
 import {buildJsonSchemas} from 'fastify-zod'
-import {emailInvalid, emailRequired, passwordInvalid, passwordRequired} from "./personalTrainer.mesages";
+import {
+  count,
+  dateCreatedUpdated, loginResponseSchema, loginSchema,
+  personalTrainerOccupation,
+  userCore,
+  userPassword,
+  usersAddress,
+  usersRole
+} from "../../utils/common.schema";
 
 const personalTrainerId = {
-    id: z.string()
-};
-
-const personalTrainerDate = {
-    created_at: z.date(),
-    updated_at: z.date(),
+  id: z.string()
 };
 
 const personalTrainerCore = {
-    name: z.string(),
-    cpf: z.string(),
-    occupation: z.string(),
-    email: z.string({
-        required_error: 'Email is required',
-        invalid_type_error: emailInvalid(),
-    }).email(),
-    phone: z.string(),
-    role: z.string().optional(),
+  ...userCore,
+  personal_trainer: z.object({
+    occupation: personalTrainerOccupation,
+  }),
+  ...usersAddress
 }
 
-const passwordPersonalTrainer = {
-    password: z.string({
-        required_error: passwordRequired(),
-        invalid_type_error: passwordInvalid()
-    })
+const personalTrainerResume = {
+  id: z.string(),
+  name: z.string(),
+  deleted: z.boolean().nullable(),
+  occupation: personalTrainerOccupation.optional(),
 };
 
-const personalTrainerResume = {
-    name: z.string(),
-    phone: z.string().optional(),
+const updatePersonalTrainerSchema = z.object({
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  phone: z.string().optional(),
+});
+
+export const personalTrainerIdSchema = {
+  type: 'object',
+  properties: {
+    personal_trainer_id: {type: 'string', description: 'Personal Trainer Id'},
+  }
+};
+
+export const queryAllPersonalTrainersSchema = {
+  type: 'object',
+  properties: {
+    cpf: {type: 'string', description: 'CPF'},
+    email: {type: 'string', description: 'Email'},
+    name: {type: 'string', description: 'Name'},
+    occupation: {type: 'string', description: 'physical_educator or physiotherapist'},
+  }
 };
 
 const personalTrainerFindUnique = {
-    ...personalTrainerId,
-    ...personalTrainerCore,
-    ...personalTrainerDate,
+  ...personalTrainerId,
+  ...personalTrainerCore,
+  ...dateCreatedUpdated,
 };
 
 const personalTrainerFindMany = {
-    ...personalTrainerId,
+  data: z.array(z.object({
     ...personalTrainerResume,
+  }))
 };
 
 const createPersonalTrainerSchema = z.object({
-    ...personalTrainerCore,
-    ...passwordPersonalTrainer,
-});
-
-const createPersonalTrainerResponseSchema = z.object({
-    ...personalTrainerId,
-});
-
-const PersonalTrainerIdSchema = z.object({
-    ...personalTrainerId
+  ...personalTrainerCore,
+  ...userPassword,
+  ...usersRole,
 });
 
 const PersonalTrainerUniqueResponseSchema = z.object({
-    ...personalTrainerFindUnique
+  ...personalTrainerFindUnique
 });
 
 const PersonalTrainersManyResponseSchema = z.object({
-    ...personalTrainerFindMany
-});
-
-const loginSchema = z.object({
-    email: z.string({
-        required_error: emailRequired(),
-        invalid_type_error: emailInvalid()
-    }).email(),
-    password: z.string()
-});
-
-const loginResponseSchema = z.object({
-    accessToken: z.string(),
-});
-
-const updatePersonalTrainerSchema = z.object({
-    email: z.string().email().optional(),
-    name: z.string().optional(),
-    phone: z.string().optional(),
-    occupation: z.string().optional(),
-    active: z.boolean().optional(),
+  ...count,
+  ...personalTrainerFindMany,
 });
 
 export type CreatePersonalTrainerInput = z.infer<typeof createPersonalTrainerSchema>
-export type DeletePersonalTrainer = z.infer<typeof PersonalTrainerIdSchema>;
-export type LoginInput = z.infer<typeof loginSchema>
-export type PersonalTrainerId = z.infer<typeof PersonalTrainerIdSchema>;
 export type UpdatePersonalTrainer = z.infer<typeof updatePersonalTrainerSchema>;
+export type PersonalTrainersManyResponse = z.infer<typeof PersonalTrainersManyResponseSchema>;
 
 export const {schemas: personalTrainerSchemas, $ref} = buildJsonSchemas({
-    createPersonalTrainerSchema,
-    createPersonalTrainerResponseSchema,
-    loginSchema,
-    loginResponseSchema,
-    PersonalTrainerUniqueResponseSchema,
-    PersonalTrainersManyResponseSchema,
-    PersonalTrainerIdSchema,
-    updatePersonalTrainerSchema
+  createPersonalTrainerSchema,
+  loginSchema,
+  loginResponseSchema,
+  PersonalTrainerUniqueResponseSchema,
+  PersonalTrainersManyResponseSchema,
+  updatePersonalTrainerSchema
 }, {$id: "personalTrainerSchemas"});

@@ -1,73 +1,96 @@
-import {FastifyReply, FastifyRequest} from "fastify";
+import {FastifyInstance} from "fastify";
+import {$ref} from "./trainingRecord.schema";
 import {
-    CreateTrainingRecordInput, DeleteTrainingRecord, GetTrainingRecord, TrainingRecordsQueryString,
-    UpdateTrainingRecord
-} from "./trainingRecord.schema";
-import {
-    createTrainingRecord, deleteTrainingRecord, findUniqueTrainingRecord, findManyTrainingRecords,
-    updateTrainingRecord
+  deleteTrainingRecordHandler, getUniqueTrainingRecordHandler, getManyTrainingRecordsHandler,
+  registerTrainingRecordHandler, updateTrainingRecordHandler
 } from "./trainingRecord.service";
+import {tags, trainingRecordRoutesPath, trainingRecordSummary} from "../../utils/enums";
 
-
-export async function registerTrainingRecordHandler(request: FastifyRequest<{
-    Body: CreateTrainingRecordInput
-}>, reply: FastifyReply) {
-    const personalTrainerValidate = request.user.id === request.body.personal_trainer_id;
-    if (!personalTrainerValidate) {
-        return reply.code(403).send('You can only register trainings for yourself')
+async function trainingRecordRoutes(server: FastifyInstance) {
+  server.get(trainingRecordRoutesPath.findAll, {
+    preHandler: [server.authenticate],
+    schema: {
+      tags: [tags.training_record],
+      summary: trainingRecordSummary.findAll,
+      querystring: {
+        type: 'object',
+        properties: {
+          id: {type: 'string'},
+          member_id: {type: 'string'},
+          personal_trainer_id: {type: 'string'},
+        }
+      },
+      response: {
+        200: $ref('trainingRecordFindManyScheme')
+      }
     }
-    const body = request.body;
-    try {
-        const trainingRecord = await createTrainingRecord(body);
-        return reply.code(201).send(trainingRecord)
-    } catch (e) {
-        console.log(e)
-        return reply.code(500).send(e)
+  }, getManyTrainingRecordsHandler);
+
+  server.get(trainingRecordRoutesPath.findById, {
+    preHandler: [server.authenticate],
+    schema: {
+      tags: [tags.training_record],
+      summary: trainingRecordSummary.findById,
+      params: {
+        id: {type: 'string'},
+      },
+      response: {
+        200: {
+          type: 'array',
+          items: $ref('trainingRecordFindUniqueSchema')
+        }
+      }
+    },
+  }, getUniqueTrainingRecordHandler);
+
+  server.post(trainingRecordRoutesPath.register, {
+    preHandler: [server.authenticate, server.authorizationLimited],
+    schema: {
+      tags: [tags.training_record],
+      body: $ref('createTrainingRecordSchema'),
+      summary: trainingRecordSummary.register,
+      response: {
+        201: $ref('TrainingRecordIdSchema')
+      }
     }
+  }, registerTrainingRecordHandler);
+
+  server.put(trainingRecordRoutesPath.update, {
+      preHandler: [server.authenticate, server.authorizationExclusive],
+      schema: {
+        tags: [tags.training_record],
+        summary: trainingRecordSummary.update,
+        params: {
+          id: {type: 'string'},
+        },
+        body: $ref('updateTrainingRecordSchema'),
+        response: {
+          200: $ref('updateTrainingRecordSchema')
+        },
+
+      }
+    }, updateTrainingRecordHandler
+  );
+
+  server.delete(trainingRecordRoutesPath.delete, {
+      preHandler: [server.authenticate, server.authorizationExclusive],
+      schema: {
+        tags: [tags.training_record],
+        summary: trainingRecordSummary.delete,
+        params: {
+          id: {type: 'string'},
+        },
+        response: {
+          200: {
+            type: 'object',
+            properties: {
+              message: {type: 'string', example: ''}
+            }
+          }
+        }
+      }
+    }, deleteTrainingRecordHandler
+  );
 }
 
-export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
-    Querystring: TrainingRecordsQueryString;
-}>) {
-    try {
-        return findManyTrainingRecords({...request.query}, {
-            user_id: request.user.id,
-            user_role: request.user.role
-        });
-    } catch (e) {
-        console.log(e)
-    }
-}
-
-export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
-    Params: GetTrainingRecord;
-}>) {
-
-    return findUniqueTrainingRecord({
-        ...request.params
-    }, {
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
-}
-
-export async function updateTrainingRecordHandler(request: FastifyRequest<{
-    Body: UpdateTrainingRecord;
-    Params: GetTrainingRecord;
-}>) {
-    return updateTrainingRecord({
-        ...request.body
-    }, {...request.params,});
-
-}
-
-export async function deleteTrainingRecordHandler(request: FastifyRequest<{
-    Params: DeleteTrainingRecord;
-}>, reply: FastifyReply) {
-
-    await deleteTrainingRecord({
-        ...request.params
-    });
-
-    return reply.code(200).send('');
-}
+export default trainingRecordRoutes;

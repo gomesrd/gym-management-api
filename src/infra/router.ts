@@ -1,22 +1,23 @@
 import {FastifyInstance} from "fastify";
-import personalTrainerRoutes from "../modules/personalTrainer/personalTrainer.route";
+import personalTrainerRoutes from "../modules/personalTrainer/personalTrainer.controller";
 import {healthCheck} from "./health-check";
-import {responseSchema} from "../responseSchema";
-import {loginServer} from "../modules/auth/login";
-import {documentation} from "../config/documentation";
-import memberRoutes from "../modules/member/member.route";
-import trainingRoutes from "../modules/training/training.route";
-import trainingRecordRoutes from "../modules/trainingRecord/trainingRecord.route";
-import {authorizationServer} from "../modules/auth/authorization";
+import memberRoutes from "../modules/member/member.controller";
+import trainingRoutes from "../modules/training/training.controller";
+import trainingRecordRoutes from "../modules/trainingRecord/trainingRecord.controller";
+import trainingReportRoutes from "../modules/report/training/trainingReport.controller";
+import fastifyCors from "@fastify/cors";
+import {routesPath} from "../utils/enums";
+
 
 export async function router(server: FastifyInstance) {
-    await documentation(server);
-    await loginServer(server);
-    await authorizationServer(server);
-    await responseSchema(server);
-    server.register(personalTrainerRoutes, {prefix: '/personal-trainers'});
-    server.register(memberRoutes, {prefix: '/members'});
-    server.register(trainingRoutes, {prefix: '/trainings'});
-    server.register(trainingRecordRoutes, {prefix: '/trainings-record'});
-    server.register(healthCheck);
+  server.register(memberRoutes, {prefix: routesPath.members});
+  server.register(personalTrainerRoutes, {prefix: routesPath.personalTrainers});
+  server.register(trainingReportRoutes, {prefix: routesPath.trainingsReport})
+  server.register(trainingRecordRoutes, {prefix: routesPath.trainingsRecord});
+  server.register(trainingRoutes, {prefix: routesPath.trainings});
+  server.register(healthCheck);
+  server.register(fastifyCors, {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  });
 }

@@ -1,35 +1,23 @@
 import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
+import {
+  verifyPermissionAdmin,
+  verifyPermissionMember,
+  verifyPermissionPersonalTrainer
+} from "../../utils/permissions.service";
 
 export async function authorizationServer(server: FastifyInstance) {
-    server.decorate('authorizationExclusive', async (request: FastifyRequest, reply: FastifyReply) => {
-        const userRole = request.user.role;
-        if (verifyUserRole(userRole, ['admin'])) {
-            return;
-        } else {
-            throw new Error('Unauthorized');
-        }
-    });
+  server.decorate('authorizationExclusive', async (request: FastifyRequest) => {
+    const userId = request.user.id;
+    await verifyPermissionAdmin(userId);
+  });
 
-    server.decorate('authorizationLimited', async (request: FastifyRequest, reply: FastifyReply) => {
-        const userRole = request.user.role;
-        if (verifyUserRole(userRole, ['admin', 'personal_trainer'])) {
-            return;
-        } else {
-            throw new Error('Unauthorized');
-        }
-    });
+  server.decorate('authorizationLimited', async (request: FastifyRequest) => {
+    const userId = request.user.id;
+    await verifyPermissionPersonalTrainer(userId);
+  });
 
-    server.decorate('authorizationMember', async (request: FastifyRequest, reply: FastifyReply) => {
-        const userRole = request.user.role;
-        if (verifyUserRole(userRole, ['admin', 'member'])) {
-            return;
-        } else {
-            throw new Error('Unauthorized');
-        }
-    });
+  server.decorate('authorizationMember', async (request: FastifyRequest) => {
+    const userId = request.user.id;
+    await verifyPermissionMember(userId);
+  });
 }
-
-export function verifyUserRole(userRole: string, allowedRoles: string[]): boolean {
-    return allowedRoles.includes(userRole);
-}
-

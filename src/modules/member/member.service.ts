@@ -1,110 +1,118 @@
-import prisma from "../../config/prisma";
-import {CreateMemberInput, DeleteMember, MemberId, UpdateMember} from "./member.schema";
-import {hashPassword} from "../../utils/hash";
+import {FastifyReply, FastifyRequest} from "fastify";
+import {
+  createMember,
+  deleteMember,
+  findUniqueMember,
+  findMemberByEmail,
+  findManyMembers,
+  updateMember, findUniqueMemberResume
+} from "./member.repository";
+import {CreateMemberInput, UpdateMember} from "./member.schema";
+import {invalidLoginMessage} from "./member.mesages";
+import {verifyPassword} from "../../utils/hash";
+import {server} from "../../app";
+import {Filters, LoginInput} from "../../utils/common.schema";
+import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
+import {MemberId} from "../../utils/types";
 
-export async function createMember(input: CreateMemberInput) {
-    const {password, ...rest} = input;
-    const {hash, salt} = hashPassword(password);
-
-    return prisma.member.create({
-        data: {...rest, salt, password: hash},
-    });
-}
-
-export async function findMemberByEmail(email: string) {
-    return prisma.member.findUnique({
-        where: {
-            email,
-            active: true
-        },
-    });
-}
-
-export async function findManyMembers(data: any & {
-    user_role: string
-}) {
-    return prisma.member.findMany({
-        select: {
-            id: true,
-            name: true,
-            email: false,
-            phone: true,
-            birth_date: false,
-            created_at: false,
-            updated_at: false,
-            salt: false,
-            password: false,
-        }
-    });
-}
-
-export async function findUniqueMember(data: MemberId & {
-    user_id: string, user_role: string
-}) {
-    const id = (data.user_role === 'admin' || 'personal_trainer') ? data.id : data.user_id;
-    const active = (data.user_role !== 'admin') ? true : undefined;
-    return prisma.member.findUnique({
-        where: {
-            id: id,
-            active: active
-        },
-        select: {
-            id: true,
-            name: true,
-            birth_date: true,
-            email: true,
-            phone: true,
-            created_at: true,
-            updated_at: true,
-            salt: false,
-            password: false,
-        }
-    });
-}
-
-export async function updateMember(data: UpdateMember, params: MemberId & {
-    user_id: string, user_role: string
-}) {
-    if (params.user_role !== 'admin' && params.user_id !== params.id) {
-        return Promise.reject('You do not have permission to realize this action');
+export async function registerMemberHandler(request: FastifyRequest<{
+  Body: CreateMemberInput
+}>, reply: FastifyReply) {
+  const body = request.body;
+  try {
+    const member = await createMember(body);
+    return reply.code(201).send(member)
+  } catch (e: any) {
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Member already exists'
+      })
     }
-    return prisma.member.update({
-        where: {
-            id: params.id
-        },
-        data: {
-            name: data.name,
-            email: data.email,
-            phone: data.phone,
-            birth_date: data.birth_date,
-        }
-    });
+    return reply.code(500).send(e)
+  }
 }
 
-export async function disableMember(params: MemberId) {
-    try {
-        return await prisma.member.update({
-            where: {
-                id: params.id,
-            },
-            data: {
-                active: false,
-            }
-        });
-    } catch (error) {
-        throw error;
+
+export async function loginHandler(request: FastifyRequest<{
+  Body: LoginInput
+}>, reply: FastifyReply) {
+  const body = request.body;
+
+  const member = await findMemberByEmail(body.email);
+
+  if (!member) {
+    return reply.code(401).send(invalidLoginMessage())
+  }
+
+  const correctPassword = verifyPassword(
+    {
+      candidatePassword: body.password,
+      salt: member.salt,
+      hash: member.password
     }
+  )
+
+  if (correctPassword) {
+    const {id, name} = member;
+    const dataMember = {id, name};
+    const expiresIn = 60 * 120;
+    return {accessToken: server.jwt.sign(dataMember, {expiresIn})};
+  }
+
+  return reply.code(401).send(invalidLoginMessage());
 }
 
-export async function deleteMember(params: DeleteMember & {
-    user_id: string, user_role: string
-}) {
-    if (params.user_role !== 'admin' && params.user_id !== params.id) {
-        return Promise.reject('You do not have permission to realize this action');
-    }
-    return prisma.member.delete({
-        where: {
-            id: params.id,
-        }
-    })
+export async function getUniqueMemberHandler(request: FastifyRequest<{
+  Params: MemberId;
+}>) {
+  const userId = request.user.id;
+  const memberId = request.params.member_id
+
+  return findUniqueMember(memberId, userId);
+}
+
+export async function getUniqueMemberHandlerResume(request: FastifyRequest<{
+  Params: MemberId;
+}>) {
+  const memberId = request.params.member_id
+
+  return findUniqueMemberResume(memberId);
+}
+
+export async function getManyMembersHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>) {
+  const filters = request.query;
+  const userId = request.user.id;
+
+  try {
+    return findManyMembers(filters, userId);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function updateMemberHandler(request: FastifyRequest<{
+  Body: UpdateMember;
+  Params: MemberId;
+}>) {
+  const userId = request.user.id;
+  const dataUpdate = request.body;
+  const memberId = request.params.member_id
+  await verifyPermissionActionOnlyMember(userId, memberId);
+
+  return updateMember(
+    dataUpdate,
+    memberId,
+  );
+}
+
+export async function deleteMemberHandler(request: FastifyRequest<{
+  Params: MemberId;
+}>, reply: FastifyReply) {
+  const userId = request.user.id;
+  const memberId = request.params.member_id;
+  await verifyPermissionActionOnlyMember(userId, memberId);
+  await deleteMember(memberId);
+  return reply.code(200).send('');
 }

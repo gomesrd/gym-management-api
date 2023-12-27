@@ -1,91 +1,112 @@
 import {z} from "zod";
 import {buildJsonSchemas} from "fastify-zod";
+import {daysOfWeek, trainingModalities, trainingTypes} from "../../utils/common.schema";
 
 const trainingId = {
-    id: z.string()
+  id: z.string()
 }
 
 const trainingDate = {
-    created_at: z.date(),
-    updated_at: z.date(),
+  created_at: z.date(),
+  updated_at: z.date(),
 };
 
 const trainingInput = {
-    fixed_day: z.string().optional(),
-    single_date: z.string().optional(),
-    start_time: z.string(),
-    modality_training: z.string(),
-    type_training: z.string(),
-    personal_trainer_id: z.string(),
-    member_id: z.string(),
+  fixed_day: daysOfWeek.nullable(),
+  single_date: z.date().nullable(),
+  start_time: z.string(),
+  modality: trainingModalities.optional(),
+  type: z.enum(['plan', 'singular', 'replacement']),
+  personal_trainer_id: z.string(),
+  member_id: z.string(),
+  training_replacement_id: z.string().optional(),
 };
 
+const trainingInputReplacement = z.object({
+  training_id: z.string(),
+  member_id: z.string(),
+  realized: z.boolean(),
+})
+
 const trainingResume = {
-    ...trainingId,
-    fixed_day: z.string(),
-    single_date: z.string().optional(),
-    start_time: z.string(),
-    modality_training: z.string(),
-    type_training: z.string(),
-    personal_trainer: z.object({
-        name: z.string(),
-        id: z.string().optional(),
-    }),
-    member: z.object({
-        name: z.string(),
-        id: z.string().optional(),
-    }),
+  ...trainingId,
+  fixed_day: daysOfWeek.nullable(),
+  single_date: z.date().nullable(),
+  start_time: z.string(),
+  modality: trainingModalities,
+  type: trainingTypes,
+  personal_trainer: z.object({
+    user: z.object({
+      name: z.string().optional(),
+      id: z.string().optional(),
+    }).optional(),
+  }).optional(),
+  member: z.object({
+    user: z.object({
+      name: z.string().optional(),
+      id: z.string().optional(),
+    }).optional(),
+  }).optional(),
+};
+
+const createTrainingReplacement = {
+  training_id: z.string(),
+  member_id: z.string(),
+  realized: z.boolean(),
 };
 
 const trainingFindUniqueSchema = z.object({
-    ...trainingResume,
-    ...trainingDate
+  ...trainingResume,
+  ...trainingDate
 });
+
+const trainingCount = {
+  count: z.number()
+};
 
 const trainingFindManyScheme = z.object({
-    ...trainingResume,
-});
-
-
-const trainingsQueryStringSchema = z.object({
-    id: z.string().optional(),
-    member_id: z.string().optional(),
-    personal_trainer_id: z.string().optional(),
-    active: z.boolean().optional(),
+  ...trainingCount,
+  data: z.array(
+    z.object({
+      ...trainingResume
+    })
+  ),
 });
 
 const createTraining = z.object({
-    ...trainingInput,
+  ...trainingInput,
 });
 
 const createTrainingSchema = z.array(createTraining);
 
+const createTrainingReplacementSchema = z.object({...createTrainingReplacement})
+
 const updateTrainingSchema = z.object({
-    fixed_day: z.string().optional(),
-    single_date: z.string().optional(),
-    start_time: z.string().optional(),
-    active: z.boolean().optional(),
-    personal_trainer_id: z.string().optional(),
-    modality_training: z.string().optional(),
-    type_training: z.string().optional(),
+  fixed_day: daysOfWeek.optional().nullable(),
+  single_date: z.string().nullable(),
+  start_time: z.string().optional(),
+  active: z.boolean().optional(),
+  personal_trainer_id: z.string().optional(),
+  modality: trainingModalities,
+  type: trainingTypes,
 });
 
 const TrainingIdSchema = z.object({
-    ...trainingId
+  ...trainingId
 });
 
 export type CreateTrainingInput = z.infer<typeof createTrainingSchema>;
+export type CreateTrainingReplacement = z.infer<typeof trainingInputReplacement>;
 export type DeleteTraining = z.infer<typeof TrainingIdSchema>;
 export type GetTraining = z.infer<typeof TrainingIdSchema>;
 export type UpdateTraining = z.infer<typeof updateTrainingSchema>;
-export type TrainingsQueryString = z.infer<typeof trainingsQueryStringSchema>;
-
+export type FindManyTraining = z.infer<typeof trainingFindManyScheme>;
 
 export const {schemas: trainingSchemas, $ref} = buildJsonSchemas({
-    createTrainingSchema,
-    trainingFindManyScheme,
-    trainingFindUniqueSchema,
-    TrainingIdSchema,
-    updateTrainingSchema,
-    trainingsQueryStringSchema,
+  createTrainingSchema,
+  createTrainingReplacementSchema,
+  trainingFindManyScheme,
+  trainingFindUniqueSchema,
+  TrainingIdSchema,
+  updateTrainingSchema,
 }, {$id: "TrainingSchemas"});

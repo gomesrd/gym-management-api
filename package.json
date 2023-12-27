@@ -6,13 +6,15 @@
   "author": "Douglas Santos",
   "license": "ISC",
   "scripts": {
-    "build": "prisma generate && tsc -p tsconfig.json",
+    "build": "dotenv -e .env.$NODE_ENV prisma generate && tsc -p tsconfig.json",
     "start": "dotenv -e .env.$NODE_ENV node dist/index.js",
-    "dev": "dotenv -e .env.local nodemon src/index.ts"
+    "dev": "dotenv -e .env.$NODE_ENV nodemon src/index.ts",
+    "migrate": "prisma migrate deploy"
   },
   "dependencies": {
-    "@fastify/jwt": "^5.0.0",
-    "@prisma/client": "^5.3.0",
+    "@fastify/cors": "^8.5.0",
+    "@fastify/jwt": "^5.0.1",
+    "@prisma/client": "^5.7.1",
     "dotenv": "^16.3.1",
     "dotenv-cli": "^7.3.0",
     "envalid": "^7.3.1",
@@ -24,9 +26,12 @@
     "zod-to-json-schema": "^3.21.4"
   },
   "devDependencies": {
-    "@types/node": "^20.5.9",
+    "@types/node": "^20.6.3",
+    "dotenv": "^16.3.1",
+    "dotenv-cli": "^7.3.0",
+    "envalid": "^8.0.0",
     "nodemon": "^3.0.1",
-    "prisma": "^5.3.0",
+    "prisma": "^5.7.1",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"

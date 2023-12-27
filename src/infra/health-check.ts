@@ -1,7 +1,7 @@
 import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
 
 export async function healthCheck(server: FastifyInstance) {
-    server.get("/healthcheck", {
+    server.get("/health", {
         schema: {
             tags: ['Health-Check'],
             summary: 'Health-Check',

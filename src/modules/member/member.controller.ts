@@ -1,111 +1,100 @@
-import {FastifyReply, FastifyRequest} from "fastify";
+import {FastifyInstance} from "fastify";
 import {
-    createMember,
-    deleteMember,
-    findUniqueMember,
-    findMemberByEmail,
-    findManyMembers,
-    updateMember,
-    disableMember
+  deleteMemberHandler, getUniqueMemberHandler, getManyMembersHandler, loginHandler,
+  registerMemberHandler, updateMemberHandler, getUniqueMemberHandlerResume
 } from "./member.service";
-import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
-import {invalidLoginMessage} from "./member.mesages";
-import {verifyPassword} from "../../utils/hash";
-import {server} from "../../app";
+import {$ref, memberIdSchema, queryAllMembersSchema} from "./member.schema";
+import {responseDeleteSchema, responseIdSchema} from "../../utils/common.schema";
+import {memberRoutesPath, memberSummary, tags} from "../../utils/enums";
 
-export async function registerMemberHandler(request: FastifyRequest<{
-    Body: CreateMemberInput
-}>, reply: FastifyReply) {
-    const body = request.body;
-    try {
-        const member = await createMember(body);
-        return reply.code(201).send(member)
-    } catch (e) {
-        console.log(e)
-        return reply.code(500).send(e)
+async function memberRoutes(server: FastifyInstance) {
+  server.get(memberRoutesPath.findAll, {
+    preHandler: [server.authenticate, server.authorizationLimited],
+    schema: {
+      tags: [tags.member],
+      summary: memberSummary.findAll,
+      querystring: queryAllMembersSchema,
+      response: {
+        200: $ref('MembersAllResponseSchema')
+      },
+
+    },
+  }, getManyMembersHandler);
+
+  server.get(memberRoutesPath.findById, {
+    preHandler: [server.authenticate, server.authorizationMember],
+    schema: {
+      tags: [tags.member],
+      summary: memberSummary.findById,
+      params: memberIdSchema,
+      response: {
+        200: $ref('MemberUniqueResponseSchema')
+      }
+
+    },
+  }, getUniqueMemberHandler);
+
+  server.get(memberRoutesPath.resumeAll, {
+    preHandler: [server.authenticate, server.authorizationLimited],
+    schema: {
+      tags: [tags.member],
+      summary: memberSummary.resume,
+      params: memberIdSchema,
+      response: {
+        200: $ref('MemberResumeResponseSchema')
+      }
+
+    },
+  }, getUniqueMemberHandlerResume);
+
+  server.post(memberRoutesPath.register, {
+    schema: {
+      tags: [tags.member],
+      body: $ref('createMemberSchema'),
+      summary: memberSummary.register,
+      response: {
+        201: responseIdSchema,
+      },
     }
-}
+  }, registerMemberHandler);
 
-
-export async function loginHandler(request: FastifyRequest<{
-    Body: LoginInput
-}>, reply: FastifyReply) {
-    const body = request.body;
-
-    const member = await findMemberByEmail(body.email);
-
-    if (!member) {
-        return reply.code(401).send(invalidLoginMessage())
+  server.post(memberRoutesPath.login, {
+    schema: {
+      tags: [tags.member],
+      body: $ref('loginSchema'),
+      summary: memberSummary.login,
+      response: {
+        200: $ref('loginResponseSchema')
+      }
     }
+  }, loginHandler);
 
-    const correctPassword = verifyPassword(
-        {
-            candidatePassword: body.password,
-            salt: member.salt,
-            hash: member.password
+  server.put(memberRoutesPath.update, {
+      preHandler: [server.authenticate, server.authorizationMember],
+      schema: {
+        tags: [tags.member],
+        summary: memberSummary.update,
+        params: memberIdSchema,
+        body: $ref('updateMemberSchema'),
+        response: {
+          200: $ref('updateMemberSchema')
         }
-    )
+      }
+    }, updateMemberHandler
+  );
 
-    if (correctPassword) {
-        const {password, salt, ...rest} = member;
-
-        return {accessToken: server.jwt.sign(rest)};
-    }
-
-    return reply.code(401).send(invalidLoginMessage());
+  server.delete(memberRoutesPath.delete, {
+      preHandler: [server.authenticate, server.authorizationMember],
+      schema: {
+        tags: [tags.member],
+        summary: memberSummary.delete,
+        params: memberIdSchema,
+        response: {
+          200: responseDeleteSchema
+        }
+      }
+    }, deleteMemberHandler
+  );
 }
 
-export async function getUniqueMemberHandler(request: FastifyRequest<{
-    Params: MemberId;
-}>) {
-    return findUniqueMember({
-        ...request.params,
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
-}
-
-export async function getManyMembersHandler(request: FastifyRequest) {
-    try {
-        return findManyMembers({
-            user_id: request.user.id,
-        });
-    } catch (e) {
-        console.log(e)
-    }
-}
-
-export async function updateMemberHandler(request: FastifyRequest<{
-    Body: UpdateMember;
-    Params: MemberId;
-}>) {
-    return updateMember(
-        {
-            ...request.body
-        },
-        {
-            ...request.params,
-            user_id: request.user.id,
-            user_role: request.user.role
-        });
-}
-
-export async function disableMemberHandler(request: FastifyRequest<{
-    Body: UpdateMember;
-    Params: MemberId
-}>) {
-    return disableMember({
-        ...request.params
-    });
-}
-
-export async function deleteMemberHandler(request: FastifyRequest<{
-    Params: DeleteMember;
-}>, reply: FastifyReply) {
-    await deleteMember({
-        ...request.params,
-        user_id: request.user.id,
-        user_role: request.user.role
-    });
-    return reply.code(200).send('');
-}
+export default memberRoutes;
