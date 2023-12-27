@@ -49,7 +49,18 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
 
   const totalTrainings = totalRegularTrainingsRealized + totalTrainingsFoul + totalTrainingsReplacement;
 
+  const memberData = await prisma.users.findUnique({
+    where: {
+      id: memberId
+    },
+    select: {
+      id: true,
+      name: true
+    }
+  });
+
   return {
+    member: memberData,
     totalRegularTrainingsRealized: totalRegularTrainingsRealized,
     totalTrainingsFoul: totalTrainingsFoul,
     totalTrainingsReplacement: totalTrainingsReplacement,

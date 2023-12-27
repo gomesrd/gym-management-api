@@ -5,8 +5,8 @@ import {loginServer} from "./modules/auth/login";
 import {authorizationServer} from "./modules/auth/authorization";
 import {responseSchema} from "./responseSchema";
 
-export const server = fastify();
 
+export const server = fastify();
 const setupServer = async (): Promise<{
     server: FastifyInstance
     env: Env

@@ -1,16 +1,13 @@
 import prisma from "../../config/prisma";
-import {CreatePersonalTrainerInput, PersonalTrainerId, UpdatePersonalTrainer} from "./personalTrainer.schema";
-import {hashPassword} from "../../utils/hash";
-import {queryUserRole} from "../../utils/permissions.service";
+import {CreatePersonalTrainerInput, UpdatePersonalTrainer} from "./personalTrainer.schema";
 import {Filters} from "../../utils/common.schema";
-import {parseFiltersPermission} from "../../utils/parseFilters";
+import {FiltersPermissions, PersonalTrainerId} from "../../utils/types";
 
-export async function createPersonalTrainer(input: CreatePersonalTrainerInput) {
+export async function createPersonalTrainer(input: CreatePersonalTrainerInput, hash: string, salt: string) {
   const {
-    password, cpf, email, phone, name, personal_trainer: {occupation},
-    role, birth_date, address
+    cpf, email, phone, name, personal_trainer: {occupation},
+    role, birth_date, users_address
   } = input;
-  const {hash, salt} = hashPassword(password);
 
   return prisma.users.create({
     data: {
@@ -23,7 +20,7 @@ export async function createPersonalTrainer(input: CreatePersonalTrainerInput) {
       salt,
       password: hash,
       users_address: {
-        create: address,
+        create: users_address,
       },
       personal_trainer: {
         create: {
@@ -46,14 +43,12 @@ export async function findPersonalTrainerByEmail(email: string) {
   });
 }
 
-export async function findUniquePersonalTrainer(data: PersonalTrainerId,
-                                                userId: string) {
-  const applyFilters = await parseFiltersPermission(userId, data.id);
+export async function findUniquePersonalTrainer(filters: FiltersPermissions) {
 
   return prisma.users.findUnique({
     where: {
-      id: applyFilters.user_id,
-      deleted: applyFilters.deleted
+      id: filters.user_id,
+      deleted: filters.deleted
     },
     select: {
       id: true,
@@ -141,30 +136,27 @@ export async function findManyPersonalTrainers(filters: Filters) {
   };
 }
 
-export async function updatePersonalTrainer(data: UpdatePersonalTrainer, params: PersonalTrainerId,
-                                            userId: string) {
-  const userRole = await queryUserRole(userId);
-  if (userRole !== 'admin' && userId !== params.id) {
-    return Promise.reject('You can only update your own data');
-  }
+export async function updatePersonalTrainer(dataUpdate: UpdatePersonalTrainer, personalTrainerId: string) {
+  const {name, email, phone} = dataUpdate
+
 
   return prisma.users.update({
     where: {
-      id: params.id
+      id: personalTrainerId
     },
     data: {
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
+      name: name,
+      email: email,
+      phone: phone,
     }
   });
 }
 
-export async function deletePersonalTrainer(params: PersonalTrainerId) {
+export async function deletePersonalTrainer(personalTrainerId: string) {
   try {
     return await prisma.users.update({
       where: {
-        id: params.id,
+        id: personalTrainerId,
       },
       data: {
         deleted: true,

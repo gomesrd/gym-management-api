@@ -10,6 +10,10 @@ export const daysOfWeek = z.enum([
   'sunday',
 ]);
 
+export const usersRole = {
+  role: z.enum(['admin', 'employee', 'member']),
+}
+
 export const trainingModalities = z.enum(['pilates', 'functional']);
 
 export const personalTrainerOccupation = z.enum(['physical_educator', 'physiotherapist']);
@@ -38,4 +42,45 @@ const filtersSchema = z.object({
   type: trainingTypes.optional(),
 });
 
+export const usersAddress = {
+  users_address: z.object({
+    address: z.string(),
+    address_number: z.string(),
+    address_complement: z.string().nullable(),
+    address_neighborhood: z.string(),
+    city: z.string(),
+    state: z.string(),
+    country: z.string().nullable(),
+    zip_code: z.string(),
+  }),
+};
+
+export const userCore = {
+  name: z.string(),
+  cpf: z.string(),
+  birth_date: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+};
+
+export const userPassword = {
+  password: z.string()
+};
+
+export const dateCreatedUpdated = {
+  created_at: z.date().nullable(),
+  updated_at: z.date().nullable(),
+};
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string()
+});
+
+export const loginResponseSchema = z.object({
+  accessToken: z.string(),
+});
+
 export type Filters = z.infer<typeof filtersSchema>;
+export type LoginInput = z.infer<typeof loginSchema>
+

@@ -9,6 +9,7 @@ import {
 } from "./trainingRecord.repository";
 import {personalTrainerValidate} from "../../utils/permissions.service";
 import {updateTrainingReplacement} from "../training/training.repository";
+import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
 
 
 export async function registerTrainingRecordHandler(request: FastifyRequest<{
@@ -29,9 +30,11 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
 
   try {
     const trainingRecord = await createTrainingRecord(body);
+
     if (trainingType === 'replacement') {
       await updateTrainingReplacement(trainingReplacementId, realizedReplacement);
     }
+
     return reply.code(201).send(trainingRecord)
   } catch (e) {
     console.log(e)
@@ -43,8 +46,11 @@ export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
   Querystring: TrainingRecordsQueryString;
 }>) {
   const userId = request.user.id;
+  const filters = request.query;
+  const parseFilters = await parseFiltersTraining(filters, userId);
+
   try {
-    return findManyTrainingRecords({...request.query}, userId);
+    return findManyTrainingRecords(filters, parseFilters);
   } catch (e) {
     console.log(e)
   }
@@ -54,28 +60,28 @@ export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
   Params: GetTrainingRecord;
 }>) {
   const userId = request.user.id;
+  const trainingRecordId = request.params.id;
+  const parseFilters = await parseFiltersPermission(userId);
 
-  return findUniqueTrainingRecord({
-    ...request.params
-  }, userId);
+  return findUniqueTrainingRecord(trainingRecordId, parseFilters);
 }
 
 export async function updateTrainingRecordHandler(request: FastifyRequest<{
   Body: UpdateTrainingRecord;
   Params: GetTrainingRecord;
 }>) {
-  return updateTrainingRecord({
-    ...request.body
-  }, {...request.params})
+  const trainingRecordId = request.params.id;
+  const dataUpdate = request.body;
+
+  return updateTrainingRecord(trainingRecordId, dataUpdate)
 }
 
 export async function deleteTrainingRecordHandler(request: FastifyRequest<{
   Params: DeleteTrainingRecord;
 }>, reply: FastifyReply) {
+  const trainingRecordId = request.params.id;
 
-  await deleteTrainingRecord({
-    ...request.params
-  });
+  await deleteTrainingRecord(trainingRecordId);
 
   return reply.code(200).send('');
 }

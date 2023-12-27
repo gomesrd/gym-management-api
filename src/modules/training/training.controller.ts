@@ -2,8 +2,9 @@ import {FastifyInstance} from "fastify";
 import {$ref} from "./training.schema";
 import {
   deleteTrainingHandler, getUniqueTrainingHandler, getManyTrainingsHandler, registerTrainingHandler,
-  updateTrainingHandler, registerTrainingReplacementHandler
+  updateTrainingHandler
 } from "./training.service";
+import {registerTrainingReplacementHandler} from "./replacement/trainingReplacement.service";
 
 async function trainingRoutes(server: FastifyInstance) {
   server.get('', {
@@ -55,13 +56,17 @@ async function trainingRoutes(server: FastifyInstance) {
   server.post('/replacement/:id', {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: ['Training'],
-      //body: ,
+      tags: ['Training Replacement'],
+      body: $ref('createTrainingReplacementSchema'),
       summary: 'Create a new training for replacement',
       response: {
-//          201: $ref('createTrainingSchema')
+        201: {
+          type: 'object',
+          properties: {
+            id: {type: 'string', example: ''}
+          }
+        }
       }
-
     }
   }, registerTrainingReplacementHandler);
 

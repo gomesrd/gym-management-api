@@ -5,12 +5,19 @@ import memberRoutes from "../modules/member/member.controller";
 import trainingRoutes from "../modules/training/training.controller";
 import trainingRecordRoutes from "../modules/trainingRecord/trainingRecord.controller";
 import trainingReportRoutes from "../modules/report/training/trainingReport.controller";
+import fastifyCors from "@fastify/cors";
+import {routesPath} from "../utils/enums";
+
 
 export async function router(server: FastifyInstance) {
-    server.register(memberRoutes, {prefix: '/members'});
-    server.register(personalTrainerRoutes, {prefix: '/personal-trainers'});
-    server.register(trainingReportRoutes, {prefix: '/reports/trainings'})
-    server.register(trainingRecordRoutes, {prefix: '/trainings-record'});
-    server.register(trainingRoutes, {prefix: '/trainings'});
-    server.register(healthCheck);
+  server.register(memberRoutes, {prefix: routesPath.members});
+  server.register(personalTrainerRoutes, {prefix: routesPath.personalTrainers});
+  server.register(trainingReportRoutes, {prefix: routesPath.trainingsReport})
+  server.register(trainingRecordRoutes, {prefix: routesPath.trainingsRecord});
+  server.register(trainingRoutes, {prefix: routesPath.trainings});
+  server.register(healthCheck);
+  server.register(fastifyCors, {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  });
 }

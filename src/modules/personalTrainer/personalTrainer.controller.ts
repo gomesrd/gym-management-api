@@ -7,65 +7,69 @@ import {
   registerPersonalTrainerHandler,
   updatePersonalTrainerHandler
 } from "./personalTrainer.service";
-import {$ref} from "./personalTrainer.schema";
+import {$ref, personalTrainerIdSchema, queryAllPersonalTrainersSchema} from "./personalTrainer.schema";
+import {personalTrainerRoutesPath, personalTrainerSummary, personalTrainerTag} from "../../utils/enums";
+
 
 async function personalTrainerRoutes(server: FastifyInstance) {
-  server.get('', {
+  server.get(personalTrainerRoutesPath.findAll, {
     preHandler: [server.authenticate, server.authorizationExclusive],
     schema: {
-      tags: ['PersonalTrainer'],
-      summary: 'Get all Personal Trainers',
+      tags: personalTrainerTag,
+      summary: personalTrainerSummary.findAll,
+      querystring: queryAllPersonalTrainersSchema,
       response: {
         200: $ref('PersonalTrainersManyResponseSchema'),
       },
     },
   }, getManyPersonalTrainersHandler);
 
-  server.get('/:id', {
+  server.get(personalTrainerRoutesPath.findById, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: ['PersonalTrainer'],
-      summary: 'Get a specific Personal Trainer',
-      params: {
-        id: {type: 'string'},
-      },
+      tags: personalTrainerTag,
+      summary: personalTrainerSummary.findById,
+      params: personalTrainerIdSchema,
       response: {
         200: $ref('PersonalTrainerUniqueResponseSchema')
       }
     },
   }, getUniquePersonalTrainerHandler);
 
-  server.post('', {
+  server.post(personalTrainerRoutesPath.register, {
     preHandler: [server.authenticate, server.authorizationExclusive],
     schema: {
-      tags: ['PersonalTrainer'],
+      tags: personalTrainerTag,
+      summary: personalTrainerSummary.register,
       body: $ref('createPersonalTrainerSchema'),
-      summary: 'Create a new Personal Trainer',
       response: {
-        201: $ref('createPersonalTrainerResponseSchema')
+        201: {
+          type: 'object',
+          properties: {
+            id: {type: 'string', example: ''}
+          }
+        }
       }
     }
   }, registerPersonalTrainerHandler);
 
-  server.post('/login', {
+  server.post(personalTrainerRoutesPath.login, {
     schema: {
-      tags: ['PersonalTrainer'],
+      tags: personalTrainerTag,
+      summary: personalTrainerSummary.login,
       body: $ref('loginSchema'),
-      summary: 'Login in the application',
       response: {
         200: $ref('loginResponseSchema')
       }
     }
   }, loginHandler);
 
-  server.put('/:id', {
+  server.put(personalTrainerRoutesPath.update, {
       preHandler: [server.authenticate, server.authorizationLimited],
       schema: {
-        tags: ['PersonalTrainer'],
-        summary: 'Update a specific Personal Trainer',
-        params: {
-          id: {type: 'string'},
-        },
+        tags: personalTrainerTag,
+        summary: personalTrainerSummary.update,
+        params: personalTrainerIdSchema,
         body: $ref('updatePersonalTrainerSchema'),
         response: {
           200: $ref('updatePersonalTrainerSchema')
@@ -74,14 +78,12 @@ async function personalTrainerRoutes(server: FastifyInstance) {
     }, updatePersonalTrainerHandler
   );
 
-  server.delete('/:id', {
+  server.delete(personalTrainerRoutesPath.delete, {
       preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
-        tags: ['PersonalTrainer'],
-        summary: 'Delete a specific Personal Trainer',
-        params: {
-          id: {type: 'string'},
-        },
+        tags: personalTrainerTag,
+        summary: personalTrainerSummary.delete,
+        params: personalTrainerIdSchema,
         response: {
           200: {
             type: 'object',

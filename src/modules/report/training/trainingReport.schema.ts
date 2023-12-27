@@ -2,7 +2,11 @@ import {object, z} from "zod";
 import {buildJsonSchemas} from "fastify-zod";
 
 const trainingReport = {
-  totalTrainingsRealized: z.number(),
+  member: z.object({
+    id: z.string(),
+    name: z.string()
+  }),
+  totalRegularTrainingsRealized: z.number(),
   totalTrainingsFoul: z.number(),
   totalTrainingsReplacement: z.number(),
   totalTraining: z.number(),

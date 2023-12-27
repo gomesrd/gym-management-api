@@ -1,6 +1,6 @@
 import {FastifyInstance} from "fastify";
-import {$ref} from "../../training/training.schema";
 import {getManyReportTrainingHandler} from "./trainingReport.service";
+import {$ref} from "./trainingReport.schema";
 
 async function trainingReportRoutes(server: FastifyInstance) {
 
@@ -24,12 +24,7 @@ async function trainingReportRoutes(server: FastifyInstance) {
           created_at_lte: {type: 'string'},
         }
       },
-      // response: {
-      //   200: {
-      //     type: 'object',
-      //     items: $ref('trainingReportSchema')
-      //   }
-      //  }
+
     }
   }, getManyReportTrainingHandler);
 

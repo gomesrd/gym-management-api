@@ -60,7 +60,7 @@ export async function getUniqueMemberHandler(request: FastifyRequest<{
   Params: MemberId;
 }>) {
   const userId = request.user.id;
-  const memberId = request.params.id
+  const memberId = request.params.member_id
 
   return findUniqueMember(memberId, userId);
 }
@@ -68,7 +68,7 @@ export async function getUniqueMemberHandler(request: FastifyRequest<{
 export async function getUniqueMemberHandlerResume(request: FastifyRequest<{
   Params: MemberId;
 }>) {
-  const memberId = request.params.id
+  const memberId = request.params.member_id
 
   return findUniqueMemberResume(memberId);
 }
@@ -92,7 +92,7 @@ export async function updateMemberHandler(request: FastifyRequest<{
 }>) {
   const userId = request.user.id;
   const dataUpdate = request.body;
-  const memberId = request.params.id
+  const memberId = request.params.member_id
   await verifyPermissionActionOnlyMember(userId, memberId);
 
   return updateMember(
@@ -105,7 +105,7 @@ export async function deleteMemberHandler(request: FastifyRequest<{
   Params: DeleteMember;
 }>, reply: FastifyReply) {
   const userId = request.user.id;
-  const memberId = request.params.id;
+  const memberId = request.params.member_id;
   await verifyPermissionActionOnlyMember(userId, memberId);
   await deleteMember(memberId);
   return reply.code(200).send('');

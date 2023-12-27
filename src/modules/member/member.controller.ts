@@ -3,7 +3,7 @@ import {
   deleteMemberHandler, getUniqueMemberHandler, getManyMembersHandler, loginHandler,
   registerMemberHandler, updateMemberHandler, getUniqueMemberHandlerResume
 } from "./member.service";
-import {$ref} from "./member.schema";
+import {$ref, memberIdSchema, queryAllMembersSchema} from "./member.schema";
 
 async function memberRoutes(server: FastifyInstance) {
   server.get('', {
@@ -11,12 +11,7 @@ async function memberRoutes(server: FastifyInstance) {
     schema: {
       tags: ['Member'],
       summary: 'Get all members',
-      querystring: {
-        type: 'object',
-        properties: {
-          deleted: {type: 'string'},
-        }
-      },
+      querystring: queryAllMembersSchema,
       response: {
         200: $ref('MembersResponseSchema')
       },
@@ -24,14 +19,12 @@ async function memberRoutes(server: FastifyInstance) {
     },
   }, getManyMembersHandler);
 
-  server.get('/:id', {
+  server.get('/:member_id', {
     preHandler: [server.authenticate, server.authorizationMember],
     schema: {
       tags: ['Member'],
       summary: 'Get all data a specific member',
-      params: {
-        id: {type: 'string'},
-      },
+      params: memberIdSchema,
       response: {
         200: $ref('MemberResponseSchema')
       }
@@ -39,14 +32,12 @@ async function memberRoutes(server: FastifyInstance) {
     },
   }, getUniqueMemberHandler);
 
-    server.get('/resume/:id', {
+  server.get('/resume/:member_id', {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
       tags: ['Member'],
       summary: 'Get resume data a specific member',
-      params: {
-        id: {type: 'string'},
-      },
+      params: memberIdSchema,
       response: {
         200: $ref('MemberResumeResponseSchema')
       }
@@ -61,7 +52,6 @@ async function memberRoutes(server: FastifyInstance) {
       summary: 'Create a new member',
       response: {
         201: $ref('createMemberResponseSchema'),
-
       },
     }
   }, registerMemberHandler);
@@ -77,14 +67,12 @@ async function memberRoutes(server: FastifyInstance) {
     }
   }, loginHandler);
 
-  server.put('/:id', {
+  server.put('/:member_id', {
       preHandler: [server.authenticate, server.authorizationMember],
       schema: {
         tags: ['Member'],
         summary: 'Update a specific member',
-        params: {
-          id: {type: 'string'},
-        },
+        params: memberIdSchema,
         body: $ref('updateMemberSchema'),
         response: {
           200: $ref('updateMemberSchema')
@@ -93,14 +81,12 @@ async function memberRoutes(server: FastifyInstance) {
     }, updateMemberHandler
   );
 
-  server.delete('/:id', {
+  server.delete('/:member_id', {
       preHandler: [server.authenticate, server.authorizationMember],
       schema: {
         tags: ['Member'],
         summary: 'Delete a specific member',
-        params: {
-          id: {type: 'string'},
-        },
+        params: memberIdSchema,
         response: {
           200: {
             type: 'object',

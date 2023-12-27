@@ -12,6 +12,7 @@
     "migrate": "prisma migrate deploy"
   },
   "dependencies": {
+    "@fastify/cors": "^8.5.0",
     "@fastify/jwt": "^5.0.1",
     "@prisma/client": "^5.7.1",
     "dotenv": "^16.3.1",

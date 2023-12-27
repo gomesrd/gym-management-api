@@ -212,3 +212,6 @@ model MemberPlan {
 // TODO - Adicionar validação para verificar se o registro do treino está sendo salvo para o member correto
 // TODO - Criar endpoint para buscar as informações de training-replacement (getAll, getById)
 // TODO - Criar regra de negócio para verificar se o número de aulas do mês ultrapassa a quantidade de aula que o aluno tem direito
+// TODO - Adicionar período e nome do aluno no retorno do relatório de aulas
+// TODO - Adicionar o nome dos query path (id --> personal_traine_id, member_id, etc)
+// TODO - Criar método para reset de senha (apenas se não integrar com o firebase)

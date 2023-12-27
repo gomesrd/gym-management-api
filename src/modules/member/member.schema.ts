@@ -1,9 +1,10 @@
 import {z} from 'zod';
 import {buildJsonSchemas} from 'fastify-zod'
 import {emailInvalid, emailRequired, passwordInvalid, passwordRequired} from "./member.mesages";
+import {usersAddress} from "../../utils/common.schema";
 
 const memberId = {
-  id: z.string()
+  member_id: z.string()
 }
 
 const memberDate = {
@@ -11,29 +12,11 @@ const memberDate = {
   updated_at: z.date(),
 };
 
-const memberAddress = {
-  users_address: z.object({
-    address: z.string(),
-    address_number: z.string(),
-    address_complement: z.string().optional(),
-    address_neighborhood: z.string(),
-    city: z.string(),
-    state: z.string(),
-    country: z.string().optional(),
-    zip_code: z.string(),
-  }),
-};
-
 const memberCore = {
   name: z.string(),
   cpf: z.string(),
   birth_date: z.string(),
-  email: z.string(
-    {
-      required_error: emailRequired(),
-      invalid_type_error: emailInvalid()
-    }
-  ),
+  email: z.string().email(),
   phone: z.string(),
 };
 
@@ -61,7 +44,7 @@ const memberFindUniqueResume = {
 const memberFindUnique = {
   ...memberId,
   ...memberCore,
-  ...memberAddress,
+  ...usersAddress,
   ...memberDate,
 };
 
@@ -78,32 +61,22 @@ const memberPassword = {
   })
 };
 
-const createMemberSchema = z.object({
-  ...memberCore,
-  ...memberAddress,
-  ...memberPassword,
-});
+export const queryAllMembersSchema = {
+  type: 'object',
+  properties: {
+    cpf: {type: 'string', description: 'CPF'},
+    email: {type: 'string', description: 'Email'},
+    deleted: {type: 'string', description: 'true or false'},
+    name: {type: 'string', description: 'Name'},
+  }
+};
 
-const createMemberResponseSchema = z.object({
-  ...memberId
-});
-
-const MemberIdSchema = z.object({
-  ...memberId
-});
-
-const MemberResponseSchema = z.object({
-  ...memberFindUnique
-});
-
-const MembersResponseSchema = z.object({
-  ...memberCount,
-  ...memberFindMany
-});
-
-const MemberResumeResponseSchema = z.object({
-  ...memberFindUniqueResume
-});
+export const memberIdSchema = {
+  type: 'object',
+  properties: {
+    member_id: {type: 'string', description: 'Member Id'},
+  }
+};
 
 const filtersSchema = z.object({
   deleted: z.string().default('true')
@@ -127,6 +100,33 @@ const updateMemberSchema = z.object({
   name: z.string().optional(),
   phone: z.string().optional(),
   birth_date: z.string().optional(),
+});
+
+const createMemberSchema = z.object({
+  ...memberCore,
+  ...usersAddress,
+  ...memberPassword,
+});
+
+const createMemberResponseSchema = z.object({
+  ...memberId
+});
+
+const MemberIdSchema = z.object({
+  ...memberId
+});
+
+const MemberResponseSchema = z.object({
+  ...memberFindUnique
+});
+
+const MembersResponseSchema = z.object({
+  ...memberCount,
+  ...memberFindMany
+});
+
+const MemberResumeResponseSchema = z.object({
+  ...memberFindUniqueResume
 });
 
 export type CreateMemberInput = z.infer<typeof createMemberSchema>

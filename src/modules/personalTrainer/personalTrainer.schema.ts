@@ -1,57 +1,25 @@
 import {z} from 'zod';
 import {buildJsonSchemas} from 'fastify-zod'
-import {emailInvalid, emailRequired, passwordInvalid, passwordRequired} from "./personalTrainer.mesages";
-import {personalTrainerOccupation} from "../../utils/common.schema";
-
-export type OccupationT = 'Personal_Trainer' | 'Physiotherapist';
+import {
+  dateCreatedUpdated, loginResponseSchema, loginSchema,
+  personalTrainerOccupation,
+  userCore,
+  userPassword,
+  usersAddress,
+  usersRole
+} from "../../utils/common.schema";
 
 const personalTrainerId = {
   id: z.string()
 };
 
-const personalTrainerDate = {
-  created_at: z.date(),
-  updated_at: z.date(),
-};
-
-const personalTrainerAddress = {
-  address: z.object({
-    address: z.string(),
-    address_number: z.string(),
-    address_complement: z.string().optional(),
-    address_neighborhood: z.string(),
-    city: z.string(),
-    state: z.string(),
-    country: z.string().optional(),
-    zip_code: z.string(),
-  }),
-};
-
 const personalTrainerCore = {
-  name: z.string(),
-  cpf: z.string(),
-  birth_date: z.string(),
-  email: z.string({
-    required_error: 'Email is required',
-    invalid_type_error: emailInvalid(),
-  }).email(),
-  phone: z.string(),
+  ...userCore,
   personal_trainer: z.object({
     occupation: personalTrainerOccupation,
   }),
-  ...personalTrainerAddress
+  ...usersAddress
 }
-
-const PersonalTrainerRole = {
-  role: z.enum(['admin', 'employee', 'member']),
-}
-
-const passwordPersonalTrainer = {
-  password: z.string({
-    required_error: passwordRequired(),
-    invalid_type_error: passwordInvalid()
-  })
-};
 
 const personalTrainerResume = {
   id: z.string(),
@@ -64,10 +32,34 @@ const personalTrainerCount = {
   count: z.number()
 };
 
+
+const updatePersonalTrainerSchema = z.object({
+  email: z.string().email().optional(),
+  name: z.string().optional(),
+  phone: z.string().optional(),
+});
+
+export const personalTrainerIdSchema = {
+  type: 'object',
+  properties: {
+    personal_trainer_id: {type: 'string', description: 'Personal Trainer Id'},
+  }
+};
+
+export const queryAllPersonalTrainersSchema = {
+  type: 'object',
+  properties: {
+    cpf: {type: 'string', description: 'CPF'},
+    email: {type: 'string', description: 'Email'},
+    name: {type: 'string', description: 'Name'},
+    occupation: {type: 'string', description: 'physical_educator or physiotherapist'},
+  }
+};
+
 const personalTrainerFindUnique = {
   ...personalTrainerId,
-  ...personalTrainerDate,
-  ...personalTrainerCore
+  ...personalTrainerCore,
+  ...dateCreatedUpdated,
 };
 
 const personalTrainerFindMany = {
@@ -78,16 +70,8 @@ const personalTrainerFindMany = {
 
 const createPersonalTrainerSchema = z.object({
   ...personalTrainerCore,
-  ...passwordPersonalTrainer,
-  ...PersonalTrainerRole,
-});
-
-const createPersonalTrainerResponseSchema = z.object({
-  ...personalTrainerId,
-});
-
-const PersonalTrainerIdSchema = z.object({
-  ...personalTrainerId
+  ...userPassword,
+  ...usersRole,
 });
 
 const PersonalTrainerUniqueResponseSchema = z.object({
@@ -99,40 +83,15 @@ const PersonalTrainersManyResponseSchema = z.object({
   ...personalTrainerFindMany,
 });
 
-const loginSchema = z.object({
-  email: z.string({
-    required_error: emailRequired(),
-    invalid_type_error: emailInvalid()
-  }).email(),
-  password: z.string()
-});
-
-const loginResponseSchema = z.object({
-  accessToken: z.string(),
-});
-
-const updatePersonalTrainerSchema = z.object({
-  email: z.string().email().optional(),
-  name: z.string().optional(),
-  phone: z.string().optional(),
-  active: z.boolean().optional(),
-});
-
 export type CreatePersonalTrainerInput = z.infer<typeof createPersonalTrainerSchema>
-export type DeletePersonalTrainer = z.infer<typeof PersonalTrainerIdSchema>;
-export type LoginInput = z.infer<typeof loginSchema>
-export type PersonalTrainerId = z.infer<typeof PersonalTrainerIdSchema>;
 export type UpdatePersonalTrainer = z.infer<typeof updatePersonalTrainerSchema>;
-export type PersonalTrainerUniqueResponse = z.infer<typeof PersonalTrainerUniqueResponseSchema>;
 export type PersonalTrainersManyResponse = z.infer<typeof PersonalTrainersManyResponseSchema>;
 
 export const {schemas: personalTrainerSchemas, $ref} = buildJsonSchemas({
   createPersonalTrainerSchema,
-  createPersonalTrainerResponseSchema,
   loginSchema,
   loginResponseSchema,
   PersonalTrainerUniqueResponseSchema,
   PersonalTrainersManyResponseSchema,
-  PersonalTrainerIdSchema,
   updatePersonalTrainerSchema
 }, {$id: "personalTrainerSchemas"});

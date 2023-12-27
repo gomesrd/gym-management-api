@@ -5,6 +5,7 @@ import {
 } from "./trainingRecord.schema";
 import {Filters} from "../../utils/common.schema";
 import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
+import {FiltersPermissions} from "../../utils/types";
 
 export async function createTrainingRecord(input: CreateTrainingRecordInput) {
   const {training_id, personal_trainer_id, status, type, member_id} = input;
@@ -19,14 +20,13 @@ export async function createTrainingRecord(input: CreateTrainingRecordInput) {
   });
 }
 
-export async function findManyTrainingRecords(filters: Filters, userId: string) {
-  const applyFilters = await parseFiltersTraining(filters, userId);
+export async function findManyTrainingRecords(filters: Filters, parseFilters: FiltersPermissions) {
 
   const trainingRecordsCount = await prisma.trainingRecord.count({
     where: {
       training_id: filters.training_id,
-      member_id: applyFilters.member_id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
+      member_id: parseFilters.member_id,
+      personal_trainer_id: parseFilters.personal_trainer_id,
       status: filters.status,
       type: filters.type,
       created_at: {
@@ -39,8 +39,8 @@ export async function findManyTrainingRecords(filters: Filters, userId: string) 
   const trainingRecords = await prisma.trainingRecord.findMany({
     where: {
       training_id: filters.training_id,
-      member_id: applyFilters.member_id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
+      member_id: parseFilters.member_id,
+      personal_trainer_id: parseFilters.personal_trainer_id,
       status: filters.status,
       type: filters.type,
       created_at: {
@@ -99,33 +99,25 @@ export async function findManyTrainingRecords(filters: Filters, userId: string) 
 
 }
 
-export async function findUniqueTrainingRecord(params: GetTrainingRecord, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId);
+export async function findUniqueTrainingRecord(trainingRecordId: string, parseFilters: FiltersPermissions) {
 
   return prisma.trainingRecord.findMany({
     where: {
-      id: params.id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      member_id: applyFilters.member_id,
+      id: trainingRecordId,
+      personal_trainer_id: parseFilters.personal_trainer_id,
+      member_id: parseFilters.member_id,
     },
     select: {
       id: true,
       type: true,
       status: true,
       training_id: true,
-      personal_trainer_id: false,
-      member_id: false,
       personal_trainer: {
         select: {
           user: {
             select: {
               id: true,
               name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
             }
           }
         }
@@ -136,11 +128,6 @@ export async function findUniqueTrainingRecord(params: GetTrainingRecord, userId
             select: {
               id: true,
               name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
             }
           }
         }
@@ -151,21 +138,21 @@ export async function findUniqueTrainingRecord(params: GetTrainingRecord, userId
   });
 }
 
-export async function updateTrainingRecord(data: UpdateTrainingRecord, params: GetTrainingRecord) {
+export async function updateTrainingRecord(trainingId: string, dataUpdate: UpdateTrainingRecord) {
   return prisma.trainingRecord.update({
     where: {
-      id: params.id
+      id: trainingId
     },
     data: {
-      status: data.status,
+      status: dataUpdate.status,
     }
   });
 }
 
-export async function deleteTrainingRecord(data: DeleteTrainingRecord) {
+export async function deleteTrainingRecord(trainingRecordId: string) {
   return prisma.trainingRecord.delete({
     where: {
-      id: data.id,
+      id: trainingRecordId,
     }
   })
 }

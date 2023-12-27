@@ -8,11 +8,9 @@ import {
 import {Prisma} from "@prisma/client";
 import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
 import {Filters} from "../../utils/common.schema";
+import {FiltersPermissions} from "../../utils/types";
 
 export async function createTraining(input: CreateTrainingInput) {
-
-  const {} = input;
-
   return prisma.training.createMany(
     {
       data: input
@@ -43,13 +41,12 @@ export async function updateTrainingReplacement(
   });
 }
 
-export async function findManyTrainings(filters: Filters, userId: string): Promise<FindManyTraining> {
-  const applyFilters = await parseFiltersTraining(filters, userId);
+export async function findManyTrainings(filters: Filters, parseFilters: FiltersPermissions): Promise<FindManyTraining> {
 
   const filtersTraining = {
-    member_id: applyFilters.member_id,
-    personal_trainer_id: applyFilters.personal_trainer_id,
-    deleted: applyFilters.deleted,
+    member_id: parseFilters.member_id,
+    personal_trainer_id: parseFilters.personal_trainer_id,
+    deleted: parseFilters.deleted,
     fixed_day: filters.fixed_day,
     single_date: filters.single_date,
     start_time: filters.start_time,
@@ -99,15 +96,14 @@ export async function findManyTrainings(filters: Filters, userId: string): Promi
   }
 }
 
-export async function findUniqueTraining(params: GetTraining, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId);
+export async function findUniqueTraining(trainingId: string, parseFilters: FiltersPermissions) {
 
   return prisma.training.findUnique({
     where: {
-      id: params.id,
-      personal_trainer_id: applyFilters.personal_trainer_id,
-      member_id: applyFilters.member_id,
-      deleted: applyFilters.deleted,
+      id: trainingId,
+      personal_trainer_id: parseFilters.personal_trainer_id,
+      member_id: parseFilters.member_id,
+      deleted: parseFilters.deleted,
     },
     select: {
       id: true,
@@ -154,38 +150,39 @@ export async function findUniqueTraining(params: GetTraining, userId: string) {
   });
 }
 
-export async function updateTraining(data: UpdateTraining, params: GetTraining, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId);
+export async function updateTraining(dataUpdate: UpdateTraining, trainingId: string, parseFilters: FiltersPermissions) {
+  const {
+    start_time, modality, personal_trainer_id,
+    type, single_date, fixed_day
+  } = dataUpdate;
 
   try {
     return await prisma.training.update({
       where: {
-        id: params.id,
-        personal_trainer_id: applyFilters.personal_trainer_id,
+        id: trainingId,
+        personal_trainer_id: parseFilters.personal_trainer_id,
       },
       data: {
-        start_time: data.start_time,
-        fixed_day: data.fixed_day,
-        single_date: data.single_date,
-        personal_trainer_id: data.personal_trainer_id,
-        modality: data.modality,
-        type: data.type,
+        start_time: start_time,
+        fixed_day: fixed_day,
+        single_date: single_date,
+        personal_trainer_id: personal_trainer_id,
+        modality: modality,
+        type: type,
       }
     });
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === 'P2025') {
-        throw new Error('Training not found');
-      }
-    }
     throw error;
   }
 }
 
-export async function deleteTraining(data: DeleteTraining) {
-  return prisma.training.delete({
+export async function deleteTraining(trainingId: string, parseFilters: FiltersPermissions) {
+  return prisma.training.update({
     where: {
-      id: data.id,
+      id: trainingId,
+      personal_trainer_id: parseFilters.personal_trainer_id,
+    }, data: {
+      deleted: true,
     }
   })
 }
