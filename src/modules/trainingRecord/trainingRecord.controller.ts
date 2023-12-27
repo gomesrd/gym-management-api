@@ -4,13 +4,14 @@ import {
   deleteTrainingRecordHandler, getUniqueTrainingRecordHandler, getManyTrainingRecordsHandler,
   registerTrainingRecordHandler, updateTrainingRecordHandler
 } from "./trainingRecord.service";
+import {tags, trainingRecordRoutesPath, trainingRecordSummary} from "../../utils/enums";
 
 async function trainingRecordRoutes(server: FastifyInstance) {
-  server.get('', {
+  server.get(trainingRecordRoutesPath.findAll, {
     preHandler: [server.authenticate],
     schema: {
-      tags: ['TrainingRecord'],
-      summary: 'Get all training records',
+      tags: [tags.training_record],
+      summary: trainingRecordSummary.findAll,
       querystring: {
         type: 'object',
         properties: {
@@ -25,11 +26,11 @@ async function trainingRecordRoutes(server: FastifyInstance) {
     }
   }, getManyTrainingRecordsHandler);
 
-  server.get('/:id', {
+  server.get(trainingRecordRoutesPath.findById, {
     preHandler: [server.authenticate],
     schema: {
-      tags: ['TrainingRecord'],
-      summary: 'Get a specific training record',
+      tags: [tags.training_record],
+      summary: trainingRecordSummary.findById,
       params: {
         id: {type: 'string'},
       },
@@ -42,23 +43,23 @@ async function trainingRecordRoutes(server: FastifyInstance) {
     },
   }, getUniqueTrainingRecordHandler);
 
-  server.post('', {
+  server.post(trainingRecordRoutesPath.register, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: ['TrainingRecord'],
+      tags: [tags.training_record],
       body: $ref('createTrainingRecordSchema'),
-      summary: 'Create a new training record',
+      summary: trainingRecordSummary.register,
       response: {
         201: $ref('TrainingRecordIdSchema')
       }
     }
   }, registerTrainingRecordHandler);
 
-  server.put('/:id', {
+  server.put(trainingRecordRoutesPath.update, {
       preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
-        tags: ['TrainingRecord'],
-        summary: 'Update a specific training record',
+        tags: [tags.training_record],
+        summary: trainingRecordSummary.update,
         params: {
           id: {type: 'string'},
         },
@@ -71,11 +72,11 @@ async function trainingRecordRoutes(server: FastifyInstance) {
     }, updateTrainingRecordHandler
   );
 
-  server.delete('/:id', {
+  server.delete(trainingRecordRoutesPath.delete, {
       preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
-        tags: ['TrainingRecord'],
-        summary: 'Delete a specific training record',
+        tags: [tags.training_record],
+        summary: trainingRecordSummary.delete,
         params: {
           id: {type: 'string'},
         },

@@ -1,14 +1,14 @@
-import prisma from "../../config/prisma";
+import prisma from "../../../config/prisma";
 import {
   CreateTrainingInput, CreateTrainingReplacement,
   DeleteTraining, FindManyTraining,
   GetTraining,
   UpdateTraining
-} from "./training.schema";
+} from "../training.schema";
 import {Prisma} from "@prisma/client";
-import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
-import {Filters} from "../../utils/common.schema";
-import {FiltersPermissions} from "../../utils/types";
+import {parseFiltersPermission, parseFiltersTraining} from "../../../utils/parseFilters";
+import {Filters} from "../../../utils/common.schema";
+import {FiltersPermissions} from "../../../utils/types";
 
 export async function createTraining(input: CreateTrainingInput) {
   return prisma.training.createMany(

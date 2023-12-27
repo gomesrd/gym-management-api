@@ -3,15 +3,22 @@ import {$ref} from "./training.schema";
 import {
   deleteTrainingHandler, getUniqueTrainingHandler, getManyTrainingsHandler, registerTrainingHandler,
   updateTrainingHandler
-} from "./training.service";
+} from "./training/training.service";
 import {registerTrainingReplacementHandler} from "./replacement/trainingReplacement.service";
+import {
+  tags,
+  trainingReplacementRoutesPath,
+  trainingReplacementSummary,
+  trainingRoutesPath,
+  trainingSummary
+} from "../../utils/enums";
 
 async function trainingRoutes(server: FastifyInstance) {
-  server.get('', {
+  server.get(trainingRoutesPath.findAll, {
     preHandler: [server.authenticate],
     schema: {
-      tags: ['Training'],
-      summary: 'Get all trainings',
+      tags: [tags.training],
+      summary: trainingSummary.findAll,
       querystring: {
         type: 'object',
         properties: {
@@ -26,11 +33,11 @@ async function trainingRoutes(server: FastifyInstance) {
     }
   }, getManyTrainingsHandler);
 
-  server.get('/:id', {
+  server.get(trainingRoutesPath.findById, {
     preHandler: [server.authenticate],
     schema: {
-      tags: ['Training'],
-      summary: 'Get a specific training',
+      tags: [tags.training],
+      summary: trainingSummary.findById,
       params: {
         id: {type: 'string'},
       },
@@ -40,12 +47,12 @@ async function trainingRoutes(server: FastifyInstance) {
     },
   }, getUniqueTrainingHandler);
 
-  server.post('', {
+  server.post(trainingRoutesPath.register, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: ['Training'],
+      tags: [tags.training],
+      summary: trainingSummary.register,
       body: $ref('createTrainingSchema'),
-      summary: 'Create a new training',
       response: {
         201: $ref('createTrainingSchema')
       }
@@ -53,12 +60,12 @@ async function trainingRoutes(server: FastifyInstance) {
     }
   }, registerTrainingHandler);
 
-  server.post('/replacement/:id', {
+  server.post(trainingReplacementRoutesPath.register, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: ['Training Replacement'],
+      tags: [tags.training_replacement],
+      summary: trainingReplacementSummary.register,
       body: $ref('createTrainingReplacementSchema'),
-      summary: 'Create a new training for replacement',
       response: {
         201: {
           type: 'object',
@@ -70,11 +77,11 @@ async function trainingRoutes(server: FastifyInstance) {
     }
   }, registerTrainingReplacementHandler);
 
-  server.put('/:id', {
+  server.put(trainingRoutesPath.update, {
       preHandler: [server.authenticate, server.authorizationLimited],
       schema: {
-        tags: ['Training'],
-        summary: 'Update a specific training',
+        tags: [tags.training],
+        summary: trainingSummary.update,
         params: {
           id: {type: 'string'},
         },
@@ -87,11 +94,11 @@ async function trainingRoutes(server: FastifyInstance) {
     }, updateTrainingHandler
   );
 
-  server.delete('/:id', {
+  server.delete(trainingRoutesPath.delete, {
       preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
-        tags: ['Training'],
-        summary: 'Delete a specific training',
+        tags: [tags.training],
+        summary: trainingSummary.delete,
         params: {
           id: {type: 'string'},
         },

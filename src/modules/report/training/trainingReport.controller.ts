@@ -1,14 +1,15 @@
 import {FastifyInstance} from "fastify";
 import {getManyReportTrainingHandler} from "./trainingReport.service";
 import {$ref} from "./trainingReport.schema";
+import {tags, trainingReportRoutesPath, trainingReportSummary} from "../../../utils/enums";
 
 async function trainingReportRoutes(server: FastifyInstance) {
 
-  server.get('/:member_id', {
+  server.get(trainingReportRoutesPath.findAll, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: ['Report Training'],
-      summary: 'Get report trainings',
+      tags: [tags.training_report],
+      summary: trainingReportSummary.findAll,
       params: {
         type: 'object',
         properties: {

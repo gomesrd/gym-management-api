@@ -8,7 +8,7 @@ import {
   updateTrainingRecord
 } from "./trainingRecord.repository";
 import {personalTrainerValidate} from "../../utils/permissions.service";
-import {updateTrainingReplacement} from "../training/training.repository";
+import {updateTrainingReplacement} from "../training/training/training.repository";
 import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
 
 

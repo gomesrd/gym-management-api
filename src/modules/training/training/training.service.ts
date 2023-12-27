@@ -4,7 +4,7 @@ import {
   DeleteTraining,
   GetTraining,
   UpdateTraining
-} from "./training.schema";
+} from "../training.schema";
 import {
   createTraining, createTrainingReplacement,
   deleteTraining,
@@ -12,8 +12,8 @@ import {
   findUniqueTraining,
   updateTraining
 } from "./training.repository";
-import {Filters} from "../../utils/common.schema";
-import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
+import {Filters} from "../../../utils/common.schema";
+import {parseFiltersPermission, parseFiltersTraining} from "../../../utils/parseFilters";
 
 
 export async function registerTrainingHandler(request: FastifyRequest<{
