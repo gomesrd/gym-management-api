@@ -7,12 +7,13 @@ import {
   findManyMembers,
   updateMember, findUniqueMemberResume
 } from "./member.repository";
-import {CreateMemberInput, DeleteMember, LoginInput, MemberId, UpdateMember} from "./member.schema";
+import {CreateMemberInput, UpdateMember} from "./member.schema";
 import {invalidLoginMessage} from "./member.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
-import {Filters} from "../../utils/common.schema";
+import {Filters, LoginInput} from "../../utils/common.schema";
 import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
+import {MemberId} from "../../utils/types";
 
 export async function registerMemberHandler(request: FastifyRequest<{
   Body: CreateMemberInput
@@ -21,7 +22,12 @@ export async function registerMemberHandler(request: FastifyRequest<{
   try {
     const member = await createMember(body);
     return reply.code(201).send(member)
-  } catch (e) {
+  } catch (e: any) {
+    if (e.code === 'P2002') {
+      return reply.code(400).send({
+        message: 'Member already exists'
+      })
+    }
     return reply.code(500).send(e)
   }
 }
@@ -102,7 +108,7 @@ export async function updateMemberHandler(request: FastifyRequest<{
 }
 
 export async function deleteMemberHandler(request: FastifyRequest<{
-  Params: DeleteMember;
+  Params: MemberId;
 }>, reply: FastifyReply) {
   const userId = request.user.id;
   const memberId = request.params.member_id;

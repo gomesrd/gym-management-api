@@ -1,16 +1,17 @@
 import {z} from 'zod';
 import {buildJsonSchemas} from 'fastify-zod'
 import {emailInvalid, emailRequired, passwordInvalid, passwordRequired} from "./member.mesages";
-import {usersAddress} from "../../utils/common.schema";
+import {
+  count,
+  dateCreatedUpdated,
+  loginResponseSchema,
+  loginSchema, userPassword,
+  usersAddress
+} from "../../utils/common.schema";
 
 const memberId = {
-  member_id: z.string()
+  id: z.string()
 }
-
-const memberDate = {
-  created_at: z.date(),
-  updated_at: z.date(),
-};
 
 const memberCore = {
   name: z.string(),
@@ -18,49 +19,29 @@ const memberCore = {
   birth_date: z.string(),
   email: z.string().email(),
   phone: z.string(),
+  deleted: z.boolean().optional().default(false),
 };
 
 const memberResume = {
-  id: z.string(),
-  name: z.string(),
-  phone: z.string().optional(),
-  deleted: z.boolean(),
-};
-
-const memberCount = {
-  count: z.number()
-};
-
-const memberFindUniqueResume = {
-  id: z.string(),
-  name: z.string(),
-  birth_date: z.string(),
-  email: z.string(),
-  phone: z.string(),
-  deleted: z.boolean(),
-  ...memberDate
-};
-
-const memberFindUnique = {
   ...memberId,
-  ...memberCore,
-  ...usersAddress,
-  ...memberDate,
+  name: z.string(),
+  deleted: z.boolean(),
 };
 
-const memberFindMany = {
-  data: z.array(z.object({
-    ...memberResume
-  }))
-};
+const updateMemberSchema = z.object({
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  birth_date: z.string().optional(),
+});
 
-const memberPassword = {
-  password: z.string({
-    required_error: passwordRequired(),
-    invalid_type_error: passwordInvalid()
-  })
+const findUniqueResume = {
+  name: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  birth_date: z.string(),
+  deleted: z.boolean(),
 };
-
 export const queryAllMembersSchema = {
   type: 'object',
   properties: {
@@ -78,50 +59,37 @@ export const memberIdSchema = {
   }
 };
 
-const filtersSchema = z.object({
-  deleted: z.string().default('true')
-});
+const memberFindUniqueResume = {
+  ...memberId,
+  ...findUniqueResume,
+  ...dateCreatedUpdated
+};
 
+const memberFindMany = {
+  data: z.array(z.object({
+    ...memberResume
+  }))
+};
 
-const loginSchema = z.object({
-  email: z.string({
-    required_error: emailRequired(),
-    invalid_type_error: emailInvalid()
-  }).email(),
-  password: z.string()
-});
-
-const loginResponseSchema = z.object({
-  accessToken: z.string(),
-});
-
-const updateMemberSchema = z.object({
-  email: z.string().email().optional(),
-  name: z.string().optional(),
-  phone: z.string().optional(),
-  birth_date: z.string().optional(),
-});
+const memberFindUnique = {
+  ...memberId,
+  ...memberCore,
+  ...usersAddress,
+  ...dateCreatedUpdated,
+};
 
 const createMemberSchema = z.object({
   ...memberCore,
   ...usersAddress,
-  ...memberPassword,
+  ...userPassword,
 });
 
-const createMemberResponseSchema = z.object({
-  ...memberId
-});
-
-const MemberIdSchema = z.object({
-  ...memberId
-});
-
-const MemberResponseSchema = z.object({
+const MemberUniqueResponseSchema = z.object({
   ...memberFindUnique
 });
 
-const MembersResponseSchema = z.object({
-  ...memberCount,
+const MembersAllResponseSchema = z.object({
+  ...count,
   ...memberFindMany
 });
 
@@ -130,21 +98,14 @@ const MemberResumeResponseSchema = z.object({
 });
 
 export type CreateMemberInput = z.infer<typeof createMemberSchema>
-export type DeleteMember = z.infer<typeof MemberIdSchema>;
-export type LoginInput = z.infer<typeof loginSchema>
-export type MemberId = z.infer<typeof MemberIdSchema>;
 export type UpdateMember = z.infer<typeof updateMemberSchema>;
-export type Filters = z.infer<typeof filtersSchema>;
 
 export const {schemas: memberSchemas, $ref} = buildJsonSchemas({
   createMemberSchema,
-  createMemberResponseSchema,
-  loginSchema,
-  loginResponseSchema,
-  MemberResponseSchema,
-  MemberIdSchema,
-  MembersResponseSchema,
+  MemberUniqueResponseSchema,
+  MembersAllResponseSchema,
   updateMemberSchema,
-  filtersSchema,
-  MemberResumeResponseSchema
+  MemberResumeResponseSchema,
+  loginSchema,
+  loginResponseSchema
 }, {$id: "memberSchemas"});

@@ -24,4 +24,31 @@ export enum personalTrainerRoutesPath {
   delete = '/:personal_trainer_id',
 }
 
-export const personalTrainerTag = ['Personal Trainer']
+export enum memberSummary {
+  findAll = 'Get all Members',
+  findById = 'Get a specific Member',
+  register = 'Create a new Member',
+  login = 'Login in the application',
+  update = 'Update a specific Member',
+  delete = 'Delete a specific Member',
+  resume = 'Get resume data a specific member'
+}
+
+export enum tags {
+  personalTrainer = 'Personal Trainer',
+  member = 'Member',
+  training = 'Training',
+  training_record = 'Training Record',
+  training_report = 'Training Report',
+  training_replacement = 'Training Replacement',
+}
+
+export enum memberRoutesPath {
+  findAll = '',
+  findById = '/:member_id',
+  resumeAll = '/resume/:member_id',
+  register = '/register',
+  login = '/login',
+  update = '/:member_id',
+  delete = '/:member_id',
+}

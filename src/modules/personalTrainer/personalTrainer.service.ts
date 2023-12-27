@@ -27,7 +27,6 @@ export async function registerPersonalTrainerHandler(request: FastifyRequest<{
   const password = body.password;
   const {hash, salt} = hashPassword(password);
 
-
   try {
     const personalTrainer = await createPersonalTrainer(body, hash, salt);
     return reply.code(201).send(personalTrainer)

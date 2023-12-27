@@ -81,6 +81,24 @@ export const loginResponseSchema = z.object({
   accessToken: z.string(),
 });
 
+export const responseDeleteSchema = {
+  type: 'object',
+  properties: {
+    message: {type: 'string', description: 'success', example: 'success'},
+  }
+};
+
+export const responseIdSchema = {
+  type: 'object',
+  properties: {
+    id: {type: 'string', description: 'Id return', example: '9fb45576-6e37-4ffb-972a-0b6ed9720bd7'},
+  }
+};
+
+export const count = {
+  count: z.number()
+};
+
 export type Filters = z.infer<typeof filtersSchema>;
 export type LoginInput = z.infer<typeof loginSchema>
 

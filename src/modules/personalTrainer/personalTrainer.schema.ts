@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import {buildJsonSchemas} from 'fastify-zod'
 import {
+  count,
   dateCreatedUpdated, loginResponseSchema, loginSchema,
   personalTrainerOccupation,
   userCore,
@@ -27,11 +28,6 @@ const personalTrainerResume = {
   deleted: z.boolean().nullable(),
   occupation: personalTrainerOccupation.optional(),
 };
-
-const personalTrainerCount = {
-  count: z.number()
-};
-
 
 const updatePersonalTrainerSchema = z.object({
   email: z.string().email().optional(),
@@ -79,7 +75,7 @@ const PersonalTrainerUniqueResponseSchema = z.object({
 });
 
 const PersonalTrainersManyResponseSchema = z.object({
-  ...personalTrainerCount,
+  ...count,
   ...personalTrainerFindMany,
 });
 

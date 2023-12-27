@@ -65,16 +65,7 @@ export async function findManyMembers(filters: Filters, userId: string) {
     select: {
       id: true,
       name: true,
-      cpf: false,
-      users_address: false,
-      birth_date: false,
-      email: false,
-      phone: false,
-      password: false,
-      salt: false,
       deleted: true,
-      created_at: false,
-      updated_at: false,
     }
   });
 
@@ -98,7 +89,6 @@ export async function findUniqueMember(memberId: string, userId: string) {
       cpf: true,
       users_address: {
         select: {
-          id: false,
           address: true,
           address_number: true,
           address_complement: true,
@@ -107,7 +97,6 @@ export async function findUniqueMember(memberId: string, userId: string) {
           state: true,
           country: true,
           zip_code: true,
-          user_address_id: false,
         }
       },
       birth_date: true,
@@ -131,12 +120,9 @@ export async function findUniqueMemberResume(memberId: string) {
     select: {
       id: true,
       name: true,
-      cpf: false,
       birth_date: true,
       email: true,
       phone: true,
-      password: false,
-      salt: false,
       deleted: true,
       created_at: true,
       updated_at: true,
