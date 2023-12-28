@@ -1,5 +1,5 @@
 import {FastifyInstance} from "fastify";
-import {$ref} from "./training.schema";
+import {$ref, trainingIdSchema} from "./training.schema";
 import {
   deleteTrainingHandler, getUniqueTrainingHandler, getManyTrainingsHandler, registerTrainingHandler,
   updateTrainingHandler
@@ -12,6 +12,7 @@ import {
   trainingRoutesPath,
   trainingSummary
 } from "../../utils/enums";
+import {queryStringTraining, responseDeleteSchema, responseIdSchema} from "../../utils/common.schema";
 
 async function trainingRoutes(server: FastifyInstance) {
   server.get(trainingRoutesPath.findAll, {
@@ -19,14 +20,7 @@ async function trainingRoutes(server: FastifyInstance) {
     schema: {
       tags: [tags.training],
       summary: trainingSummary.findAll,
-      querystring: {
-        type: 'object',
-        properties: {
-          id: {type: 'string'},
-          member_id: {type: 'string'},
-          personal_trainer_id: {type: 'string'},
-        }
-      },
+      querystring: queryStringTraining,
       response: {
         200: $ref('trainingFindManyScheme')
       }
@@ -38,9 +32,7 @@ async function trainingRoutes(server: FastifyInstance) {
     schema: {
       tags: [tags.training],
       summary: trainingSummary.findById,
-      params: {
-        id: {type: 'string'},
-      },
+      params: trainingIdSchema,
       response: {
         200: $ref('trainingFindUniqueSchema')
       }
@@ -52,9 +44,9 @@ async function trainingRoutes(server: FastifyInstance) {
     schema: {
       tags: [tags.training],
       summary: trainingSummary.register,
-      body: $ref('createTrainingSchema'),
+      body: $ref('trainingCreateSchema'),
       response: {
-        201: $ref('createTrainingSchema')
+        201: $ref('trainingCreateSchema')
       }
 
     }
@@ -65,14 +57,9 @@ async function trainingRoutes(server: FastifyInstance) {
     schema: {
       tags: [tags.training_replacement],
       summary: trainingReplacementSummary.register,
-      body: $ref('createTrainingReplacementSchema'),
+      body: $ref('trainingReplacementCreateSchema'),
       response: {
-        201: {
-          type: 'object',
-          properties: {
-            id: {type: 'string', example: ''}
-          }
-        }
+        201: responseIdSchema
       }
     }
   }, registerTrainingReplacementHandler);
@@ -82,14 +69,11 @@ async function trainingRoutes(server: FastifyInstance) {
       schema: {
         tags: [tags.training],
         summary: trainingSummary.update,
-        params: {
-          id: {type: 'string'},
-        },
-        body: $ref('updateTrainingSchema'),
+        params: trainingIdSchema,
+        body: $ref('trainingUpdateSchema'),
         response: {
-          200: $ref('updateTrainingSchema')
+          200: $ref('trainingUpdateSchema')
         },
-
       }
     }, updateTrainingHandler
   );
@@ -99,16 +83,9 @@ async function trainingRoutes(server: FastifyInstance) {
       schema: {
         tags: [tags.training],
         summary: trainingSummary.delete,
-        params: {
-          id: {type: 'string'},
-        },
+        params: trainingIdSchema,
         response: {
-          200: {
-            type: 'object',
-            properties: {
-              message: {type: 'string', example: ''}
-            }
-          }
+          200: responseDeleteSchema
         }
       }
     }, deleteTrainingHandler
