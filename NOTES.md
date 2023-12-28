@@ -99,18 +99,3 @@ Thursday - Quinta-feira
 Friday - Sexta-feira
 Saturday - Sábado
 
-// TODO - Implementar integração com cognito ou firebase
-// TODO - Criar paginação
-// TODO - Criar validação para cpf
-// TODO - Criar validação para cadastro de usuários
-// TODO - Criar endpoints Planos
-// TODO - Incluir nos arquivos route os parametros aceitos em cada endpoint (busca por id, name, cpf, etc)
-// TODO - Organizar toda a estrutura dos schemas (schemas genêricos)
-// TODO - Validar se o personal trainer não está criando um registro de treino como membro
-// TODO - Validar se o treino no registro de treino pertence ao member e ao personal trainer
-// TODO - Criar possibilidade de transferência de treino para outro personal trainer
-// TODO - Adicionar validação para verificar se o registro do treino está sendo salvo para o member correto
-// TODO - Criar endpoint para buscar as informações de training-replacement (getAll, getById)
-// TODO - Criar regra de negócio para verificar se o número de aulas do mês ultrapassa a quantidade de aula que o aluno tem direito
-// TODO - Adicionar o nome dos query path (id --> personal_traine_id, member_id, etc)
-// TODO - Criar método para reset de senha (apenas se não integrar com o firebase)

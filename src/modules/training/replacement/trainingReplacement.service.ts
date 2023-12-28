@@ -2,7 +2,6 @@ import {FastifyReply, FastifyRequest} from "fastify";
 import {CreateTrainingReplacement} from "../training.schema";
 import {createTrainingReplacement} from "./trainingReplacement.repository";
 
-
 export async function registerTrainingReplacementHandler(request: FastifyRequest<{
   Body: CreateTrainingReplacement
 }>, reply: FastifyReply) {

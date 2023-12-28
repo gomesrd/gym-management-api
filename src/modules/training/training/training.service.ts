@@ -13,7 +13,6 @@ import {Filters} from "../../../utils/common.schema";
 import {parseFiltersPermission, parseFiltersTraining} from "../../../utils/parseFilters";
 import {TrainingId} from "../../../utils/types";
 
-
 export async function registerTrainingHandler(request: FastifyRequest<{
   Body: CreateTrainingInput
 }>, reply: FastifyReply) {
