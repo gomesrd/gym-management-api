@@ -40,17 +40,26 @@ export async function updateTrainingReplacement(
 }
 
 export async function findManyTrainings(filters: Filters, parseFilters: FiltersPermissions, dayTraining: DaysOfWeek | undefined): Promise<FindManyTraining> {
-  debugger
   const filtersTraining = {
     OR: [
-      {single_date: filters.single_date || filters.training_date},
-      {fixed_day: filters.fixed_day || dayTraining}
+      {
+        single_date: {
+          equals: filters.training_date,
+          not: null
+        }
+      },
+      {
+        fixed_day: {
+          equals: dayTraining,
+          not: null
+        }
+      },
     ],
+    fixed_day: filters.fixed_day,
+    single_date: filters.single_date,
     member_id: parseFilters.member_id,
     personal_trainer_id: parseFilters.personal_trainer_id,
     deleted: parseFilters.deleted,
-    single_date: filters.single_date,
-    fixed_day: filters.fixed_day,
     start_time: filters.start_time,
     end_time: filters.end_time,
     modality: filters.modality,
@@ -60,6 +69,7 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
       lte: filters.created_at_lte,
     },
   }
+
 
   const trainingsCount = await prisma.training.count({
     where: {
