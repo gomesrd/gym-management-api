@@ -129,16 +129,10 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
       type: true,
       member: {
         select: {
-          user_id: false,
           user: {
             select: {
               id: true,
               name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
             }
           }
         }
@@ -150,11 +144,6 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
             select: {
               id: true,
               name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false,
             }
           }
         }
