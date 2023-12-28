@@ -4,8 +4,9 @@ import {
   FindManyTraining,
   UpdateTraining
 } from "../training.schema";
-import {Filters} from "../../../utils/common.schema";
+import {DaysOfWeek, Filters} from "../../../utils/common.schema";
 import {FiltersPermissions} from "../../../utils/types";
+import {Days} from "@prisma/client";
 
 export async function createTraining(input: CreateTrainingInput) {
   return prisma.training.createMany(
@@ -38,15 +39,20 @@ export async function updateTrainingReplacement(
   });
 }
 
-export async function findManyTrainings(filters: Filters, parseFilters: FiltersPermissions): Promise<FindManyTraining> {
-
+export async function findManyTrainings(filters: Filters, parseFilters: FiltersPermissions, dayTraining: DaysOfWeek | undefined): Promise<FindManyTraining> {
+  debugger
   const filtersTraining = {
+    OR: [
+      {single_date: filters.single_date || filters.training_date},
+      {fixed_day: filters.fixed_day || dayTraining}
+    ],
     member_id: parseFilters.member_id,
     personal_trainer_id: parseFilters.personal_trainer_id,
     deleted: parseFilters.deleted,
-    fixed_day: filters.fixed_day,
     single_date: filters.single_date,
+    fixed_day: filters.fixed_day,
     start_time: filters.start_time,
+    end_time: filters.end_time,
     modality: filters.modality,
     type: filters.type,
     created_at: {
@@ -70,6 +76,7 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
       fixed_day: true,
       single_date: true,
       start_time: true,
+      end_time: true,
       modality: true,
       type: true,
       personal_trainer_id: false,
@@ -107,6 +114,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
       fixed_day: true,
       single_date: true,
       start_time: true,
+      end_time: true,
       modality: true,
       type: true,
       member: {
@@ -150,7 +158,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
 export async function updateTraining(dataUpdate: UpdateTraining, trainingId: string, parseFilters: FiltersPermissions) {
   const {
     start_time, modality, personal_trainer_id,
-    type, single_date, fixed_day
+    type, single_date, fixed_day, end_time
   } = dataUpdate;
 
   try {
@@ -161,6 +169,7 @@ export async function updateTraining(dataUpdate: UpdateTraining, trainingId: str
       },
       data: {
         start_time: start_time,
+        end_time: end_time,
         fixed_day: fixed_day,
         single_date: single_date,
         personal_trainer_id: personal_trainer_id,

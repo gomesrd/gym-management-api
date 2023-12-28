@@ -9,6 +9,7 @@
     "build": "dotenv -e .env.$NODE_ENV prisma generate && tsc -p tsconfig.json",
     "start": "dotenv -e .env.$NODE_ENV node dist/index.js",
     "dev": "dotenv -e .env.$NODE_ENV nodemon src/index.ts",
+    "migrate-dev": "dotenv -e .env.$NODE_ENV prisma migrate dev --name init",
     "migrate": "prisma migrate deploy"
   },
   "dependencies": {

@@ -10,7 +10,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
   server.get(trainingRecordRoutesPath.findAll, {
     preHandler: [server.authenticate],
     schema: {
-      tags: [tags.training_record],
+      tags: [tags.trainingRecord],
       summary: trainingRecordSummary.findAll,
       querystring: {
         type: 'object',
@@ -29,7 +29,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
   server.get(trainingRecordRoutesPath.findById, {
     preHandler: [server.authenticate],
     schema: {
-      tags: [tags.training_record],
+      tags: [tags.trainingRecord],
       summary: trainingRecordSummary.findById,
       params: {
         id: {type: 'string'},
@@ -46,7 +46,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
   server.post(trainingRecordRoutesPath.register, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: [tags.training_record],
+      tags: [tags.trainingRecord],
       body: $ref('createTrainingRecordSchema'),
       summary: trainingRecordSummary.register,
       response: {
@@ -58,7 +58,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
   server.put(trainingRecordRoutesPath.update, {
       preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
-        tags: [tags.training_record],
+        tags: [tags.trainingRecord],
         summary: trainingRecordSummary.update,
         params: {
           id: {type: 'string'},
@@ -75,7 +75,7 @@ async function trainingRecordRoutes(server: FastifyInstance) {
   server.delete(trainingRecordRoutesPath.delete, {
       preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
-        tags: [tags.training_record],
+        tags: [tags.trainingRecord],
         summary: trainingRecordSummary.delete,
         params: {
           id: {type: 'string'},

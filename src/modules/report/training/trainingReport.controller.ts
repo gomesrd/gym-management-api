@@ -8,7 +8,7 @@ async function trainingReportRoutes(server: FastifyInstance) {
   server.get(trainingReportRoutesPath.findAll, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: [tags.training_report],
+      tags: [tags.trainingReport],
       summary: trainingReportSummary.findAll,
       params: {
         type: 'object',

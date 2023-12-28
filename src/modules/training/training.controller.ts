@@ -55,7 +55,7 @@ async function trainingRoutes(server: FastifyInstance) {
   server.post(trainingReplacementRoutesPath.register, {
     preHandler: [server.authenticate, server.authorizationLimited],
     schema: {
-      tags: [tags.training_replacement],
+      tags: [tags.trainingReplacement],
       summary: trainingReplacementSummary.register,
       body: $ref('trainingReplacementCreateSchema'),
       response: {

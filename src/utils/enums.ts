@@ -10,9 +10,9 @@ export enum tags {
   personalTrainer = 'Personal Trainer',
   member = 'Member',
   training = 'Training',
-  training_record = 'Training Record',
-  training_report = 'Training Report',
-  training_replacement = 'Training Replacement',
+  trainingRecord = 'Training Record',
+  trainingReport = 'Training Report',
+  trainingReplacement = 'Training Replacement',
 }
 
 export enum personalTrainerSummary {

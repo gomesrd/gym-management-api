@@ -28,7 +28,7 @@ const filtersSchema = z.object({
   created_at_lte: z.string().optional(),
   deleted: z.string().default('true').optional(),
   email: z.string().optional(),
-  fixed_day: daysOfWeek.optional(),
+  fixed_day: daysOfWeek.optional().nullable(),
   id: z.string().optional(),
   member_id: z.string().optional(),
   modality: trainingModalities.optional(),
@@ -38,8 +38,10 @@ const filtersSchema = z.object({
   single_date: z.string().optional(),
   status: trainingStatus.optional(),
   start_time: z.string().optional(),
+  end_time: z.string().optional(),
   training_id: z.string().optional(),
   type: trainingTypes.optional(),
+  training_date: z.string().optional(),
 });
 
 export const usersAddress = {
@@ -109,4 +111,5 @@ export const queryStringTraining = {
 
 export type Filters = z.infer<typeof filtersSchema>;
 export type LoginInput = z.infer<typeof loginSchema>
+export type DaysOfWeek = z.infer<typeof daysOfWeek>;
 

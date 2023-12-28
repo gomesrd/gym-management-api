@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -118,8 +119,9 @@ model Member {
 model Training {
   id                  String                @id @unique @default(uuid()) @db.Uuid
   fixed_day           Days?
-  single_date         DateTime? // If it singular or replacement
+  single_date         String? // If it singular or replacement
   start_time          String                @db.VarChar()
+  end_time            String                @db.VarChar()
   modality            Modality              @default(pilates)
   type                TrainingType          @default(plan)
   deleted             Boolean?              @default(false) @db.Boolean()

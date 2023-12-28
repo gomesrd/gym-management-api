@@ -12,6 +12,8 @@ import {
 import {Filters} from "../../../utils/common.schema";
 import {parseFiltersPermission, parseFiltersTraining} from "../../../utils/parseFilters";
 import {TrainingId} from "../../../utils/types";
+import {getDayTraining} from "../../../utils/getDay";
+
 
 export async function registerTrainingHandler(request: FastifyRequest<{
   Body: CreateTrainingInput
@@ -40,12 +42,12 @@ export async function registerTrainingHandler(request: FastifyRequest<{
 export async function getManyTrainingsHandler(request: FastifyRequest<{
   Querystring: Filters;
 }>) {
+  const userId = request.user.id;
+  const filters = request.query;
+  const parseFilters = await parseFiltersTraining(filters, userId);
+  const dayTraining = await getDayTraining(filters.training_date)
   try {
-    const userId = request.user.id;
-    const filters = request.query;
-    const parseFilters = await parseFiltersTraining(filters, userId);
-
-    return findManyTrainings(filters, parseFilters);
+    return findManyTrainings(filters, parseFilters, dayTraining);
   } catch (e) {
     console.log(e)
   }

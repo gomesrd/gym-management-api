@@ -14,8 +14,9 @@ const trainingId = {
 
 const trainingCore = {
   fixed_day: daysOfWeek.nullable(),
-  single_date: z.date().nullable(),
+  single_date: z.string().nullable(),
   start_time: z.string(),
+  end_time: z.string(),
   modality: trainingModalities.optional(),
   type: trainingTypes,
 }
