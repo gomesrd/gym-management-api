@@ -27,11 +27,11 @@ const trainingInput = {
   training_replacement_id: z.string().optional(),
 };
 
-const trainingReplacement = z.object({
+const trainingReplacement = {
   training_id: z.string(),
   member_id: z.string(),
   realized: z.boolean(),
-})
+}
 
 const usersResume = {
   personal_trainer: z.object({
@@ -59,6 +59,13 @@ const trainingFindUniqueSchema = z.object({
   ...dateCreatedUpdated
 });
 
+export const trainingIdSchema = {
+  type: 'object',
+  properties: {
+    training_id: {type: 'string', description: 'Training Id'},
+  }
+};
+
 const trainingFindManyScheme = z.object({
   ...count,
   data: z.array(
@@ -68,40 +75,32 @@ const trainingFindManyScheme = z.object({
   ),
 });
 
-const createTraining = z.object({
-  ...trainingInput,
-});
-
-const createTrainingSchema = z.array(createTraining);
-
-const createTrainingReplacementSchema = {...trainingReplacement}
-
-const updateTrainingSchema = z.object({
-  fixed_day: daysOfWeek.optional().nullable(),
-  single_date: z.string().nullable(),
-  start_time: z.string().optional(),
-  active: z.boolean().optional(),
+const trainingUpdateSchema = z.object({
+  ...trainingCore,
   personal_trainer_id: z.string().optional(),
-  modality: trainingModalities,
-  type: trainingTypes,
+  active: z.boolean().optional(),
 });
 
-const TrainingIdSchema = z.object({
-  ...trainingId
-});
+const trainingCreateSchema = z.array(z.object({
+  ...trainingInput,
+}));
 
-export type CreateTrainingInput = z.infer<typeof createTrainingSchema>;
-export type CreateTrainingReplacement = z.infer<typeof trainingReplacement>;
-export type DeleteTraining = z.infer<typeof TrainingIdSchema>;
-export type GetTraining = z.infer<typeof TrainingIdSchema>;
-export type UpdateTraining = z.infer<typeof updateTrainingSchema>;
+const trainingReplacementCreateSchema = z.object({...trainingReplacement})
+
+const responseTrainingReplacementSchema = z.object({
+  id: z.string(),
+  ...trainingReplacement
+})
+
+export type CreateTrainingInput = z.infer<typeof trainingCreateSchema>;
+export type CreateTrainingReplacement = z.infer<typeof trainingReplacementCreateSchema>;
+export type UpdateTraining = z.infer<typeof trainingUpdateSchema>;
 export type FindManyTraining = z.infer<typeof trainingFindManyScheme>;
 
 export const {schemas: trainingSchemas, $ref} = buildJsonSchemas({
-  createTrainingSchema,
-  trainingReplacement,
+  trainingCreateSchema,
+  trainingReplacementCreateSchema,
   trainingFindManyScheme,
   trainingFindUniqueSchema,
-  TrainingIdSchema,
-  updateTrainingSchema,
+  trainingUpdateSchema,
 }, {$id: "TrainingSchemas"});

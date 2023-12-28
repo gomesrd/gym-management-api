@@ -12,3 +12,7 @@ export interface PersonalTrainerId {
 export interface MemberId {
   member_id: string;
 }
+
+export interface TrainingId {
+  training_id: string;
+}

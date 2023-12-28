@@ -95,8 +95,16 @@ export const responseIdSchema = {
   }
 };
 
-export const count = {
-  count: z.number()
+export const count = {count: z.number()};
+
+export const queryStringTraining = {
+  type: 'object',
+  properties: {
+    training_id: {type: 'string'},
+    training_record_id: {type: 'string'},
+    member_id: {type: 'string'},
+    personal_trainer_id: {type: 'string'},
+  }
 };
 
 export type Filters = z.infer<typeof filtersSchema>;

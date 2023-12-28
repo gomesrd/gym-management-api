@@ -1,12 +1,9 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {
-  CreateTrainingInput, CreateTrainingReplacement,
-  DeleteTraining,
-  GetTraining,
-  UpdateTraining
+  CreateTrainingInput, UpdateTraining
 } from "../training.schema";
 import {
-  createTraining, createTrainingReplacement,
+  createTraining,
   deleteTraining,
   findManyTrainings,
   findUniqueTraining,
@@ -14,6 +11,7 @@ import {
 } from "./training.repository";
 import {Filters} from "../../../utils/common.schema";
 import {parseFiltersPermission, parseFiltersTraining} from "../../../utils/parseFilters";
+import {TrainingId} from "../../../utils/types";
 
 
 export async function registerTrainingHandler(request: FastifyRequest<{
@@ -55,10 +53,10 @@ export async function getManyTrainingsHandler(request: FastifyRequest<{
 }
 
 export async function getUniqueTrainingHandler(request: FastifyRequest<{
-  Params: GetTraining;
+  Params: TrainingId;
 }>) {
   const userId = request.user.id;
-  const trainingId = request.params.id;
+  const trainingId = request.params.training_id;
   const parseFilters = await parseFiltersPermission(userId);
 
   return findUniqueTraining(trainingId, parseFilters);
@@ -66,13 +64,12 @@ export async function getUniqueTrainingHandler(request: FastifyRequest<{
 
 export async function updateTrainingHandler(request: FastifyRequest<{
   Body: UpdateTraining;
-  Params: GetTraining;
+  Params: TrainingId;
 }>, reply: FastifyReply) {
   const userId = request.user.id;
   const dataUpdate = request.body
-  const trainingId = request.params.id;
+  const trainingId = request.params.training_id;
   const parseFilters = await parseFiltersPermission(userId);
-
 
   try {
     return await updateTraining(dataUpdate, trainingId, parseFilters);
@@ -89,10 +86,10 @@ export async function updateTrainingHandler(request: FastifyRequest<{
 }
 
 export async function deleteTrainingHandler(request: FastifyRequest<{
-  Params: DeleteTraining;
+  Params: TrainingId;
 }>, reply: FastifyReply) {
   const userId = request.user.id;
-  const trainingId = request.params.id;
+  const trainingId = request.params.training_id;
   const parseFilters = await parseFiltersPermission(userId);
 
   await deleteTraining(trainingId, parseFilters);
