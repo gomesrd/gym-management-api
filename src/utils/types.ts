@@ -3,6 +3,7 @@ export interface FiltersPermissions {
   personal_trainer_id?: string | undefined;
   member_id?: string | undefined;
   deleted?: boolean | undefined;
+  realized?: boolean | undefined;
 }
 
 export interface PersonalTrainerId {
@@ -15,4 +16,8 @@ export interface MemberId {
 
 export interface TrainingId {
   training_id: string;
+}
+
+export interface TrainingReplacementId {
+  training_replacement_id: string;
 }

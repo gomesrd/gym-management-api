@@ -1,42 +1,32 @@
 import prisma from "../../../config/prisma";
 import {
-  CreateTrainingInput, CreateTrainingReplacement,
+  CreateTrainingInput,
   FindManyTraining,
   UpdateTraining
 } from "../training.schema";
 import {DaysOfWeek, Filters} from "../../../utils/common.schema";
 import {FiltersPermissions} from "../../../utils/types";
-import {Days} from "@prisma/client";
 
 export async function createTraining(input: CreateTrainingInput) {
+  const dataTraining = input.map((training) => {
+    return {
+      start_time: training.start_time,
+      end_time: training.end_time,
+      modality: training.modality,
+      type: training.type,
+      personal_trainer_id: training.personal_trainer_id,
+      member_id: training.member_id,
+      fixed_day: training.fixed_day,
+      single_date: training.single_date,
+      training_replacement_id: training.training_replacement_id,
+    }
+  });
+
   return prisma.training.createMany(
     {
-      data: input
+      data: dataTraining
     }
   )
-}
-
-
-export async function createTrainingReplacement(input: CreateTrainingReplacement) {
-
-  return prisma.trainingReplacement.create({
-    data: input
-  });
-}
-
-export async function updateTrainingReplacement(
-  trainingReplacementId: string | undefined,
-  realized: boolean | undefined
-) {
-
-  return prisma.trainingReplacement.update({
-    where: {
-      id: trainingReplacementId,
-    },
-    data: {
-      realized: realized,
-    }
-  });
 }
 
 export async function findManyTrainings(filters: Filters, parseFilters: FiltersPermissions, dayTraining: DaysOfWeek | undefined): Promise<FindManyTraining> {
@@ -89,8 +79,7 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
       end_time: true,
       modality: true,
       type: true,
-      personal_trainer_id: false,
-      member_id: false,
+      training_replacement_id: true,
       member: {
         include: {
           user: {
@@ -126,6 +115,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
       start_time: true,
       end_time: true,
       modality: true,
+      training_replacement_id: true,
       type: true,
       member: {
         select: {
@@ -139,7 +129,6 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
       },
       personal_trainer: {
         select: {
-          user_id: false,
           user: {
             select: {
               id: true,

@@ -15,23 +15,34 @@ const trainingId = {
 const trainingCore = {
   fixed_day: daysOfWeek.nullable(),
   single_date: z.string().nullable(),
-  start_time: z.string(),
-  end_time: z.string(),
-  modality: trainingModalities.optional(),
+  start_time: z.string().nullable(),
+  end_time: z.string().nullable(),
+  modality: trainingModalities,
   type: trainingTypes,
+  training_replacement_id: z.string().nullable(),
 }
 
 const trainingInput = {
   ...trainingCore,
   personal_trainer_id: z.string(),
   member_id: z.string(),
-  training_replacement_id: z.string().optional(),
 };
 
 const trainingReplacement = {
-  training_id: z.string(),
+  id: z.string().optional(),
   member_id: z.string(),
   realized: z.boolean(),
+}
+
+const trainingReplacementResponse = {
+  id: z.string().optional(),
+  realized: z.boolean(),
+  member: z.object({
+    user: z.object({
+      id: z.string(),
+      name: z.string(),
+    }),
+  }),
 }
 
 const usersResume = {
@@ -60,10 +71,30 @@ const trainingFindUniqueSchema = z.object({
   ...dateCreatedUpdated
 });
 
+const trainingReplacementFindUniqueSchema = z.object({
+  ...trainingReplacementResponse,
+  ...dateCreatedUpdated
+});
+
 export const trainingIdSchema = {
   type: 'object',
   properties: {
     training_id: {type: 'string', description: 'Training Id'},
+  }
+};
+
+export const trainingReplacementIdSchema = {
+  type: 'object',
+  properties: {
+    training_replacement_id: {type: 'string', description: 'Training Replacement Id'},
+  }
+};
+
+export const queryStringTrainingReplacement = {
+  type: 'object',
+  properties: {
+    member_id: {type: 'string'},
+    realized: {type: 'string'},
   }
 };
 
@@ -72,6 +103,15 @@ const trainingFindManyScheme = z.object({
   data: z.array(
     z.object({
       ...trainingResume
+    })
+  ),
+});
+
+const trainingReplacementFindManyScheme = z.object({
+  ...count,
+  data: z.array(
+    z.object({
+      ...trainingReplacementResponse
     })
   ),
 });
@@ -88,10 +128,6 @@ const trainingCreateSchema = z.array(z.object({
 
 const trainingReplacementCreateSchema = z.object({...trainingReplacement})
 
-const responseTrainingReplacementSchema = z.object({
-  id: z.string(),
-  ...trainingReplacement
-})
 
 export type CreateTrainingInput = z.infer<typeof trainingCreateSchema>;
 export type CreateTrainingReplacement = z.infer<typeof trainingReplacementCreateSchema>;
@@ -104,4 +140,6 @@ export const {schemas: trainingSchemas, $ref} = buildJsonSchemas({
   trainingFindManyScheme,
   trainingFindUniqueSchema,
   trainingUpdateSchema,
+  trainingReplacementFindManyScheme,
+  trainingReplacementFindUniqueSchema,
 }, {$id: "TrainingSchemas"});

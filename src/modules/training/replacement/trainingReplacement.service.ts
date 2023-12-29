@@ -1,8 +1,52 @@
 import {FastifyReply, FastifyRequest} from "fastify";
 import {CreateTrainingReplacement} from "../training.schema";
-import {createTrainingReplacement} from "./trainingReplacement.repository";
+import {
+  createTrainingReplacement,
+  findManyTrainingsReplacement,
+  findUniqueTrainingReplacement
+} from "./trainingReplacement.repository";
+import {Filters} from "../../../utils/common.schema";
+import {parseFiltersPermission, parseFiltersTraining} from "../../../utils/parseFilters";
+import { TrainingReplacementId} from "../../../utils/types";
 
 export async function registerTrainingReplacementHandler(request: FastifyRequest<{
+  Body: CreateTrainingReplacement
+}>, reply: FastifyReply) {
+  const body = request.body;
+
+  try {
+    const trainingReplacement = await createTrainingReplacement(body);
+    return reply.code(201).send(trainingReplacement)
+  } catch (e: any) {
+    console.log(e)
+    return reply.code(500).send('Something went wrong')
+  }
+}
+
+export async function getManyTrainingsReplacementHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>) {
+  const userId = request.user.id;
+  const filters = request.query;
+  const parseFilters = await parseFiltersTraining(filters, userId);
+  try {
+    return findManyTrainingsReplacement(filters, parseFilters);
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+export async function getUniqueTrainingReplacementHandler(request: FastifyRequest<{
+  Params: TrainingReplacementId;
+}>) {
+  const userId = request.user.id;
+  const trainingReplacementId = request.params.training_replacement_id;
+  const parseFilters = await parseFiltersPermission(userId);
+
+  return findUniqueTrainingReplacement(trainingReplacementId, parseFilters);
+}
+
+export async function updateTrainingReplacementHandler(request: FastifyRequest<{
   Body: CreateTrainingReplacement
 }>, reply: FastifyReply) {
   const body = request.body;

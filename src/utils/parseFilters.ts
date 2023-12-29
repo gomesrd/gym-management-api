@@ -23,16 +23,22 @@ export async function parseFiltersTraining(filters: Filters, userId: string) {
   const personal_trainer_id = (userRole === Role.employee) ? userId : filters.personal_trainer_id;
   const member_id = (userRole === Role.member) ? userId : filters.member_id;
   let parseDeleted = undefined;
+  let parseRealized = undefined;
 
 
   if (filters?.deleted === 'true' || filters?.deleted === 'false') {
     parseDeleted = filters?.deleted === 'true';
   }
 
+    if (filters?.realized === 'true' || filters?.realized === 'false') {
+    parseRealized = filters?.realized === 'true';
+  }
+
   return {
     deleted: parseDeleted,
     personal_trainer_id,
-    member_id
+    member_id,
+    realized: parseRealized
   };
 }
 

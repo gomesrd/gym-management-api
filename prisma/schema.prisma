@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -117,24 +116,26 @@ model Member {
 }
 
 model Training {
-  id                  String                @id @unique @default(uuid()) @db.Uuid
-  fixed_day           Days?
-  single_date         String? // If it singular or replacement
-  start_time          String                @db.VarChar()
-  end_time            String                @db.VarChar()
-  modality            Modality              @default(pilates)
-  type                TrainingType          @default(plan)
-  deleted             Boolean?              @default(false) @db.Boolean()
-  created_at          DateTime              @default(now())
-  updated_at          DateTime              @updatedAt
-  member_id           String                @db.Uuid
-  personal_trainer_id String                @db.Uuid
-  member              Member                @relation(fields: [member_id], references: [user_id])
-  personal_trainer    PersonalTrainer       @relation(fields: [personal_trainer_id], references: [user_id])
-  training_record     TrainingRecord[]
-  TrainingReplacement TrainingReplacement[]
+  id                      String               @id @unique @default(uuid()) @db.Uuid
+  fixed_day               Days?
+  single_date             String?              @db.VarChar()
+  start_time              String?              @db.VarChar()
+  end_time                String?              @db.VarChar()
+  modality                Modality             @default(pilates)
+  type                    TrainingType         @default(plan)
+  deleted                 Boolean?             @default(false) @db.Boolean()
+  created_at              DateTime             @default(now())
+  updated_at              DateTime             @updatedAt
+  member_id               String               @db.Uuid
+  personal_trainer_id     String               @db.Uuid
+  training_replacement_id String?              @db.Uuid @unique
+  training_replacement    TrainingReplacement? @relation(fields: [training_replacement_id], references: [id])
+  member                  Member               @relation(fields: [member_id], references: [user_id])
+  personal_trainer        PersonalTrainer      @relation(fields: [personal_trainer_id], references: [user_id])
+  training_record         TrainingRecord[]
 
-  @@unique(fields: [start_time, fixed_day, personal_trainer_id], name: "training_unique")
+  @@unique(fields: [start_time, end_time, fixed_day, personal_trainer_id], name: "training_unique_fixed_day")
+  @@unique(fields: [start_time, end_time, single_date, personal_trainer_id], name: "training_unique_single_date")
   @@map("training")
 }
 
@@ -155,14 +156,13 @@ model TrainingRecord {
 }
 
 model TrainingReplacement {
-  id          String   @id @unique @default(uuid()) @db.Uuid
-  realized    Boolean? @default(false) @db.Boolean()
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  member_id   String   @db.Uuid
-  training_id String   @db.Uuid
-  training    Training @relation(fields: [training_id], references: [id])
-  member      Member   @relation(fields: [member_id], references: [user_id])
+  id         String     @id @unique @default(uuid()) @db.Uuid
+  realized   Boolean?   @default(false) @db.Boolean()
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  member_id  String     @db.Uuid
+  member     Member     @relation(fields: [member_id], references: [user_id])
+  Training   Training[]
 
   @@map("training_replacement")
 }

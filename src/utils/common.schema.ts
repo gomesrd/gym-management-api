@@ -42,6 +42,7 @@ const filtersSchema = z.object({
   training_id: z.string().optional(),
   type: trainingTypes.optional(),
   training_date: z.string().optional(),
+  realized: z.string().optional(),
 });
 
 export const usersAddress = {
@@ -108,6 +109,8 @@ export const queryStringTraining = {
     personal_trainer_id: {type: 'string'},
   }
 };
+
+
 
 export type Filters = z.infer<typeof filtersSchema>;
 export type LoginInput = z.infer<typeof loginSchema>

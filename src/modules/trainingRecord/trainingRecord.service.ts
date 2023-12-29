@@ -8,9 +8,9 @@ import {
   updateTrainingRecord
 } from "./trainingRecord.repository";
 import {personalTrainerValidate} from "../../utils/permissions.service";
-import {updateTrainingReplacement} from "../training/training/training.repository";
+import {deleteTraining} from "../training/training/training.repository";
 import {parseFiltersPermission, parseFiltersTraining} from "../../utils/parseFilters";
-
+import {updateRealizedTrainingReplacement} from "../training/replacement/trainingReplacement.repository";
 
 export async function registerTrainingRecordHandler(request: FastifyRequest<{
   Body: CreateTrainingRecordInput
@@ -20,8 +20,9 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
   const personalTrainerId = body.personal_trainer_id;
   const memberId = body.member_id;
   const trainingReplacementId = body.training_replacement_id;
-  const realizedReplacement = body.realized;
   const trainingType = body.type;
+  const parseFilters = await parseFiltersPermission(userId);
+
 
   const invalidRequest = await personalTrainerValidate(userId, personalTrainerId, memberId);
   if (invalidRequest) {
@@ -31,14 +32,15 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
   try {
     const trainingRecord = await createTrainingRecord(body);
 
-    if (trainingType === 'replacement') {
-      await updateTrainingReplacement(trainingReplacementId, realizedReplacement);
+    if (trainingType === 'replacement' && trainingReplacementId) {
+      await updateRealizedTrainingReplacement(trainingReplacementId);
+      await deleteTraining(body.training_id, parseFilters);
     }
 
     return reply.code(201).send(trainingRecord)
   } catch (e) {
     console.log(e)
-    return reply.code(500).send(e)
+    return reply.code(500).send('Something went wrong')
   }
 }
 

@@ -91,10 +91,9 @@ export enum trainingReportSummary {
 }
 
 export enum trainingReportRoutesPath {
-  findAll = '',
+  findAll = '/:member_id',
 
 }
-
 export enum trainingReplacementSummary {
   findAll = 'Get all Trainings Replacements',
   findById = 'Get a specific Training Replacement',
@@ -105,8 +104,8 @@ export enum trainingReplacementSummary {
 
 export enum trainingReplacementRoutesPath {
   findAll = '/replacement',
-  findById = '/replacement/:replacement_id',
+  findById = '/replacement/:training_replacement_id',
   register = '/replacement',
-  update = '/replacement/:replacement_id',
-  delete = '/replacement/:replacement_id',
+  update = '/replacement/:training_replacement_id',
+  delete = '/replacement/:training_replacement_id',
 }

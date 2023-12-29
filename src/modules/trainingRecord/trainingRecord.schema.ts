@@ -16,7 +16,7 @@ const trainingRecordInput = {
   training_id: z.string(),
   personal_trainer_id: z.string(),
   member_id: z.string(),
-  training_replacement_id: z.string().optional(),
+  training_replacement_id: z.string().nullable(),
   realized: z.boolean().optional().default(true)
 };
 

@@ -1,10 +1,18 @@
 import {FastifyInstance} from "fastify";
-import {$ref, trainingIdSchema} from "./training.schema";
+import {
+  $ref,
+  queryStringTrainingReplacement,
+  trainingIdSchema,
+  trainingReplacementIdSchema
+} from "./training.schema";
 import {
   deleteTrainingHandler, getUniqueTrainingHandler, getManyTrainingsHandler, registerTrainingHandler,
   updateTrainingHandler
 } from "./training/training.service";
-import {registerTrainingReplacementHandler} from "./replacement/trainingReplacement.service";
+import {
+  getManyTrainingsReplacementHandler, getUniqueTrainingReplacementHandler,
+  registerTrainingReplacementHandler
+} from "./replacement/trainingReplacement.service";
 import {
   tags,
   trainingReplacementRoutesPath,
@@ -38,6 +46,30 @@ async function trainingRoutes(server: FastifyInstance) {
       }
     },
   }, getUniqueTrainingHandler);
+
+    server.get(trainingReplacementRoutesPath.findAll, {
+    preHandler: [server.authenticate],
+    schema: {
+      tags: [tags.trainingReplacement],
+      summary: trainingReplacementSummary.findAll,
+      querystring: queryStringTrainingReplacement,
+      response: {
+        200: $ref('trainingReplacementFindManyScheme')
+      }
+    }
+  }, getManyTrainingsReplacementHandler);
+
+  server.get(trainingReplacementRoutesPath.findById, {
+    preHandler: [server.authenticate],
+    schema: {
+      tags: [tags.trainingReplacement],
+      summary: trainingReplacementSummary.findById,
+      params: trainingReplacementIdSchema,
+      response: {
+        200: $ref('trainingReplacementFindUniqueSchema')
+      }
+    },
+  }, getUniqueTrainingReplacementHandler);
 
   server.post(trainingRoutesPath.register, {
     preHandler: [server.authenticate, server.authorizationLimited],
