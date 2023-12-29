@@ -19,6 +19,7 @@ import {parseFiltersPermission} from "../../utils/parseFilters";
 import {queryUserRole} from "../../utils/permissions.service";
 import {PersonalTrainerId} from "../../utils/types";
 import {Filters, LoginInput} from "../../utils/common.schema";
+import {messageErrorDefault, replyErrorDefault} from "../../utils/error";
 
 export async function registerPersonalTrainerHandler(request: FastifyRequest<{
   Body: CreatePersonalTrainerInput
@@ -36,7 +37,8 @@ export async function registerPersonalTrainerHandler(request: FastifyRequest<{
         message: 'Personal trainer already exists'
       })
     }
-    return reply.code(500).send('Something went wrong')
+    console.log(e)
+    return replyErrorDefault(reply)
   }
 }
 
@@ -58,55 +60,83 @@ export async function loginHandler(request: FastifyRequest<{
     }
   )
 
-  if (correctPassword) {
+  if (!correctPassword) {
+    return reply.code(401).send(invalidLoginMessage());
+  }
+
+  try {
     const {id, name, role} = personalTrainer;
     const personalTrainerData = {id, name, role};
     // const expiresIn = 60 * 120;
     const accessToken = server.jwt.sign(personalTrainerData);
-
     return reply.code(200).send({accessToken});
+
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
   }
-  return reply.code(401).send(invalidLoginMessage());
 }
 
 export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
   Params: PersonalTrainerId;
-}>) {
+}>, reply: FastifyReply) {
   const userId = request.user.id;
   const personalTrainerId = request.params.personal_trainer_id
   const filters = await parseFiltersPermission(userId, personalTrainerId);
 
+  try {
+    const findPersonalTrainer = await findUniquePersonalTrainer(filters)
 
-  return await findUniquePersonalTrainer(filters)
+    if (!findPersonalTrainer) {
+      return reply.code(204).send('Personal Trainer not found');
+    }
+    return reply.code(200).send(findPersonalTrainer)
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
+
 }
 
 export async function getManyPersonalTrainersHandler(request: FastifyRequest<{
   Querystring: Filters;
-}>): Promise<PersonalTrainersManyResponse | undefined> {
+}>, reply: FastifyReply): Promise<PersonalTrainersManyResponse | undefined> {
   const filters = request.query
 
   try {
-    return await findManyPersonalTrainers(filters);
+    const findPersonalTrainers = await findManyPersonalTrainers(filters);
+
+    if (!findPersonalTrainers) {
+      return reply.code(204).send('Personal Trainers not found');
+    }
+    return reply.code(200).send(findPersonalTrainers)
+
   } catch (e) {
     console.log(e)
-    return undefined;
+    return replyErrorDefault(reply)
   }
 }
 
 export async function updatePersonalTrainerHandler(request: FastifyRequest<{
   Body: UpdatePersonalTrainer;
   Params: PersonalTrainerId;
-}>) {
+}>, reply: FastifyReply) {
   const userId = request.user.id;
   const dataUpdate = request.body;
   const personalTrainerId = request.params.personal_trainer_id
   const userRole = await queryUserRole(userId);
 
   if (userRole !== 'admin' && userId !== personalTrainerId) {
-    return Promise.reject('You can only update your own data');
+    return reply.code(403).send('You can only update your own data');
   }
 
-  return updatePersonalTrainer(dataUpdate, personalTrainerId);
+  try {
+    const update = updatePersonalTrainer(dataUpdate, personalTrainerId);
+    return reply.code(200).send(update)
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
 }
 
 
@@ -115,6 +145,11 @@ export async function deletePersonalTrainerHandler(request: FastifyRequest<{
 }>, reply: FastifyReply) {
   const personalTrainerId = request.params.personal_trainer_id;
 
-  await deletePersonalTrainer(personalTrainerId);
-  return reply.code(200).send('');
+  try {
+    await deletePersonalTrainer(personalTrainerId);
+    return reply.code(204).send('');
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
 }

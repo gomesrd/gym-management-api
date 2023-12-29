@@ -14,7 +14,7 @@ import {server} from "../../app";
 import {Filters, LoginInput} from "../../utils/common.schema";
 import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
 import {MemberId} from "../../utils/types";
-import {messageErrorDefault} from "../../utils/error";
+import {replyErrorDefault} from "../../utils/error";
 
 export async function registerMemberHandler(request: FastifyRequest<{
   Body: CreateMemberInput
@@ -30,8 +30,9 @@ export async function registerMemberHandler(request: FastifyRequest<{
       })
     }
     console.log(e)
-    return reply.code(500).send(messageErrorDefault)
+    return replyErrorDefault(reply)
   }
+  // TODO - REFATORAR A VALIDAÇÃO SE O EMAIL JÁ EXISTE
 }
 
 
@@ -40,7 +41,6 @@ export async function loginHandler(request: FastifyRequest<{
 }>, reply: FastifyReply) {
   const body = request.body;
   const member = await findMemberByEmail(body.email);
-
   if (!member) {
     return reply.code(401).send(invalidLoginMessage())
   }
@@ -52,19 +52,20 @@ export async function loginHandler(request: FastifyRequest<{
       hash: member.password
     }
   )
+  if (!correctPassword) {
+    return reply.code(401).send(invalidLoginMessage());
+  }
 
   try {
-    if (correctPassword) {
-      const {id, name} = member;
-      const dataMember = {id, name};
-      const expiresIn = 60 * 120;
-      return {accessToken: server.jwt.sign(dataMember, {expiresIn})};
-    }
+    const {id, name} = member;
+    const dataMember = {id, name};
+    const expiresIn = 60 * 120;
+    const accessToken = {accessToken: server.jwt.sign(dataMember, {expiresIn})}
+    return reply.code(200).send(accessToken);
 
-    return reply.code(401).send(invalidLoginMessage());
   } catch (e) {
     console.log(e)
-    return reply.code(500).send(messageErrorDefault)
+    return replyErrorDefault(reply)
   }
 
 }
@@ -76,10 +77,12 @@ export async function getUniqueMemberHandler(request: FastifyRequest<{
   const memberId = request.params.member_id
 
   try {
-    return findUniqueMember(memberId, userId);
+    const findMember = await findUniqueMember(memberId, userId);
+    return reply.code(200).send(findMember)
+
   } catch (e) {
     console.log(e)
-    return reply.code(500).send(messageErrorDefault)
+    return replyErrorDefault(reply)
   }
 }
 
@@ -89,10 +92,11 @@ export async function getUniqueMemberHandlerResume(request: FastifyRequest<{
   const memberId = request.params.member_id
 
   try {
-    return findUniqueMemberResume(memberId);
+    const findMember = await findUniqueMemberResume(memberId);
+    return reply.code(200).send(findMember)
   } catch (e) {
     console.log(e)
-    return reply.code(500).send(messageErrorDefault)
+    return replyErrorDefault(reply)
   }
 }
 
@@ -103,10 +107,11 @@ export async function getManyMembersHandler(request: FastifyRequest<{
   const userId = request.user.id;
 
   try {
-    return findManyMembers(filters, userId);
+    const findMembers = await findManyMembers(filters, userId);
+    return reply.code(200).send(findMembers)
   } catch (e) {
     console.log(e)
-    return reply.code(500).send(messageErrorDefault)
+    return replyErrorDefault(reply)
   }
 }
 
@@ -120,13 +125,14 @@ export async function updateMemberHandler(request: FastifyRequest<{
   await verifyPermissionActionOnlyMember(userId, memberId);
 
   try {
-    return updateMember(
+    const update = updateMember(
       dataUpdate,
       memberId,
     );
+    return reply.code(200).send(update)
   } catch (e) {
     console.log(e)
-    return reply.code(500).send(messageErrorDefault)
+    return replyErrorDefault(reply)
   }
 }
 
@@ -137,10 +143,11 @@ export async function deleteMemberHandler(request: FastifyRequest<{
   const memberId = request.params.member_id;
   await verifyPermissionActionOnlyMember(userId, memberId);
   await deleteMember(memberId);
+
   try {
-    return reply.code(200).send('');
+    return reply.code(204).send('');
   } catch (e) {
     console.log(e)
-    return reply.code(500).send(messageErrorDefault)
+    return replyErrorDefault(reply)
   }
 }
