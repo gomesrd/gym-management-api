@@ -15,7 +15,7 @@ export function passwordInvalid() {
 }
 
 export function invalidLoginMessage() {
-  return 'Invalid email or password'
+  return {message: 'Invalid email or password'}
 }
 
 export function confirmDeletedPersonalTrainer() {

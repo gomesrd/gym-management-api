@@ -34,11 +34,20 @@ export async function createPersonalTrainer(input: CreatePersonalTrainerInput, h
   });
 }
 
-export async function findPersonalTrainerByEmail(email: string) {
+export async function findPersonalTrainerByEmailCpf(email?: string | undefined, cpf?: string | undefined) {
   return prisma.users.findUnique({
     where: {
-      email,
+      email: email,
+      cpf: cpf,
       deleted: false
+    },
+  });
+}
+
+export async function findPersonalTrainerById(personalTrainerId: string) {
+  return prisma.users.findUnique({
+    where: {
+      id: personalTrainerId,
     },
   });
 }
@@ -138,7 +147,6 @@ export async function findManyPersonalTrainers(filters: Filters) {
 
 export async function updatePersonalTrainer(dataUpdate: UpdatePersonalTrainer, personalTrainerId: string) {
   const {name, email, phone} = dataUpdate
-
 
   return prisma.users.update({
     where: {

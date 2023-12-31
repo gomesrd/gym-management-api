@@ -3,7 +3,8 @@ import {
   createPersonalTrainer,
   deletePersonalTrainer,
   findManyPersonalTrainers,
-  findPersonalTrainerByEmail,
+  findPersonalTrainerByEmailCpf,
+  findPersonalTrainerById,
   findUniquePersonalTrainer,
   updatePersonalTrainer
 } from "./personalTrainer.repository";
@@ -12,14 +13,19 @@ import {
   PersonalTrainersManyResponse,
   UpdatePersonalTrainer
 } from "./personalTrainer.schema";
-import {invalidLoginMessage} from "./personalTrainer.mesages";
 import {hashPassword, verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
 import {parseFiltersPermission} from "../../utils/parseFilters";
 import {queryUserRole} from "../../utils/permissions.service";
 import {PersonalTrainerId} from "../../utils/types";
-import {Filters, LoginInput} from "../../utils/common.schema";
-import {messageErrorDefault, replyErrorDefault} from "../../utils/error";
+import {
+  Filters,
+  invalidLogin,
+  LoginInput,
+  personalTrainerExists,
+  personalTrainerNotFound
+} from "../../utils/common.schema";
+import {replyErrorDefault} from "../../utils/error";
 
 export async function registerPersonalTrainerHandler(request: FastifyRequest<{
   Body: CreatePersonalTrainerInput
@@ -27,16 +33,16 @@ export async function registerPersonalTrainerHandler(request: FastifyRequest<{
   const body = request.body;
   const password = body.password;
   const {hash, salt} = hashPassword(password);
+  const cpf = body.cpf;
+
+  const personalTrainer = await findPersonalTrainerByEmailCpf(undefined, cpf);
+  console.log(personalTrainer)
+  if (personalTrainer) return reply.code(401).send(personalTrainerExists)
 
   try {
     const personalTrainer = await createPersonalTrainer(body, hash, salt);
     return reply.code(201).send(personalTrainer)
   } catch (e: any) {
-    if (e.code === 'P2002') {
-      return reply.code(400).send({
-        message: 'Personal trainer already exists'
-      })
-    }
     console.log(e)
     return replyErrorDefault(reply)
   }
@@ -46,11 +52,10 @@ export async function loginHandler(request: FastifyRequest<{
   Body: LoginInput
 }>, reply: FastifyReply) {
   const body = request.body;
-  const personalTrainer = await findPersonalTrainerByEmail(body.email);
+  const email = body.email;
+  const personalTrainer = await findPersonalTrainerByEmailCpf(email);
+  if (!personalTrainer) return reply.code(401).send(invalidLogin)
 
-  if (!personalTrainer) {
-    return reply.code(401).send(invalidLoginMessage())
-  }
 
   const correctPassword = verifyPassword(
     {
@@ -61,7 +66,7 @@ export async function loginHandler(request: FastifyRequest<{
   )
 
   if (!correctPassword) {
-    return reply.code(401).send(invalidLoginMessage());
+    return reply.code(401).send(invalidLogin);
   }
 
   try {
@@ -88,14 +93,13 @@ export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
     const findPersonalTrainer = await findUniquePersonalTrainer(filters)
 
     if (!findPersonalTrainer) {
-      return reply.code(204).send('Personal Trainer not found');
+      return reply.code(202).send(personalTrainerNotFound);
     }
     return reply.code(200).send(findPersonalTrainer)
   } catch (e) {
     console.log(e)
     return replyErrorDefault(reply)
   }
-
 }
 
 export async function getManyPersonalTrainersHandler(request: FastifyRequest<{
@@ -107,7 +111,7 @@ export async function getManyPersonalTrainersHandler(request: FastifyRequest<{
     const findPersonalTrainers = await findManyPersonalTrainers(filters);
 
     if (!findPersonalTrainers) {
-      return reply.code(204).send('Personal Trainers not found');
+      return reply.code(204).send(personalTrainerNotFound);
     }
     return reply.code(200).send(findPersonalTrainers)
 
@@ -126,13 +130,14 @@ export async function updatePersonalTrainerHandler(request: FastifyRequest<{
   const personalTrainerId = request.params.personal_trainer_id
   const userRole = await queryUserRole(userId);
 
-  if (userRole !== 'admin' && userId !== personalTrainerId) {
-    return reply.code(403).send('You can only update your own data');
-  }
+  if (userRole !== 'admin' && userId !== personalTrainerId) return reply.code(403).send('You can only update your own data');
+  const personalTrainer = await findPersonalTrainerByIdHandler(personalTrainerId);
+  if (!personalTrainer) return reply.code(202).send(personalTrainerNotFound);
 
   try {
     const update = updatePersonalTrainer(dataUpdate, personalTrainerId);
     return reply.code(200).send(update)
+
   } catch (e) {
     console.log(e)
     return replyErrorDefault(reply)
@@ -144,6 +149,8 @@ export async function deletePersonalTrainerHandler(request: FastifyRequest<{
   Params: PersonalTrainerId;
 }>, reply: FastifyReply) {
   const personalTrainerId = request.params.personal_trainer_id;
+  const personalTrainer = await findPersonalTrainerByIdHandler(personalTrainerId);
+  if (!personalTrainer) return reply.code(202).send(personalTrainerNotFound);
 
   try {
     await deletePersonalTrainer(personalTrainerId);
@@ -152,4 +159,8 @@ export async function deletePersonalTrainerHandler(request: FastifyRequest<{
     console.log(e)
     return replyErrorDefault(reply)
   }
+}
+
+export async function findPersonalTrainerByIdHandler(personalTrainerId: string) {
+  return await findPersonalTrainerById(personalTrainerId);
 }

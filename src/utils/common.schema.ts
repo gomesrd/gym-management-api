@@ -85,18 +85,50 @@ export const loginResponseSchema = z.object({
 });
 
 export const responseDeleteSchema = {
-  type: 'object',
-  properties: {
-    message: {type: 'string', description: 'success', example: 'success'},
-  }
+  type: 'null',
+  description: 'Deleted Success',
 };
 
+export const responseInvalidLogin = {
+  type: 'object',
+  description: 'Invalid Login',
+  properties: {
+    message: {type: 'string', example: 'Invalid email or password'}
+  }
+}
 export const responseIdSchema = {
   type: 'object',
   properties: {
     id: {type: 'string', description: 'Id return', example: '9fb45576-6e37-4ffb-972a-0b6ed9720bd7'},
   }
 };
+
+export const responseNotFound = {
+  type: 'object',
+  description: 'Not found',
+  properties: {
+    message: {type: 'string', example: 'Not found',},
+  }
+}
+
+export const responsePersonalTrainerNotFound = {
+  type: 'object',
+  description: 'Personal Trainer not found',
+  properties: {
+    message: {type: 'string', example: 'Personal Trainer not found'},
+  }
+};
+export const personalTrainerNotFound = {
+  message: 'Personal Trainer not found'
+};
+
+export const personalTrainerExists = {
+  message: 'Personal Trainer already exists'
+}
+
+export const invalidLogin = {
+  message: 'Invalid email or password'
+}
 
 export const count = {count: z.number()};
 
@@ -109,7 +141,6 @@ export const queryStringTraining = {
     personal_trainer_id: {type: 'string'},
   }
 };
-
 
 
 export type Filters = z.infer<typeof filtersSchema>;

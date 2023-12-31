@@ -13,7 +13,11 @@ import {
   queryAllPersonalTrainersSchema
 } from "./personalTrainer.schema";
 import {personalTrainerRoutesPath, personalTrainerSummary, tags} from "../../utils/enums";
-import {responseDeleteSchema, responseIdSchema} from "../../utils/common.schema";
+import {
+  responseDeleteSchema,
+  responseIdSchema, responseInvalidLogin,
+  responsePersonalTrainerNotFound
+} from "../../utils/common.schema";
 
 
 async function personalTrainerRoutes(server: FastifyInstance) {
@@ -25,6 +29,7 @@ async function personalTrainerRoutes(server: FastifyInstance) {
       querystring: queryAllPersonalTrainersSchema,
       response: {
         200: $ref('PersonalTrainersManyResponseSchema'),
+        202: responsePersonalTrainerNotFound
       },
     },
   }, getManyPersonalTrainersHandler);
@@ -36,7 +41,8 @@ async function personalTrainerRoutes(server: FastifyInstance) {
       summary: personalTrainerSummary.findById,
       params: personalTrainerIdSchema,
       response: {
-        200: $ref('PersonalTrainerUniqueResponseSchema')
+        200: $ref('PersonalTrainerUniqueResponseSchema'),
+        202: responsePersonalTrainerNotFound
       }
     },
   }, getUniquePersonalTrainerHandler);
@@ -59,7 +65,8 @@ async function personalTrainerRoutes(server: FastifyInstance) {
       summary: personalTrainerSummary.login,
       body: $ref('loginSchema'),
       response: {
-        200: $ref('loginResponseSchema')
+        200: $ref('loginResponseSchema'),
+        401: responseInvalidLogin
       }
     }
   }, loginHandler);
@@ -72,7 +79,8 @@ async function personalTrainerRoutes(server: FastifyInstance) {
         params: personalTrainerIdSchema,
         body: $ref('updatePersonalTrainerSchema'),
         response: {
-          200: $ref('updatePersonalTrainerSchema')
+          200: $ref('updatePersonalTrainerSchema'),
+          202: responsePersonalTrainerNotFound
         }
       }
     }, updatePersonalTrainerHandler
@@ -85,7 +93,8 @@ async function personalTrainerRoutes(server: FastifyInstance) {
         summary: personalTrainerSummary.delete,
         params: personalTrainerIdSchema,
         response: {
-          200: responseDeleteSchema
+          204: responseDeleteSchema,
+          202: responsePersonalTrainerNotFound
         }
       }
     }, deletePersonalTrainerHandler
