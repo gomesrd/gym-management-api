@@ -10,16 +10,79 @@ import {
 import {CreateMemberInput, UpdateMember} from "./member.schema";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
-import {Filters, invalidLogin, LoginInput, memberExists} from "../../utils/common.schema";
+import {Filters, invalidLogin, LoginInput, memberExists, memberNotFound} from "../../utils/common.schema";
 import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
 import {MemberId} from "../../utils/types";
 import {replyErrorDefault} from "../../utils/error";
+
+export async function getManyMembersHandler(request: FastifyRequest<{
+  Querystring: Filters;
+}>, reply: FastifyReply) {
+  const filters = request.query;
+  const userId = request.user.id;
+
+  try {
+    const findMembers = await findManyMembers(filters, userId);
+
+    if (!findMembers) {
+      return reply.code(204).send(memberNotFound);
+    }
+
+    return reply.code(200).send(findMembers)
+
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
+}
+
+export async function getUniqueMemberHandler(request: FastifyRequest<{
+  Params: MemberId;
+}>, reply: FastifyReply) {
+  const userId = request.user.id;
+  const memberId = request.params.member_id
+
+  try {
+    const findMember = await findUniqueMember(memberId, userId);
+
+    if (!findMember) {
+      return reply.code(202).send(memberNotFound);
+    }
+
+    return reply.code(200).send(findMember)
+
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
+}
+
+export async function getUniqueMemberHandlerResume(request: FastifyRequest<{
+  Params: MemberId;
+}>, reply: FastifyReply) {
+  const memberId = request.params.member_id
+
+  try {
+    const findMember = await findUniqueMemberResume(memberId);
+
+    if (!findMember) {
+      return reply.code(202).send(memberNotFound);
+    }
+
+    return reply.code(200).send(findMember)
+
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
+}
 
 export async function registerMemberHandler(request: FastifyRequest<{
   Body: CreateMemberInput
 }>, reply: FastifyReply) {
   const body = request.body;
   const cpf = body.cpf;
+
   const verifyMember = await findMemberByEmailCpf(undefined, cpf);
   if (verifyMember) return reply.code(400).send(memberExists)
 
@@ -38,9 +101,8 @@ export async function loginHandler(request: FastifyRequest<{
   const body = request.body;
   const email = body.email;
   const member = await findMemberByEmailCpf(email);
-  if (!member) {
-    return reply.code(401).send(invalidLogin)
-  }
+
+  if (!member) return reply.code(401).send(invalidLogin)
 
   const correctPassword = verifyPassword(
     {
@@ -49,9 +111,8 @@ export async function loginHandler(request: FastifyRequest<{
       hash: member.password
     }
   )
-  if (!correctPassword) {
-    return reply.code(401).send(invalidLogin);
-  }
+
+  if (!correctPassword) return reply.code(401).send(invalidLogin);
 
   try {
     const {id, name} = member;
@@ -60,51 +121,6 @@ export async function loginHandler(request: FastifyRequest<{
     const accessToken = {accessToken: server.jwt.sign(dataMember, {expiresIn})}
     return reply.code(200).send(accessToken);
 
-  } catch (e) {
-    console.log(e)
-    return replyErrorDefault(reply)
-  }
-}
-
-export async function getUniqueMemberHandler(request: FastifyRequest<{
-  Params: MemberId;
-}>, reply: FastifyReply) {
-  const userId = request.user.id;
-  const memberId = request.params.member_id
-
-  try {
-    const findMember = await findUniqueMember(memberId, userId);
-    return reply.code(200).send(findMember)
-
-  } catch (e) {
-    console.log(e)
-    return replyErrorDefault(reply)
-  }
-}
-
-export async function getUniqueMemberHandlerResume(request: FastifyRequest<{
-  Params: MemberId;
-}>, reply: FastifyReply) {
-  const memberId = request.params.member_id
-
-  try {
-    const findMember = await findUniqueMemberResume(memberId);
-    return reply.code(200).send(findMember)
-  } catch (e) {
-    console.log(e)
-    return replyErrorDefault(reply)
-  }
-}
-
-export async function getManyMembersHandler(request: FastifyRequest<{
-  Querystring: Filters;
-}>, reply: FastifyReply) {
-  const filters = request.query;
-  const userId = request.user.id;
-
-  try {
-    const findMembers = await findManyMembers(filters, userId);
-    return reply.code(200).send(findMembers)
   } catch (e) {
     console.log(e)
     return replyErrorDefault(reply)

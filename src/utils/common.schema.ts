@@ -107,7 +107,7 @@ export const responseIdSchema = {
 
 export const responseMemberExists = {
   type: 'object',
-  description: 'Not found',
+  description: 'Member already exists',
   properties: {
     message: {type: 'string', example: 'Member already exists'},
   }
@@ -137,8 +137,20 @@ export const responsePersonalTrainerNotFound = {
   }
 };
 
+export const responseMemberNotFound = {
+  type: 'object',
+  description: 'Member not found',
+  properties: {
+    message: {type: 'string', example: 'Member not found'},
+  }
+};
+
 export const personalTrainerNotFound = {
   message: 'Personal Trainer not found'
+};
+
+export const memberNotFound = {
+  message: 'Member not found'
 };
 
 export const personalTrainerExists = {

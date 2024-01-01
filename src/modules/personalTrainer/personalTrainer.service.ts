@@ -33,12 +33,14 @@ export async function getManyPersonalTrainersHandler(request: FastifyRequest<{
   const userid = request.user.id;
   const filters = request.query
   const parseFilters = await parseFiltersTraining(filters, userid);
+
   try {
     const findPersonalTrainers = await findManyPersonalTrainers(filters, parseFilters);
 
     if (!findPersonalTrainers) {
       return reply.code(204).send(personalTrainerNotFound);
     }
+
     return reply.code(200).send(findPersonalTrainers)
 
   } catch (e) {
@@ -60,7 +62,9 @@ export async function getUniquePersonalTrainerHandler(request: FastifyRequest<{
     if (!findPersonalTrainer) {
       return reply.code(202).send(personalTrainerNotFound);
     }
+
     return reply.code(200).send(findPersonalTrainer)
+
   } catch (e) {
     console.log(e)
     return replyErrorDefault(reply)
@@ -93,8 +97,8 @@ export async function loginHandler(request: FastifyRequest<{
   const body = request.body;
   const email = body.email;
   const personalTrainer = await findPersonalTrainerByEmailCpf(email);
-  if (!personalTrainer) return reply.code(401).send(invalidLogin)
 
+  if (!personalTrainer) return reply.code(401).send(invalidLogin)
 
   const correctPassword = verifyPassword(
     {
@@ -104,9 +108,7 @@ export async function loginHandler(request: FastifyRequest<{
     }
   )
 
-  if (!correctPassword) {
-    return reply.code(401).send(invalidLogin);
-  }
+  if (!correctPassword) return reply.code(401).send(invalidLogin);
 
   try {
     const {id, name, role} = personalTrainer;
@@ -131,7 +133,9 @@ export async function updatePersonalTrainerHandler(request: FastifyRequest<{
   const userRole = await queryUserRole(userId);
 
   if (userRole !== 'admin' && userId !== personalTrainerId) return reply.code(403).send('You can only update your own data');
+
   const personalTrainer = await findPersonalTrainerByIdHandler(personalTrainerId);
+
   if (!personalTrainer) return reply.code(202).send(personalTrainerNotFound);
 
   try {

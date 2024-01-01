@@ -8,7 +8,7 @@ import {
   responseDeleteSchema,
   responseIdSchema,
   responseInvalidLogin,
-  responseMemberExists
+  responseMemberExists, responseMemberNotFound
 } from "../../utils/common.schema";
 import {memberRoutesPath, memberSummary, tags} from "../../utils/enums";
 
@@ -20,7 +20,8 @@ async function memberRoutes(server: FastifyInstance) {
       summary: memberSummary.findAll,
       querystring: queryAllMembersSchema,
       response: {
-        200: $ref('MembersAllResponseSchema')
+        200: $ref('MembersAllResponseSchema'),
+        202: responseMemberNotFound
       },
 
     },
@@ -33,7 +34,8 @@ async function memberRoutes(server: FastifyInstance) {
       summary: memberSummary.findById,
       params: memberIdSchema,
       response: {
-        200: $ref('MemberUniqueResponseSchema')
+        200: $ref('MemberUniqueResponseSchema'),
+        202: responseMemberNotFound,
       }
 
     },
@@ -46,7 +48,8 @@ async function memberRoutes(server: FastifyInstance) {
       summary: memberSummary.resume,
       params: memberIdSchema,
       response: {
-        200: $ref('MemberResumeResponseSchema')
+        200: $ref('MemberResumeResponseSchema'),
+        202: responseMemberNotFound
       }
 
     },
@@ -84,7 +87,8 @@ async function memberRoutes(server: FastifyInstance) {
         params: memberIdSchema,
         body: $ref('updateMemberSchema'),
         response: {
-          200: $ref('updateMemberSchema')
+          200: $ref('updateMemberSchema'),
+          202: responseMemberNotFound,
         }
       }
     }, updateMemberHandler
@@ -97,7 +101,8 @@ async function memberRoutes(server: FastifyInstance) {
         summary: memberSummary.delete,
         params: memberIdSchema,
         response: {
-          200: responseDeleteSchema
+          202: responseMemberNotFound,
+          204: responseDeleteSchema,
         }
       }
     }, deleteMemberHandler
