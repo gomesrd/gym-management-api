@@ -13,6 +13,7 @@ import {Filters} from "../../../utils/common.schema";
 import {parseFiltersPermission, parseFiltersTraining} from "../../../utils/parseFilters";
 import {TrainingId} from "../../../utils/types";
 import {getDayTraining} from "../../../utils/getDay";
+import {replyErrorDefault} from "../../../utils/error";
 
 
 export async function registerTrainingHandler(request: FastifyRequest<{
@@ -21,13 +22,14 @@ export async function registerTrainingHandler(request: FastifyRequest<{
   const body = request.body;
   const personalTrainerId = body.map((training) => training.personal_trainer_id)
   const personalTrainerValidate = personalTrainerId.every((id) => id === request.user.id)
-
   if (!personalTrainerValidate) {
     return reply.code(403).send('You can only register trainings for yourself')
   }
 
   try {
-    return await createTraining(body)
+    const create = await createTraining(body);
+    return reply.code(201).send(create);
+
   } catch (e: any) {
     console.log(e)
     if (e.code === 'P2002') {
@@ -35,13 +37,13 @@ export async function registerTrainingHandler(request: FastifyRequest<{
         message: 'Training already exists'
       })
     }
-    return reply.code(500).send('Something went wrong')
+    return replyErrorDefault(reply)
   }
 }
 
 export async function getManyTrainingsHandler(request: FastifyRequest<{
   Querystring: Filters;
-}>) {
+}>, reply: FastifyReply) {
   const userId = request.user.id;
   const filters = request.query;
   const parseFilters = await parseFiltersTraining(filters, userId);
@@ -50,17 +52,23 @@ export async function getManyTrainingsHandler(request: FastifyRequest<{
     return findManyTrainings(filters, parseFilters, dayTraining);
   } catch (e) {
     console.log(e)
+    return replyErrorDefault(reply)
   }
 }
 
 export async function getUniqueTrainingHandler(request: FastifyRequest<{
   Params: TrainingId;
-}>) {
+}>, reply: FastifyReply) {
   const userId = request.user.id;
   const trainingId = request.params.training_id;
   const parseFilters = await parseFiltersPermission(userId);
 
-  return findUniqueTraining(trainingId, parseFilters);
+  try {
+    return findUniqueTraining(trainingId, parseFilters);
+  } catch (e) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
 }
 
 export async function updateTrainingHandler(request: FastifyRequest<{
@@ -81,7 +89,7 @@ export async function updateTrainingHandler(request: FastifyRequest<{
         message: 'Training already exists'
       })
     }
-    return reply.code(500).send('Something went wrong')
+    return replyErrorDefault(reply)
   }
 
 }
@@ -93,6 +101,12 @@ export async function deleteTrainingHandler(request: FastifyRequest<{
   const trainingId = request.params.training_id;
   const parseFilters = await parseFiltersPermission(userId);
 
-  await deleteTraining(trainingId, parseFilters);
-  return reply.code(200).send('');
+  try {
+    await deleteTraining(trainingId, parseFilters);
+    return reply.code(200).send('');
+
+  } catch (e: any) {
+    console.log(e)
+    return replyErrorDefault(reply)
+  }
 }

@@ -26,7 +26,7 @@ const filtersSchema = z.object({
   cpf: z.string().optional(),
   created_at_gte: z.string().optional(),
   created_at_lte: z.string().optional(),
-  deleted: z.string().default('true').optional(),
+  deleted: z.string().optional(),
   email: z.string().optional(),
   fixed_day: daysOfWeek.optional().nullable(),
   id: z.string().optional(),
@@ -62,7 +62,9 @@ export const userCore = {
   name: z.string(),
   cpf: z.string(),
   birth_date: z.string(),
-  email: z.string().email(),
+  email: z.string().email(
+    {message: 'Email must be a valid email'}
+  ),
   phone: z.string(),
 };
 
@@ -103,6 +105,22 @@ export const responseIdSchema = {
   }
 };
 
+export const responseMemberExists = {
+  type: 'object',
+  description: 'Not found',
+  properties: {
+    message: {type: 'string', example: 'Member already exists'},
+  }
+};
+
+export const responsePersonalTrainerExists = {
+  type: 'object',
+  description: 'Not found',
+  properties: {
+    message: {type: 'string', example: 'Personal Trainer already exists'},
+  }
+};
+
 export const responseNotFound = {
   type: 'object',
   description: 'Not found',
@@ -118,12 +136,17 @@ export const responsePersonalTrainerNotFound = {
     message: {type: 'string', example: 'Personal Trainer not found'},
   }
 };
+
 export const personalTrainerNotFound = {
   message: 'Personal Trainer not found'
 };
 
 export const personalTrainerExists = {
   message: 'Personal Trainer already exists'
+}
+
+export const memberExists = {
+  message: 'Member already exists'
 }
 
 export const invalidLogin = {
@@ -141,7 +164,6 @@ export const queryStringTraining = {
     personal_trainer_id: {type: 'string'},
   }
 };
-
 
 export type Filters = z.infer<typeof filtersSchema>;
 export type LoginInput = z.infer<typeof loginSchema>

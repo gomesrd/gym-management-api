@@ -1,7 +1,7 @@
 import prisma from "../../config/prisma";
 import {CreatePersonalTrainerInput, UpdatePersonalTrainer} from "./personalTrainer.schema";
 import {Filters} from "../../utils/common.schema";
-import {FiltersPermissions, PersonalTrainerId} from "../../utils/types";
+import {FiltersPermissions} from "../../utils/types";
 
 export async function createPersonalTrainer(input: CreatePersonalTrainerInput, hash: string, salt: string) {
   const {
@@ -92,7 +92,7 @@ export async function findUniquePersonalTrainer(filters: FiltersPermissions) {
   });
 }
 
-export async function findManyPersonalTrainers(filters: Filters) {
+export async function findManyPersonalTrainers(filters: Filters, parseFilters: FiltersPermissions) {
   const countOfPersonalTrainers = await prisma.users.count({
     where: {
       name: {
@@ -104,6 +104,7 @@ export async function findManyPersonalTrainers(filters: Filters) {
       personal_trainer: {
         is: {occupation: filters.occupation} || {not: null}
       },
+      deleted: parseFilters.deleted,
     }
   });
 
@@ -118,6 +119,7 @@ export async function findManyPersonalTrainers(filters: Filters) {
       personal_trainer: {
         is: {occupation: filters.occupation} || {not: null}
       },
+      deleted: parseFilters.deleted,
     },
     select: {
       id: true,

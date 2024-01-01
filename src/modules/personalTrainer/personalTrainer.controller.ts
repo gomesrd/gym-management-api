@@ -15,7 +15,7 @@ import {
 import {personalTrainerRoutesPath, personalTrainerSummary, tags} from "../../utils/enums";
 import {
   responseDeleteSchema,
-  responseIdSchema, responseInvalidLogin,
+  responseIdSchema, responseInvalidLogin, responsePersonalTrainerExists,
   responsePersonalTrainerNotFound
 } from "../../utils/common.schema";
 
@@ -54,7 +54,8 @@ async function personalTrainerRoutes(server: FastifyInstance) {
       summary: personalTrainerSummary.register,
       body: $ref('createPersonalTrainerSchema'),
       response: {
-        201: responseIdSchema
+        201: responseIdSchema,
+        400: responsePersonalTrainerExists
       }
     }
   }, registerPersonalTrainerHandler);

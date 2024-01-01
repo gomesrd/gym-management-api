@@ -4,7 +4,12 @@ import {
   registerMemberHandler, updateMemberHandler, getUniqueMemberHandlerResume
 } from "./member.service";
 import {$ref, memberIdSchema, queryAllMembersSchema} from "./member.schema";
-import {responseDeleteSchema, responseIdSchema} from "../../utils/common.schema";
+import {
+  responseDeleteSchema,
+  responseIdSchema,
+  responseInvalidLogin,
+  responseMemberExists
+} from "../../utils/common.schema";
 import {memberRoutesPath, memberSummary, tags} from "../../utils/enums";
 
 async function memberRoutes(server: FastifyInstance) {
@@ -54,6 +59,7 @@ async function memberRoutes(server: FastifyInstance) {
       summary: memberSummary.register,
       response: {
         201: responseIdSchema,
+        400: responseMemberExists
       },
     }
   }, registerMemberHandler);
@@ -64,7 +70,8 @@ async function memberRoutes(server: FastifyInstance) {
       body: $ref('loginSchema'),
       summary: memberSummary.login,
       response: {
-        200: $ref('loginResponseSchema')
+        200: $ref('loginResponseSchema'),
+        401: responseInvalidLogin
       }
     }
   }, loginHandler);

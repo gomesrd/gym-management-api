@@ -3,15 +3,14 @@ import {
   createMember,
   deleteMember,
   findUniqueMember,
-  findMemberByEmail,
+  findMemberByEmailCpf,
   findManyMembers,
   updateMember, findUniqueMemberResume
 } from "./member.repository";
 import {CreateMemberInput, UpdateMember} from "./member.schema";
-import {invalidLoginMessage} from "./member.mesages";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
-import {Filters, LoginInput} from "../../utils/common.schema";
+import {Filters, invalidLogin, LoginInput, memberExists} from "../../utils/common.schema";
 import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
 import {MemberId} from "../../utils/types";
 import {replyErrorDefault} from "../../utils/error";
@@ -20,29 +19,27 @@ export async function registerMemberHandler(request: FastifyRequest<{
   Body: CreateMemberInput
 }>, reply: FastifyReply) {
   const body = request.body;
+  const cpf = body.cpf;
+  const verifyMember = await findMemberByEmailCpf(undefined, cpf);
+  if (verifyMember) return reply.code(400).send(memberExists)
+
   try {
     const member = await createMember(body);
     return reply.code(201).send(member)
   } catch (e: any) {
-    if (e.code === 'P2002') {
-      return reply.code(400).send({
-        message: 'Member already exists'
-      })
-    }
     console.log(e)
     return replyErrorDefault(reply)
   }
-  // TODO - REFATORAR A VALIDAÇÃO SE O EMAIL JÁ EXISTE
 }
-
 
 export async function loginHandler(request: FastifyRequest<{
   Body: LoginInput
 }>, reply: FastifyReply) {
   const body = request.body;
-  const member = await findMemberByEmail(body.email);
+  const email = body.email;
+  const member = await findMemberByEmailCpf(email);
   if (!member) {
-    return reply.code(401).send(invalidLoginMessage())
+    return reply.code(401).send(invalidLogin)
   }
 
   const correctPassword = verifyPassword(
@@ -53,7 +50,7 @@ export async function loginHandler(request: FastifyRequest<{
     }
   )
   if (!correctPassword) {
-    return reply.code(401).send(invalidLoginMessage());
+    return reply.code(401).send(invalidLogin);
   }
 
   try {
@@ -67,7 +64,6 @@ export async function loginHandler(request: FastifyRequest<{
     console.log(e)
     return replyErrorDefault(reply)
   }
-
 }
 
 export async function getUniqueMemberHandler(request: FastifyRequest<{

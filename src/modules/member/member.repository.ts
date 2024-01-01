@@ -28,11 +28,11 @@ export async function createMember(input: CreateMemberInput) {
   });
 }
 
-export async function findMemberByEmail(email: string) {
+export async function findMemberByEmailCpf(email?: string | undefined, cpf?: string | undefined) {
   return prisma.users.findUnique({
     where: {
-      email,
-      deleted: false
+      cpf: cpf,
+      email: email,
     },
   });
 }
