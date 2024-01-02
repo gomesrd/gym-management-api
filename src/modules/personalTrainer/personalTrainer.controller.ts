@@ -12,7 +12,7 @@ import {
   personalTrainerIdSchema,
   queryAllPersonalTrainersSchema
 } from "./personalTrainer.schema";
-import {personalTrainerRoutesPath, personalTrainerSummary, tags} from "../../utils/enums";
+import {personalTrainerRoutesPath, personalTrainerSummary, tags} from "../../utils/enumsController";
 import {
   responseDeleteSchema,
   responseIdSchema, responseInvalidLogin, responsePersonalTrainerExists,

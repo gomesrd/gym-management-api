@@ -19,7 +19,7 @@ import {
   trainingReplacementSummary,
   trainingRoutesPath,
   trainingSummary
-} from "../../utils/enums";
+} from "../../utils/enumsController";
 import {queryStringTraining, responseDeleteSchema, responseIdSchema} from "../../utils/common.schema";
 
 async function trainingRoutes(server: FastifyInstance) {

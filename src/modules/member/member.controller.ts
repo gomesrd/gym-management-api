@@ -10,7 +10,7 @@ import {
   responseInvalidLogin,
   responseMemberExists, responseMemberNotFound
 } from "../../utils/common.schema";
-import {memberRoutesPath, memberSummary, tags} from "../../utils/enums";
+import {memberRoutesPath, memberSummary, tags} from "../../utils/enumsController";
 
 async function memberRoutes(server: FastifyInstance) {
   server.get(memberRoutesPath.findAll, {

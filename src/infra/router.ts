@@ -6,7 +6,7 @@ import trainingRoutes from "../modules/training/training.controller";
 import trainingRecordRoutes from "../modules/trainingRecord/trainingRecord.controller";
 import trainingReportRoutes from "../modules/report/training/trainingReport.controller";
 import fastifyCors from "@fastify/cors";
-import {routesPath} from "../utils/enums";
+import {routesPath} from "../utils/enumsController";
 
 
 export async function router(server: FastifyInstance) {

@@ -1,7 +1,6 @@
 import {FastifyInstance} from "fastify";
 import {getManyReportTrainingHandler} from "./trainingReport.service";
-import {$ref} from "./trainingReport.schema";
-import {tags, trainingReportRoutesPath, trainingReportSummary} from "../../../utils/enums";
+import {tags, trainingReportRoutesPath, trainingReportSummary} from "../../../utils/enumsController";
 
 async function trainingReportRoutes(server: FastifyInstance) {
 

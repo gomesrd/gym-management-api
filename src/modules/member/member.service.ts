@@ -14,6 +14,7 @@ import {Filters, invalidLogin, LoginInput, memberExists, memberNotFound} from ".
 import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
 import {MemberId} from "../../utils/types";
 import {replyErrorDefault} from "../../utils/error";
+import {parseFiltersPermission} from "../../utils/parseFilters";
 
 export async function getManyMembersHandler(request: FastifyRequest<{
   Querystring: Filters;
@@ -41,9 +42,10 @@ export async function getUniqueMemberHandler(request: FastifyRequest<{
 }>, reply: FastifyReply) {
   const userId = request.user.id;
   const memberId = request.params.member_id
+  const parseFilters = await parseFiltersPermission(userId, memberId);
 
   try {
-    const findMember = await findUniqueMember(memberId, userId);
+    const findMember = await findUniqueMember(parseFilters);
 
     if (!findMember) {
       return reply.code(202).send(memberNotFound);
@@ -89,6 +91,7 @@ export async function registerMemberHandler(request: FastifyRequest<{
   try {
     const member = await createMember(body);
     return reply.code(201).send(member)
+
   } catch (e: any) {
     console.log(e)
     return replyErrorDefault(reply)
@@ -104,25 +107,24 @@ export async function loginHandler(request: FastifyRequest<{
 
   if (!member) return reply.code(401).send(invalidLogin)
 
-  const correctPassword = verifyPassword(
-    {
-      candidatePassword: body.password,
-      salt: member.salt,
-      hash: member.password
-    }
-  )
-
-  if (!correctPassword) return reply.code(401).send(invalidLogin);
-
   try {
+    await verifyPassword(
+      {
+        candidatePassword: body.password,
+        salt: member.salt,
+        hash: member.password
+      });
+
     const {id, name} = member;
     const dataMember = {id, name};
     const expiresIn = 60 * 120;
     const accessToken = {accessToken: server.jwt.sign(dataMember, {expiresIn})}
     return reply.code(200).send(accessToken);
 
-  } catch (e) {
+  } catch (e: any) {
     console.log(e)
+    if (e.code === 401) return reply.code(401).send(invalidLogin);
+
     return replyErrorDefault(reply)
   }
 }
@@ -134,6 +136,11 @@ export async function updateMemberHandler(request: FastifyRequest<{
   const userId = request.user.id;
   const dataUpdate = request.body;
   const memberId = request.params.member_id
+  const parseFilters = await parseFiltersPermission(userId, memberId);
+
+  const member = await findUniqueMember(parseFilters);
+  if (!member) return reply.code(202).send(memberNotFound);
+
   await verifyPermissionActionOnlyMember(userId, memberId);
 
   try {

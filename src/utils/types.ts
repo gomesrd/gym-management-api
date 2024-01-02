@@ -5,7 +5,6 @@ export interface FiltersPermissions {
   deleted?: boolean | undefined;
   realized?: boolean | undefined;
 }
-
 export interface PersonalTrainerId {
   personal_trainer_id: string;
 }

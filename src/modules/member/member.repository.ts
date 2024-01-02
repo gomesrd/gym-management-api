@@ -1,8 +1,9 @@
 import prisma from "../../config/prisma";
 import {CreateMemberInput, UpdateMember} from "./member.schema";
 import {hashPassword} from "../../utils/hash";
-import {parseFiltersCommon, parseFiltersPermission} from "../../utils/parseFilters";
+import {parseFiltersCommon} from "../../utils/parseFilters";
 import {Filters} from "../../utils/common.schema";
+import {FiltersPermissions} from "../../utils/types";
 
 export async function createMember(input: CreateMemberInput) {
   const {
@@ -76,12 +77,11 @@ export async function findManyMembers(filters: Filters, userId: string) {
 
 }
 
-export async function findUniqueMember(memberId: string, userId: string) {
-  const applyFilters = await parseFiltersPermission(userId, memberId);
+export async function findUniqueMember(parseFilters: FiltersPermissions) {
 
   return prisma.users.findUnique({
     where: {
-      id: applyFilters.user_id,
+      id: parseFilters.user_id,
     },
     select: {
       id: true,

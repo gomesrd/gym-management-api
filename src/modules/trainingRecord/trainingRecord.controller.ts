@@ -4,7 +4,7 @@ import {
   deleteTrainingRecordHandler, getUniqueTrainingRecordHandler, getManyTrainingRecordsHandler,
   registerTrainingRecordHandler, updateTrainingRecordHandler
 } from "./trainingRecord.service";
-import {tags, trainingRecordRoutesPath, trainingRecordSummary} from "../../utils/enums";
+import {tags, trainingRecordRoutesPath, trainingRecordSummary} from "../../utils/enumsController";
 
 async function trainingRecordRoutes(server: FastifyInstance) {
   server.get(trainingRecordRoutesPath.findAll, {
