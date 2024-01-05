@@ -10,7 +10,14 @@ import {
 import {CreateMemberInput, UpdateMember} from "./member.schema";
 import {verifyPassword} from "../../utils/hash";
 import {server} from "../../app";
-import {Filters, invalidLogin, LoginInput, memberExists, memberNotFound} from "../../utils/common.schema";
+import {
+  Filters,
+  invalidLogin,
+  LoginInput,
+  memberExists,
+  memberNotFound,
+  noPermissionAction
+} from "../../utils/common.schema";
 import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service";
 import {MemberId} from "../../utils/types";
 import {replyErrorDefault} from "../../utils/error";
@@ -114,7 +121,6 @@ export async function loginHandler(request: FastifyRequest<{
         salt: member.salt,
         hash: member.password
       });
-
     const {id, name} = member;
     const dataMember = {id, name};
     const expiresIn = 60 * 120;
@@ -124,7 +130,6 @@ export async function loginHandler(request: FastifyRequest<{
   } catch (e: any) {
     console.log(e)
     if (e.code === 401) return reply.code(401).send(invalidLogin);
-
     return replyErrorDefault(reply)
   }
 }
@@ -141,16 +146,16 @@ export async function updateMemberHandler(request: FastifyRequest<{
   const member = await findUniqueMember(parseFilters);
   if (!member) return reply.code(202).send(memberNotFound);
 
-  await verifyPermissionActionOnlyMember(userId, memberId);
-
   try {
+    await verifyPermissionActionOnlyMember(userId, memberId);
     const update = updateMember(
       dataUpdate,
       memberId,
     );
     return reply.code(200).send(update)
-  } catch (e) {
+  } catch (e: any) {
     console.log(e)
+    if (e.code === 403) return reply.code(403).send(noPermissionAction);
     return replyErrorDefault(reply)
   }
 }
@@ -160,13 +165,14 @@ export async function deleteMemberHandler(request: FastifyRequest<{
 }>, reply: FastifyReply) {
   const userId = request.user.id;
   const memberId = request.params.member_id;
-  await verifyPermissionActionOnlyMember(userId, memberId);
-  await deleteMember(memberId);
 
   try {
+    await verifyPermissionActionOnlyMember(userId, memberId);
+    await deleteMember(memberId);
     return reply.code(204).send('');
-  } catch (e) {
+  } catch (e: any) {
     console.log(e)
+    if (e.code === 403) return reply.code(403).send(noPermissionAction);
     return replyErrorDefault(reply)
   }
 }

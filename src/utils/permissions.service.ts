@@ -19,7 +19,7 @@ export async function verifyUserRole(id: string, allowedRoles: Role[]) {
   if (!user) return;
 
   if (!allowedRoles.includes(user)) {
-    return Promise.reject({message: 'Not Allowed', status: 403});
+    return Promise.reject({code: 403});
   }
   return user;
 }
@@ -53,6 +53,6 @@ export async function verifyPermissionActionOnlyMember (userId: string, memberId
   const userRole = await queryUserRole(userId);
 
   if (userRole !== Role.admin && userId !== memberId) {
-    return Promise.reject({message: 'You do not have permission to realize this action', code: 403});
+    return Promise.reject({code: 403});
   }
 }

@@ -4,6 +4,7 @@ import {
   verifyPermissionMember,
   verifyPermissionPersonalTrainer
 } from "../../utils/permissions.service";
+import {noPermissionAction} from "../../utils/common.schema";
 
 export async function authorizationServer(server: FastifyInstance) {
   server.decorate('authorizationExclusive', async (request: FastifyRequest) => {
@@ -16,8 +17,12 @@ export async function authorizationServer(server: FastifyInstance) {
     await verifyPermissionPersonalTrainer(userId);
   });
 
-  server.decorate('authorizationMember', async (request: FastifyRequest) => {
+  server.decorate('authorizationMember', async (request: FastifyRequest, reply: FastifyReply) => {
     const userId = request.user.id;
-    await verifyPermissionMember(userId);
-  });
+    try {
+      await verifyPermissionMember(userId);
+    } catch (e: any) {
+      if (e.code === 403) return reply.code(401).send(noPermissionAction);
+    }
+  })
 }

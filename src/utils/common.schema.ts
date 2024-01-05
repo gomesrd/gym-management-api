@@ -98,6 +98,14 @@ export const responseInvalidLogin = {
     message: {type: 'string', example: 'Invalid email or password'}
   }
 }
+
+export const responseNotAllowed = {
+  type: 'object',
+  description: 'Not Allowed',
+  properties: {
+    message: {type: 'string', example: 'Not Allowed'}
+  }
+}
 export const responseIdSchema = {
   type: 'object',
   properties: {
@@ -163,6 +171,10 @@ export const memberExists = {
 
 export const invalidLogin = {
   message: 'Invalid email or password'
+}
+
+export const noPermissionAction = {
+  message: 'You do not have permission to realize this action'
 }
 
 export const count = {count: z.number()};

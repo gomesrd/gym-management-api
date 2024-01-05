@@ -8,7 +8,7 @@ import {
   responseDeleteSchema,
   responseIdSchema,
   responseInvalidLogin,
-  responseMemberExists, responseMemberNotFound
+  responseMemberExists, responseMemberNotFound, responseNotAllowed
 } from "../../utils/common.schema";
 import {memberRoutesPath, memberSummary, tags} from "../../utils/enumsController";
 
@@ -89,6 +89,7 @@ async function memberRoutes(server: FastifyInstance) {
         response: {
           200: $ref('updateMemberSchema'),
           202: responseMemberNotFound,
+          403: responseNotAllowed
         }
       }
     }, updateMemberHandler
@@ -103,6 +104,7 @@ async function memberRoutes(server: FastifyInstance) {
         response: {
           202: responseMemberNotFound,
           204: responseDeleteSchema,
+          403: responseNotAllowed
         }
       }
     }, deleteMemberHandler

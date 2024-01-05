@@ -22,7 +22,7 @@ declare module "fastify" {
     authenticate: any;
     authorizationExclusive: (request: FastifyRequest) => Promise<void>;
     authorizationLimited: (request: FastifyRequest) => Promise<void>;
-    authorizationMember: (request: FastifyRequest) => Promise<void>;
+    authorizationMember: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     Admin: any;
   }
 }
