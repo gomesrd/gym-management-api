@@ -20,8 +20,8 @@ declare module "fastify" {
 
   export interface FastifyInstance {
     authenticate: any;
-    authorizationExclusive: (request: FastifyRequest) => Promise<void>;
-    authorizationLimited: (request: FastifyRequest) => Promise<void>;
+    authorizationExclusive: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+    authorizationLimited: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     authorizationMember: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     Admin: any;
   }
