@@ -158,3 +158,11 @@ export async function deleteMember(memberId: string) {
     }
   });
 }
+
+export async function findMemberById(memberId: string) {
+  return prisma.users.findUnique({
+    where: {
+      id: memberId,
+    },
+  });
+}

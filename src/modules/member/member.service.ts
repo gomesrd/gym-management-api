@@ -5,7 +5,7 @@ import {
   findUniqueMember,
   findMemberByEmailCpf,
   findManyMembers,
-  updateMember, findUniqueMemberResume
+  updateMember, findUniqueMemberResume, findMemberById
 } from "./member.repository";
 import {CreateMemberInput, UpdateMember} from "./member.schema";
 import {verifyPassword} from "../../utils/hash";
@@ -22,6 +22,7 @@ import {verifyPermissionActionOnlyMember} from "../../utils/permissions.service"
 import {MemberId} from "../../utils/types";
 import {replyErrorDefault} from "../../utils/error";
 import {parseFiltersPermission} from "../../utils/parseFilters";
+import {findPersonalTrainerById} from "../personalTrainer/personalTrainer.repository";
 
 export async function getManyMembersHandler(request: FastifyRequest<{
   Querystring: Filters;
@@ -165,6 +166,8 @@ export async function deleteMemberHandler(request: FastifyRequest<{
 }>, reply: FastifyReply) {
   const userId = request.user.id;
   const memberId = request.params.member_id;
+  const member = await findMemberByIdHandler(memberId);
+  if (!member) return reply.code(202).send(memberNotFound);
 
   try {
     await verifyPermissionActionOnlyMember(userId, memberId);
@@ -175,4 +178,8 @@ export async function deleteMemberHandler(request: FastifyRequest<{
     if (e.code === 403) return reply.code(403).send(noPermissionAction);
     return replyErrorDefault(reply)
   }
+}
+
+export async function findMemberByIdHandler(memberId: string) {
+  return await findMemberById(memberId);
 }
