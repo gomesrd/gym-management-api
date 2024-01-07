@@ -122,11 +122,11 @@ export async function loginHandler(request: FastifyRequest<{
         salt: member.salt,
         hash: member.password
       });
-    const {id, name, role} = member;
-    const dataMember = {id, name, role};
+    const {id, name} = member;
+    const dataMember = {id, name};
     const expiresIn = 60 * 120;
-    const accessToken = server.jwt.sign(dataMember, {expiresIn});
-    return reply.code(200).send({accessToken, userData: dataMember});
+    const accessToken = {accessToken: server.jwt.sign(dataMember, {expiresIn})}
+    return reply.code(200).send(accessToken);
 
   } catch (e: any) {
     console.log(e)
