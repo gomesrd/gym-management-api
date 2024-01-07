@@ -115,7 +115,7 @@ export async function loginHandler(request: FastifyRequest<{
     const personalTrainerData = {id, name, role};
     // const expiresIn = 60 * 120;
     const accessToken = server.jwt.sign(personalTrainerData);
-    return reply.code(200).send({accessToken, userData: personalTrainerData});
+    return reply.code(200).send({accessToken, personalTrainerData});
 
   } catch (e) {
     console.log(e)
