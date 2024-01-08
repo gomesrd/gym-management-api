@@ -15,7 +15,6 @@ import {TrainingId} from "../../../utils/types";
 import {getDayTraining} from "../../../utils/getDay";
 import {replyErrorDefault} from "../../../utils/error";
 
-
 export async function registerTrainingHandler(request: FastifyRequest<{
   Body: CreateTrainingInput
 }>, reply: FastifyReply) {
@@ -49,7 +48,9 @@ export async function getManyTrainingsHandler(request: FastifyRequest<{
   const parseFilters = await parseFiltersTraining(filters, userId);
   const dayTraining = await getDayTraining(filters.training_date)
   try {
-    return findManyTrainings(filters, parseFilters, dayTraining);
+    const findMany = findManyTrainings(filters, parseFilters, dayTraining);
+    return reply.code(200).send(findMany)
+
   } catch (e) {
     console.log(e)
     return replyErrorDefault(reply)
@@ -64,7 +65,9 @@ export async function getUniqueTrainingHandler(request: FastifyRequest<{
   const parseFilters = await parseFiltersPermission(userId);
 
   try {
-    return findUniqueTraining(trainingId, parseFilters);
+    const findUnique = findUniqueTraining(trainingId, parseFilters);
+    return reply.code(200).send(findUnique)
+
   } catch (e) {
     console.log(e)
     return replyErrorDefault(reply)
@@ -81,7 +84,9 @@ export async function updateTrainingHandler(request: FastifyRequest<{
   const parseFilters = await parseFiltersPermission(userId);
 
   try {
-    return await updateTraining(dataUpdate, trainingId, parseFilters);
+    const update = await updateTraining(dataUpdate, trainingId, parseFilters);
+    return reply.code(200).send(update);
+
   } catch (e: any) {
     console.log(e)
     if (e.code === 'P2002') {

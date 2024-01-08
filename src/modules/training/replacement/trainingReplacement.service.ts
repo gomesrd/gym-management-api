@@ -17,6 +17,7 @@ export async function registerTrainingReplacementHandler(request: FastifyRequest
   try {
     const trainingReplacement = await createTrainingReplacement(body);
     return reply.code(201).send(trainingReplacement)
+
   } catch (e: any) {
     console.log(e)
     return reply.code(500).send('Something went wrong')
@@ -29,6 +30,7 @@ export async function getManyTrainingsReplacementHandler(request: FastifyRequest
   const userId = request.user.id;
   const filters = request.query;
   const parseFilters = await parseFiltersTraining(filters, userId);
+
   try {
     const findMany = findManyTrainingsReplacement(filters, parseFilters);
     return reply.code(200).send(findMany);
