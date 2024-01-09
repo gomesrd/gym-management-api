@@ -46,36 +46,50 @@ export async function registerTrainingRecordHandler(request: FastifyRequest<{
 
 export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
   Querystring: TrainingRecordsQueryString;
-}>) {
+}>, reply: FastifyReply) {
   const userId = request.user.id;
   const filters = request.query;
   const parseFilters = await parseFiltersTraining(filters, userId);
 
   try {
-    return findManyTrainingRecords(filters, parseFilters);
-  } catch (e) {
+    const findMany = findManyTrainingRecords(filters, parseFilters);
+    return reply.code(200).send(findMany)
+
+  } catch (e: any) {
     console.log(e)
   }
 }
 
 export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
   Params: GetTrainingRecord;
-}>) {
+}>, reply: FastifyReply) {
   const userId = request.user.id;
   const trainingRecordId = request.params.id;
   const parseFilters = await parseFiltersPermission(userId);
 
-  return findUniqueTrainingRecord(trainingRecordId, parseFilters);
+  try {
+    const findUnique = await findUniqueTrainingRecord(trainingRecordId, parseFilters);
+    return reply.code(200).send(findUnique)
+
+  } catch (e: any) {
+    console.log(e)
+  }
 }
 
 export async function updateTrainingRecordHandler(request: FastifyRequest<{
   Body: UpdateTrainingRecord;
   Params: GetTrainingRecord;
-}>) {
+}>, reply: FastifyReply) {
   const trainingRecordId = request.params.id;
   const dataUpdate = request.body;
 
-  return updateTrainingRecord(trainingRecordId, dataUpdate)
+  try {
+    const update = await updateTrainingRecord(trainingRecordId, dataUpdate);
+    return reply.code(200).send(update)
+
+  } catch (e: any) {
+    console.log(e)
+  }
 }
 
 export async function deleteTrainingRecordHandler(request: FastifyRequest<{
@@ -83,7 +97,11 @@ export async function deleteTrainingRecordHandler(request: FastifyRequest<{
 }>, reply: FastifyReply) {
   const trainingRecordId = request.params.id;
 
-  await deleteTrainingRecord(trainingRecordId);
+  try {
+    await deleteTrainingRecord(trainingRecordId);
+    return reply.code(200).send('');
 
-  return reply.code(200).send('');
+  } catch (e: any) {
+    console.log(e)
+  }
 }
