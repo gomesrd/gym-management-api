@@ -19,7 +19,7 @@ const trainingCore = {
   end_time: z.string().nullable(),
   modality: trainingModalities,
   type: trainingTypes,
-  training_replacement_id: z.string().nullable(),
+  training_replacement_id: z.string().nullable().optional(),
 }
 
 const trainingInput = {

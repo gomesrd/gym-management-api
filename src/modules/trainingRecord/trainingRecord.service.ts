@@ -52,7 +52,7 @@ export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
   const parseFilters = await parseFiltersTraining(filters, userId);
 
   try {
-    const findMany = findManyTrainingRecords(filters, parseFilters);
+    const findMany = await findManyTrainingRecords(filters, parseFilters);
     return reply.code(200).send(findMany)
 
   } catch (e: any) {
@@ -61,10 +61,10 @@ export async function getManyTrainingRecordsHandler(request: FastifyRequest<{
 }
 
 export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
-  Params: GetTrainingRecord;
+  Params: { training_record_id: string };
 }>, reply: FastifyReply) {
   const userId = request.user.id;
-  const trainingRecordId = request.params.id;
+  const trainingRecordId = request.params.training_record_id;
   const parseFilters = await parseFiltersPermission(userId);
 
   try {
@@ -78,9 +78,9 @@ export async function getUniqueTrainingRecordHandler(request: FastifyRequest<{
 
 export async function updateTrainingRecordHandler(request: FastifyRequest<{
   Body: UpdateTrainingRecord;
-  Params: GetTrainingRecord;
+  Params: { training_record_id: string };
 }>, reply: FastifyReply) {
-  const trainingRecordId = request.params.id;
+  const trainingRecordId = request.params.training_record_id;
   const dataUpdate = request.body;
 
   try {
@@ -93,9 +93,9 @@ export async function updateTrainingRecordHandler(request: FastifyRequest<{
 }
 
 export async function deleteTrainingRecordHandler(request: FastifyRequest<{
-  Params: DeleteTrainingRecord;
+  Params: { training_record_id: string };
 }>, reply: FastifyReply) {
-  const trainingRecordId = request.params.id;
+  const trainingRecordId = request.params.training_record_id
 
   try {
     await deleteTrainingRecord(trainingRecordId);

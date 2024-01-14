@@ -88,7 +88,7 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
         }
       },
       created_at: true,
-      updated_at: false
+      updated_at: true
     }
   });
 
@@ -101,7 +101,7 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
 
 export async function findUniqueTrainingRecord(trainingRecordId: string, parseFilters: FiltersPermissions) {
 
-  return prisma.trainingRecord.findMany({
+  return prisma.trainingRecord.findUnique({
     where: {
       id: trainingRecordId,
       personal_trainer_id: parseFilters.personal_trainer_id,

@@ -91,7 +91,7 @@ export async function findUniquePersonalTrainer(filters: FiltersPermissions) {
       },
       password: false,
       salt: false,
-      role: false,
+      role: true,
       created_at: true,
       updated_at: true,
     }

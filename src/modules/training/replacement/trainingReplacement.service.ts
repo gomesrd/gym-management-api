@@ -32,7 +32,7 @@ export async function getManyTrainingsReplacementHandler(request: FastifyRequest
   const parseFilters = await parseFiltersTraining(filters, userId);
 
   try {
-    const findMany = findManyTrainingsReplacement(filters, parseFilters);
+    const findMany = await findManyTrainingsReplacement(filters, parseFilters);
     return reply.code(200).send(findMany);
 
   } catch (e) {
@@ -48,7 +48,7 @@ export async function getUniqueTrainingReplacementHandler(request: FastifyReques
   const parseFilters = await parseFiltersPermission(userId);
 
   try {
-    const findUnique = findUniqueTrainingReplacement(trainingReplacementId, parseFilters);
+    const findUnique = await findUniqueTrainingReplacement(trainingReplacementId, parseFilters);
     return reply.code(200).send(findUnique);
 
   } catch (e) {

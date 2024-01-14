@@ -66,6 +66,7 @@ export const userCore = {
     {message: 'Email must be a valid email'}
   ),
   phone: z.string(),
+  role: z.string().optional(),
 };
 
 export const userPassword = {

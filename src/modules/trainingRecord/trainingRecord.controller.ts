@@ -32,13 +32,10 @@ async function trainingRecordRoutes(server: FastifyInstance) {
       tags: [tags.trainingRecord],
       summary: trainingRecordSummary.findById,
       params: {
-        id: {type: 'string'},
+        training_record_id: {type: 'string'},
       },
       response: {
-        200: {
-          type: 'array',
-          items: $ref('trainingRecordFindUniqueSchema')
-        }
+        200: $ref('trainingRecordFindUniqueSchema')
       }
     },
   }, getUniqueTrainingRecordHandler);

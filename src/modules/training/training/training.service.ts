@@ -48,7 +48,8 @@ export async function getManyTrainingsHandler(request: FastifyRequest<{
   const parseFilters = await parseFiltersTraining(filters, userId);
   const dayTraining = await getDayTraining(filters.training_date)
   try {
-    const findMany = findManyTrainings(filters, parseFilters, dayTraining);
+    const findMany = await findManyTrainings(filters, parseFilters, dayTraining);
+    console.log(findMany)
     return reply.code(200).send(findMany)
 
   } catch (e) {
@@ -65,7 +66,7 @@ export async function getUniqueTrainingHandler(request: FastifyRequest<{
   const parseFilters = await parseFiltersPermission(userId);
 
   try {
-    const findUnique = findUniqueTraining(trainingId, parseFilters);
+    const findUnique = await findUniqueTraining(trainingId, parseFilters);
     return reply.code(200).send(findUnique)
 
   } catch (e) {

@@ -7,6 +7,7 @@ const trainingRecordId = {
 }
 
 const trainingRecordDateCreated = {
+  created_at: z.date(),
   updated_at: z.date(),
 };
 
@@ -16,7 +17,7 @@ const trainingRecordInput = {
   training_id: z.string(),
   personal_trainer_id: z.string(),
   member_id: z.string(),
-  training_replacement_id: z.string().nullable(),
+  training_replacement_id: z.string().nullable().optional(),
   realized: z.boolean().optional().default(true)
 };
 
@@ -41,20 +42,18 @@ const trainingRecordResume = {
       id: z.string().optional(),
     }),
   }),
-  created_at: z.date(),
+  ...trainingRecordDateCreated
 };
 
 const trainingRecordFindUniqueSchema = z.object({
   ...trainingRecordResume,
-  ...trainingRecordDateCreated
 });
 
 const trainingRecordFindManyScheme = z.object({
   ...trainingRecordCount,
   data: z.array(z.object({
-    ...trainingRecordResume
+    ...trainingRecordResume,
   })),
-
 });
 
 
