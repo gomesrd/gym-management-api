@@ -87,6 +87,11 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
           }
         }
       },
+      training: {
+        select: {
+          modality: true,
+        }
+      },
       created_at: true,
       updated_at: true
     }

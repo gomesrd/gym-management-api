@@ -26,24 +26,28 @@ const trainingRecordCount = {
 };
 
 const trainingRecordResume = {
-  ...trainingRecordId,
-  type: trainingTypes,
-  status: trainingStatus,
-  training_id: z.string(),
-  personal_trainer: z.object({
-    user: z.object({
-      name: z.string(),
-      id: z.string().optional(),
+    ...trainingRecordId,
+    type: trainingTypes,
+    status: trainingStatus,
+    training_id: z.string(),
+    personal_trainer: z.object({
+      user: z.object({
+        name: z.string(),
+        id: z.string().optional(),
+      }),
     }),
-  }),
-  member: z.object({
-    user: z.object({
-      name: z.string(),
-      id: z.string().optional(),
+    member: z.object({
+      user: z.object({
+        name: z.string(),
+        id: z.string().optional(),
+      }),
     }),
-  }),
-  ...trainingRecordDateCreated
-};
+    training: z.object({
+      modality: z.string(),
+    }),
+    ...trainingRecordDateCreated
+  }
+;
 
 const trainingRecordFindUniqueSchema = z.object({
   ...trainingRecordResume,
