@@ -27,7 +27,8 @@ export async function registerTrainingHandler(request: FastifyRequest<{
 
   try {
     const create = await createTraining(body);
-    return reply.code(201).send(create);
+
+    return reply.code(201).send('');
 
   } catch (e: any) {
     console.log(e)
