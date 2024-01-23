@@ -49,7 +49,7 @@ export const usersAddress = {
   users_address: z.object({
     address: z.string(),
     address_number: z.string(),
-    address_complement: z.string().nullable(),
+    address_complement: z.string().nullable().optional(),
     address_neighborhood: z.string(),
     city: z.string(),
     state: z.string(),
