@@ -78,8 +78,9 @@ export async function registerPersonalTrainerHandler(request: FastifyRequest<{
   const password = body.password;
   const {hash, salt} = hashPassword(password);
   const cpf = body.cpf;
+  const email = body.email;
 
-  const personalTrainer = await findPersonalTrainerByEmailCpf(undefined, cpf);
+  const personalTrainer = await findPersonalTrainerByEmailCpf(email, cpf);
   if (personalTrainer) return reply.code(400).send(personalTrainerExists)
 
   try {
