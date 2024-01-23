@@ -47,7 +47,7 @@ async function trainingRoutes(server: FastifyInstance) {
     },
   }, getUniqueTrainingHandler);
 
-    server.get(trainingReplacementRoutesPath.findAll, {
+  server.get(trainingReplacementRoutesPath.findAll, {
     preHandler: [server.authenticate],
     schema: {
       tags: [tags.trainingReplacement],
@@ -78,7 +78,10 @@ async function trainingRoutes(server: FastifyInstance) {
       summary: trainingSummary.register,
       body: $ref('trainingCreateSchema'),
       response: {
-        201: $ref('trainingCreateSchema')
+        201: {
+          type: 'string',
+          description: ''
+        }
       }
 
     }

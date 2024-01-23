@@ -18,7 +18,7 @@ export async function createTraining(input: CreateTrainingInput) {
       member_id: training.member_id,
       fixed_day: training.fixed_day,
       single_date: training.single_date,
-      training_replacement_id: training.training_replacement_id,
+      training_replacement_id: training.training_replacement_id || undefined,
     }
   });
 

@@ -17,7 +17,7 @@ export async function router(server: FastifyInstance) {
   server.register(trainingRoutes, {prefix: routesPath.trainings});
   server.register(healthCheck);
   server.register(fastifyCors, {
-    origin: '*',
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
 }
