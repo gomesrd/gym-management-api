@@ -1,7 +1,7 @@
 import prisma from "../../config/prisma";
 import {CreatePersonalTrainerInput, UpdatePersonalTrainer} from "./personalTrainer.schema";
 import {Filters} from "../../utils/common.schema";
-import {FiltersPermissions, PersonalTrainerId} from "../../utils/types";
+import {FiltersPermissions} from "../../utils/types";
 
 
 export async function findManyPersonalTrainers(filters: Filters, parseFilters: FiltersPermissions) {
@@ -161,11 +161,13 @@ export async function deletePersonalTrainer(personalTrainerId: string) {
 }
 
 export async function findPersonalTrainerByEmailCpf(email?: string | undefined, cpf?: string | undefined) {
-  return prisma.users.findUnique({
+  return prisma.users.findFirst({
     where: {
-      email: email,
-      cpf: cpf,
-      deleted: false
+      OR: [
+        {email: email},
+        {cpf: cpf},
+      ],
+      deleted: false,
     },
   });
 }
