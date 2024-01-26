@@ -4,6 +4,7 @@ export enum routesPath {
   trainings = '/trainings',
   trainingsRecord = '/trainings-record',
   trainingsReport = '/reports/trainings',
+  login = '/login',
 }
 
 export enum tags {
@@ -13,6 +14,7 @@ export enum tags {
   trainingRecord = 'Training Record',
   trainingReport = 'Training Report',
   trainingReplacement = 'Training Replacement',
+  login = 'Login'
 }
 
 export enum personalTrainerSummary {
@@ -24,6 +26,11 @@ export enum personalTrainerSummary {
   delete = 'Delete a specific Personal Trainer',
 }
 
+export enum usersSummary {
+  login = 'Login in the application',
+}
+
+
 export enum personalTrainerRoutesPath {
   findAll = '',
   findById = '/:personal_trainer_id',
@@ -31,6 +38,11 @@ export enum personalTrainerRoutesPath {
   login = '/login',
   update = '/:personal_trainer_id',
   delete = '/:personal_trainer_id',
+}
+
+export enum usersPath {
+  login = '/login',
+
 }
 
 export enum memberSummary {
@@ -94,6 +106,7 @@ export enum trainingReportRoutesPath {
   findAll = '/:member_id',
 
 }
+
 export enum trainingReplacementSummary {
   findAll = 'Get all Trainings Replacements',
   findById = 'Get a specific Training Replacement',

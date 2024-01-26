@@ -7,6 +7,7 @@ import trainingRecordRoutes from "../modules/trainingRecord/trainingRecord.contr
 import trainingReportRoutes from "../modules/report/training/trainingReport.controller";
 import fastifyCors from "@fastify/cors";
 import {routesPath} from "../utils/enumsController";
+import authRoutes from "../modules/auth/login/login.controller";
 
 
 export async function router(server: FastifyInstance) {
@@ -15,9 +16,10 @@ export async function router(server: FastifyInstance) {
   server.register(trainingReportRoutes, {prefix: routesPath.trainingsReport})
   server.register(trainingRecordRoutes, {prefix: routesPath.trainingsRecord});
   server.register(trainingRoutes, {prefix: routesPath.trainings});
+  server.register(authRoutes, {prefix: routesPath.login});
   server.register(healthCheck);
   server.register(fastifyCors, {
-    origin: ['http://localhost:3000'],
+    origin: ['*'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   });
 }

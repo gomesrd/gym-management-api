@@ -50,7 +50,6 @@ export async function getManyTrainingsHandler(request: FastifyRequest<{
   const dayTraining = await getDayTraining(filters.training_date)
   try {
     const findMany = await findManyTrainings(filters, parseFilters, dayTraining);
-    console.log(findMany)
     return reply.code(200).send(findMany)
 
   } catch (e) {
