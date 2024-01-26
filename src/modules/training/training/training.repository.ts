@@ -45,9 +45,7 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
         }
       },
     ],
-    fixed_day: filters.fixed_day,
-    single_date: filters.single_date,
-    member_id: parseFilters.member_id,
+        member_id: parseFilters.member_id,
     personal_trainer_id: parseFilters.personal_trainer_id,
     deleted: parseFilters.deleted,
     start_time: filters.start_time,
