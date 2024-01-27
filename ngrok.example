@@ -1,0 +1,9 @@
+#file: ngrok.yml
+
+version: 2
+authtoken:
+tunnels:
+  my_tunnel_name:
+    labels:
+      -
+    addr:
