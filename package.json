@@ -6,35 +6,35 @@
   "author": "Douglas Santos",
   "license": "ISC",
   "scripts": {
-    "build": "dotenv -e .env.$NODE_ENV prisma generate && tsc -p tsconfig.json",
-    "start": "dotenv -e .env.$NODE_ENV node dist/index.js",
-    "dev": "dotenv -e .env.$NODE_ENV nodemon src/index.ts",
-    "migrate-dev": "dotenv -e .env.$NODE_ENV prisma migrate dev --name init",
-    "migrate": "prisma migrate deploy"
+    "build": "prisma generate && tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "migrate-dev": "dotenv -e .env.dev prisma migrate dev --name init",
+    "migrate": "dotenv -e .env.$NODE_ENV prisma migrate deploy"
   },
   "dependencies": {
     "@fastify/cors": "^8.5.0",
     "@fastify/jwt": "^5.0.1",
-    "@prisma/client": "^5.7.1",
-    "dotenv": "^16.3.1",
-    "dotenv-cli": "^7.3.0",
-    "envalid": "^7.3.1",
-    "fastify": "^4.22.2",
-    "fastify-swagger": "^5.2.0",
-    "fastify-zod": "^1.4.0",
-    "yarn": "^1.22.19",
-    "zod": "^3.22.2",
-    "zod-to-json-schema": "^3.21.4"
-  },
-  "devDependencies": {
-    "@types/node": "^20.6.3",
-    "dotenv": "^16.3.1",
+    "@prisma/client": "^5.8.1",
+    "dotenv": "^16.4.1",
     "dotenv-cli": "^7.3.0",
     "envalid": "^8.0.0",
-    "nodemon": "^3.0.1",
-    "prisma": "^5.7.1",
-    "ts-node": "^10.9.1",
+    "fastify": "^4.25.2",
+    "fastify-swagger": "^5.2.0",
+    "fastify-zod": "^1.4.0",
+    "yarn": "^1.22.21",
+    "zod": "^3.22.4",
+    "zod-to-json-schema": "^3.22.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.8",
+    "dotenv": "^16.4.1",
+    "dotenv-cli": "^7.3.0",
+    "envalid": "^8.0.0",
+    "nodemon": "^3.0.3",
+    "prisma": "^5.8.1",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.3"
   }
 }
