@@ -11,6 +11,27 @@ services:
       POSTGRES_PASSWORD: 15059471
       POSTGRES_DB: postgres
 
+
+  api-gym-manager:
+    build: .
+    container_name: "api-gym-management"
+    ports:
+      - "80:80"
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+
+
 #  postgres-prod:
 #    image: "postgres:11"
 #    container_name: "gym_postgres_prod"
@@ -20,3 +41,4 @@ services:
 #      POSTGRES_USER: postgres
 #      POSTGRES_PASSWORD: 15059471
 #      POSTGRES_DB: postgres
+
