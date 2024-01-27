@@ -1,5 +1,9 @@
 import 'dotenv/config';
 import setupServer from './app';
+import dotenv from "dotenv";
+
+const nodeEnv = process.env.NODE_ENV || 'dev';
+dotenv.config({ path: `./.env.${nodeEnv}` });
 
 setupServer()
   .then(({server, env}) => {

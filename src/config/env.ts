@@ -1,15 +1,15 @@
-import {cleanEnv, str, num,} from 'envalid';
-import dotenv from 'dotenv';
-
-dotenv.config({path: `./.env.${process.env.NODE_ENV}`});
+import { cleanEnv, str, num } from 'envalid';
 
 const env = cleanEnv(process.env, {
-  NODE_ENV: str({choices: ['local', 'dev', 'prod']}),
-  PORT: num({default: 3000}),
-  HOST: str({default: 'localhost'}),
-  DATABASE_URL: str(),
+  NODE_ENV: str({ default: 'dev', choices: ['local', 'dev', 'prod']}),
+  PORT: num({ default: 3000 }),
+  HOST: str({ default: 'localhost' }),
+  JWT_SECRET_KEY: str({ default: 'secret' }),
+  DATABASE_URL: str({ default: '' }),
 });
+
+export default env;
 
 export type Env = typeof env;
 
-export default env;
+

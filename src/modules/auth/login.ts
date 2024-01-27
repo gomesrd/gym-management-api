@@ -1,5 +1,6 @@
 import fjwt, {JWT} from '@fastify/jwt';
 import {FastifyInstance, FastifyReply, FastifyRequest} from "fastify";
+import  {Env} from "../../config/env";
 
 declare module "@fastify/jwt" {
   interface FastifyJWT {
@@ -28,9 +29,9 @@ declare module "fastify" {
 }
 
 
-export async function loginServer(server: FastifyInstance) {
+export async function loginServer(server: FastifyInstance, env: Env ) {
   server.register(fjwt, {
-    secret: 'rQPCnFcBDV84hPqTNGcHAzCKfFfJY3thFnUgHsCf',
+    secret: `${env.JWT_SECRET_KEY}`,
   });
   server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
       try {
