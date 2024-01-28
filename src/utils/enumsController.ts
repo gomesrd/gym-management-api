@@ -59,7 +59,7 @@ export enum memberRoutesPath {
   findAll = '',
   findById = '/:member_id',
   resumeAll = '/resume/:member_id',
-  register = '/register',
+  register = '',
   login = '/login',
   update = '/:member_id',
   delete = '/:member_id',
