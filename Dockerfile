@@ -10,7 +10,7 @@ RUN npm install
 
 RUN npm run build
 
-ENV NODE_ENV="dev"
+ENV NODE_ENV="docker"
 
 EXPOSE 80
 
