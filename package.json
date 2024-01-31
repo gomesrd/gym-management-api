@@ -6,7 +6,7 @@
   "author": "Douglas Santos",
   "license": "ISC",
   "engines": {
-    "node": ">=20.x.x"
+    "node": "20.x"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
