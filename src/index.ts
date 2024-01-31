@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import setupServer from './app';
 
 setupServer()

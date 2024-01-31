@@ -4,7 +4,6 @@ import {documentation} from "./config/documentation";
 import {loginServer} from "./modules/auth/login";
 import {authorizationServer} from "./modules/auth/authorization";
 import {responseSchema} from "./responseSchema";
-import dotenv from "dotenv";
 
 export const server = fastify();
 const setupServer = async (): Promise<{
