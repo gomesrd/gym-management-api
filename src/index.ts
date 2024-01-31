@@ -1,13 +1,15 @@
 import setupServer from './app';
 
 setupServer()
-  .then(({server, env}) => {
-    server.listen({port: env.PORT, host: env.HOST}, (err) => {
+  .then(({server}) => {
+    const port = process.env.PORT;
+
+    server.listen({port: port ? parseInt(port) : 5001, host: process.env.HOST}, (err) => {
       if (err != null) {
         console.error(err);
         process.exit(1);
       }
-      console.log(`Server ready at http://${env.HOST}:${env.PORT}`);
+      console.log(`Server ready at http://${process.env.HOST}:${process.env.PORT}`);
     });
   })
   .catch((err) => {

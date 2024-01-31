@@ -9,15 +9,14 @@ import env from './config/env';
 export const server = fastify();
 const setupServer = async (): Promise<{
   server: FastifyInstance
-  env: Env
 }> => {
   const router = require('./infra/router').router;
   await documentation(server);
-  await loginServer(server, env);
+  await loginServer(server);
   await authorizationServer(server);
   await responseSchema(server);
   await router(server);
-  return {server, env};
+  return {server};
 };
 
 export default setupServer;
