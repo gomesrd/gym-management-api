@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start": "node /dist/index.js",
+    "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "migrate-dev": "dotenv -e .env.dev prisma migrate dev --name init",
     "migrate": "prisma migrate deploy"
