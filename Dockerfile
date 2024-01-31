@@ -6,6 +6,8 @@ COPY package*.json ./
 
 COPY . .
 
+COPY .env.docker .env
+
 RUN npm install
 
 RUN npm run build
@@ -14,4 +16,4 @@ ENV NODE_ENV="docker"
 
 EXPOSE 80
 
-CMD npm start
+CMD npm run migrate && npm start
