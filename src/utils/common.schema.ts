@@ -84,12 +84,7 @@ export const loginSchema = z.object({
 });
 
 export const loginResponseSchema = z.object({
-  accessToken: z.string(),
-  userData: z.object({
-    id: z.string(),
-    name: z.string(),
-    role: z.string(),
-  })
+  accessToken: z.string()
 });
 
 export const responseDeleteSchema = {

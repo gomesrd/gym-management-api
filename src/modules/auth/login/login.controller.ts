@@ -1,7 +1,7 @@
 import {FastifyInstance} from "fastify";
 import {loginHandler} from "./login.service";
 import {$ref} from "./login.schema";
-import {tags, usersPath, usersSummary} from "../../../utils/enumsController";
+import {tags, usersSummary} from "../../../utils/enumsController";
 import {responseInvalidLogin} from "../../../utils/common.schema";
 
 

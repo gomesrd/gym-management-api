@@ -29,7 +29,7 @@ export async function loginHandler(request: FastifyRequest<{
     const userData = {id, name, role};
     // const expiresIn = 60 * 120;
     const accessToken = server.jwt.sign(userData);
-    return reply.code(200).send({accessToken, userData});
+    return reply.code(200).send({accessToken});
 
   } catch (e) {
     console.log(e)
