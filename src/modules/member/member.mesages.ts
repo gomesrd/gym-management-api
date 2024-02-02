@@ -15,10 +15,9 @@ export function passwordInvalid() {
 }
 
 export function invalidLoginMessage() {
-  return {message: 'Invalid email or password'}
+  return { message: 'Invalid email or password' }
 }
 
 export function confirmDeletedMember() {
   return 'Member deleted successfully'
 }
-

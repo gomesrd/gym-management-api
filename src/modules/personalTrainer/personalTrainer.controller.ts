@@ -1,4 +1,4 @@
-import {FastifyInstance} from "fastify";
+import { FastifyInstance } from 'fastify'
 import {
   deletePersonalTrainerHandler,
   getManyPersonalTrainersHandler,
@@ -6,73 +6,88 @@ import {
   loginHandler,
   registerPersonalTrainerHandler,
   updatePersonalTrainerHandler
-} from "./personalTrainer.service";
-import {
-  $ref,
-  personalTrainerIdSchema,
-  queryAllPersonalTrainersSchema
-} from "./personalTrainer.schema";
-import {personalTrainerRoutesPath, personalTrainerSummary, tags} from "../../utils/enumsController";
+} from './personalTrainer.service'
+import { $ref, personalTrainerIdSchema, queryAllPersonalTrainersSchema } from './personalTrainer.schema'
+import { personalTrainerRoutesPath, personalTrainerSummary, tags } from '../../utils/enumsController'
 import {
   responseDeleteSchema,
-  responseIdSchema, responseInvalidLogin, responsePersonalTrainerExists,
+  responseIdSchema,
+  responseInvalidLogin,
+  responsePersonalTrainerExists,
   responsePersonalTrainerNotFound
-} from "../../utils/common.schema";
-
+} from '../../utils/common.schema'
 
 async function personalTrainerRoutes(server: FastifyInstance) {
-  server.get(personalTrainerRoutesPath.findAll, {
-    preHandler: [server.authenticate, server.authorizationExclusive],
-    schema: {
-      tags: [tags.personalTrainer],
-      summary: personalTrainerSummary.findAll,
-      querystring: queryAllPersonalTrainersSchema,
-      response: {
-        200: $ref('PersonalTrainersManyResponseSchema'),
-        202: responsePersonalTrainerNotFound
-      },
-    },
-  }, getManyPersonalTrainersHandler);
-
-  server.get(personalTrainerRoutesPath.findById, {
-    preHandler: [server.authenticate, server.authorizationLimited],
-    schema: {
-      tags: [tags.personalTrainer],
-      summary: personalTrainerSummary.findById,
-      params: personalTrainerIdSchema,
-      response: {
-        200: $ref('PersonalTrainerUniqueResponseSchema'),
-        202: responsePersonalTrainerNotFound
+  server.get(
+    personalTrainerRoutesPath.findAll,
+    {
+      preHandler: [server.authenticate, server.authorizationExclusive],
+      schema: {
+        tags: [tags.personalTrainer],
+        summary: personalTrainerSummary.findAll,
+        querystring: queryAllPersonalTrainersSchema,
+        response: {
+          200: $ref('PersonalTrainersManyResponseSchema'),
+          202: responsePersonalTrainerNotFound
+        }
       }
     },
-  }, getUniquePersonalTrainerHandler);
+    getManyPersonalTrainersHandler
+  )
 
-  server.post(personalTrainerRoutesPath.register, {
-    preHandler: [server.authenticate, server.authorizationExclusive],
-    schema: {
-      tags: [tags.personalTrainer],
-      summary: personalTrainerSummary.register,
-      body: $ref('createPersonalTrainerSchema'),
-      response: {
-        201: responseIdSchema,
-        400: responsePersonalTrainerExists
+  server.get(
+    personalTrainerRoutesPath.findById,
+    {
+      preHandler: [server.authenticate, server.authorizationLimited],
+      schema: {
+        tags: [tags.personalTrainer],
+        summary: personalTrainerSummary.findById,
+        params: personalTrainerIdSchema,
+        response: {
+          200: $ref('PersonalTrainerUniqueResponseSchema'),
+          202: responsePersonalTrainerNotFound
+        }
       }
-    }
-  }, registerPersonalTrainerHandler);
+    },
+    getUniquePersonalTrainerHandler
+  )
 
-  server.post(personalTrainerRoutesPath.login, {
-    schema: {
-      tags: [tags.personalTrainer],
-      summary: personalTrainerSummary.login,
-      body: $ref('loginSchema'),
-      response: {
-        200: $ref('loginResponseSchema'),
-        401: responseInvalidLogin
+  server.post(
+    personalTrainerRoutesPath.register,
+    {
+      preHandler: [server.authenticate, server.authorizationExclusive],
+      schema: {
+        tags: [tags.personalTrainer],
+        summary: personalTrainerSummary.register,
+        body: $ref('createPersonalTrainerSchema'),
+        response: {
+          201: responseIdSchema,
+          400: responsePersonalTrainerExists
+        }
       }
-    }
-  }, loginHandler);
+    },
+    registerPersonalTrainerHandler
+  )
 
-  server.put(personalTrainerRoutesPath.update, {
+  server.post(
+    personalTrainerRoutesPath.login,
+    {
+      schema: {
+        tags: [tags.personalTrainer],
+        summary: personalTrainerSummary.login,
+        body: $ref('loginSchema'),
+        response: {
+          200: $ref('loginResponseSchema'),
+          401: responseInvalidLogin
+        }
+      }
+    },
+    loginHandler
+  )
+
+  server.put(
+    personalTrainerRoutesPath.update,
+    {
       preHandler: [server.authenticate, server.authorizationLimited],
       schema: {
         tags: [tags.personalTrainer],
@@ -84,10 +99,13 @@ async function personalTrainerRoutes(server: FastifyInstance) {
           202: responsePersonalTrainerNotFound
         }
       }
-    }, updatePersonalTrainerHandler
-  );
+    },
+    updatePersonalTrainerHandler
+  )
 
-  server.delete(personalTrainerRoutesPath.delete, {
+  server.delete(
+    personalTrainerRoutesPath.delete,
+    {
       preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
         tags: [tags.personalTrainer],
@@ -98,8 +116,9 @@ async function personalTrainerRoutes(server: FastifyInstance) {
           202: responsePersonalTrainerNotFound
         }
       }
-    }, deletePersonalTrainerHandler
-  );
+    },
+    deletePersonalTrainerHandler
+  )
 }
 
-export default personalTrainerRoutes;
+export default personalTrainerRoutes

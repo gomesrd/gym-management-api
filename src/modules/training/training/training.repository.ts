@@ -1,14 +1,10 @@
-import prisma from "../../../config/prisma";
-import {
-  CreateTrainingInput,
-  FindManyTraining,
-  UpdateTraining
-} from "../training.schema";
-import {DaysOfWeek, Filters} from "../../../utils/common.schema";
-import {FiltersPermissions} from "../../../utils/types";
+import prisma from '../../../config/prisma'
+import { CreateTrainingInput, FindManyTraining, UpdateTraining } from '../training.schema'
+import { DaysOfWeek, Filters } from '../../../utils/common.schema'
+import { FiltersPermissions } from '../../../utils/types'
 
 export async function createTraining(input: CreateTrainingInput) {
-  const dataTraining = input.map((training) => {
+  const dataTraining = input.map(training => {
     return {
       start_time: training.start_time,
       end_time: training.end_time,
@@ -18,18 +14,20 @@ export async function createTraining(input: CreateTrainingInput) {
       member_id: training.member_id,
       fixed_day: training.fixed_day,
       single_date: training.single_date,
-      training_replacement_id: training.training_replacement_id || undefined,
+      training_replacement_id: training.training_replacement_id || undefined
     }
-  });
+  })
 
-  return prisma.training.createMany(
-    {
-      data: dataTraining
-    }
-  )
+  return prisma.training.createMany({
+    data: dataTraining
+  })
 }
 
-export async function findManyTrainings(filters: Filters, parseFilters: FiltersPermissions, dayTraining: DaysOfWeek | undefined): Promise<FindManyTraining> {
+export async function findManyTrainings(
+  filters: Filters,
+  parseFilters: FiltersPermissions,
+  dayTraining: DaysOfWeek | undefined
+): Promise<FindManyTraining> {
   const filtersTraining = {
     OR: [
       {
@@ -43,9 +41,9 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
           equals: dayTraining,
           not: null
         }
-      },
+      }
     ],
-        member_id: parseFilters.member_id,
+    member_id: parseFilters.member_id,
     personal_trainer_id: parseFilters.personal_trainer_id,
     deleted: parseFilters.deleted,
     start_time: filters.start_time,
@@ -54,16 +52,15 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
     type: filters.type,
     created_at: {
       gte: filters.created_at_gte,
-      lte: filters.created_at_lte,
-    },
+      lte: filters.created_at_lte
+    }
   }
-
 
   const trainingsCount = await prisma.training.count({
     where: {
       ...filtersTraining
     }
-  });
+  })
 
   const trainings = await prisma.training.findMany({
     where: {
@@ -83,28 +80,27 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
           user: {
             select: {
               id: true,
-              name: true,
+              name: true
             }
           }
         }
       }
     }
-  });
+  })
 
   return {
     count: trainingsCount,
-    data: trainings,
+    data: trainings
   }
 }
 
 export async function findUniqueTraining(trainingId: string, parseFilters: FiltersPermissions) {
-
   return prisma.training.findUnique({
     where: {
       id: trainingId,
       personal_trainer_id: parseFilters.personal_trainer_id,
       member_id: parseFilters.member_id,
-      deleted: parseFilters.deleted,
+      deleted: parseFilters.deleted
     },
     select: {
       id: true,
@@ -120,7 +116,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
           user: {
             select: {
               id: true,
-              name: true,
+              name: true
             }
           }
         }
@@ -130,28 +126,25 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
           user: {
             select: {
               id: true,
-              name: true,
+              name: true
             }
           }
         }
       },
       created_at: true,
-      updated_at: true,
+      updated_at: true
     }
-  });
+  })
 }
 
 export async function updateTraining(dataUpdate: UpdateTraining, trainingId: string, parseFilters: FiltersPermissions) {
-  const {
-    start_time, modality, personal_trainer_id,
-    type, single_date, fixed_day, end_time
-  } = dataUpdate;
+  const { start_time, modality, personal_trainer_id, type, single_date, fixed_day, end_time } = dataUpdate
 
   try {
     return await prisma.training.update({
       where: {
         id: trainingId,
-        personal_trainer_id: parseFilters.personal_trainer_id,
+        personal_trainer_id: parseFilters.personal_trainer_id
       },
       data: {
         start_time: start_time,
@@ -160,11 +153,11 @@ export async function updateTraining(dataUpdate: UpdateTraining, trainingId: str
         single_date: single_date,
         personal_trainer_id: personal_trainer_id,
         modality: modality,
-        type: type,
+        type: type
       }
-    });
+    })
   } catch (error) {
-    throw error;
+    throw error
   }
 }
 
@@ -172,9 +165,10 @@ export async function deleteTraining(trainingId: string, parseFilters: FiltersPe
   return prisma.training.update({
     where: {
       id: trainingId,
-      personal_trainer_id: parseFilters.personal_trainer_id,
-    }, data: {
-      deleted: true,
+      personal_trainer_id: parseFilters.personal_trainer_id
+    },
+    data: {
+      deleted: true
     }
   })
 }

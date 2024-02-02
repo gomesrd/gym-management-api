@@ -1,22 +1,21 @@
-import setupServer from './app';
-
+import setupServer from './app'
 
 setupServer()
-  .then(({server}) => {
-    const port = process.env.PORT;
+  .then(({ server }) => {
+    const port = process.env.PORT
+    const host = process.env.HOST
 
-    server.listen({port: port ? parseInt(port) : 5001, host: process.env.HOST}, (err) => {
+    server.listen({ port: port ? parseInt(port) : 5001, host: host ? host : 'localhost' }, err => {
       if (err != null) {
-        console.error(err);
-        process.exit(1);
+        console.error(err)
+        process.exit(1)
       }
-      console.log(`Server ready at http://${process.env.HOST}:${process.env.PORT}`);
-    });
+      console.log(`Server ready at http://${process.env.HOST}:${process.env.PORT}`)
+    })
   })
-  .catch((err) => {
-    console.error('Error: ', err);
-  });
-
+  .catch(err => {
+    console.error('Error: ', err)
+  })
 
 // TODO - Implementar integração com cognito ou firebase
 // TODO - Criar paginação

@@ -1,24 +1,21 @@
-import prisma from "../../../config/prisma";
-import {CreateTrainingReplacement} from "../training.schema";
-import {Filters} from "../../../utils/common.schema";
-import {FiltersPermissions} from "../../../utils/types";
+import prisma from '../../../config/prisma'
+import { CreateTrainingReplacement } from '../training.schema'
+import { Filters } from '../../../utils/common.schema'
+import { FiltersPermissions } from '../../../utils/types'
 
 export async function createTrainingReplacement(input: CreateTrainingReplacement) {
-
   return prisma.trainingReplacement.create({
     data: input
-  });
+  })
 }
 
 export async function findManyTrainingsReplacement(filters: Filters, parseFilters: FiltersPermissions) {
-  const countTrainingReplacement = await prisma.trainingReplacement.count(
-    {
-      where: {
-        realized: parseFilters.realized,
-        member_id: filters.member_id
-      }
+  const countTrainingReplacement = await prisma.trainingReplacement.count({
+    where: {
+      realized: parseFilters.realized,
+      member_id: filters.member_id
     }
-  );
+  })
   const trainingReplacement = await prisma.trainingReplacement.findMany({
     where: {
       realized: parseFilters.deleted,
@@ -35,20 +32,18 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
               name: true
             }
           }
-        },
+        }
       }
     }
-  });
+  })
 
   return {
     count: countTrainingReplacement,
     data: trainingReplacement
-
   }
 }
 
 export async function findUniqueTrainingReplacement(trainingReplacementId: string, parseFilters: FiltersPermissions) {
-
   return prisma.trainingReplacement.findUnique({
     where: {
       id: trainingReplacementId,
@@ -66,14 +61,13 @@ export async function findUniqueTrainingReplacement(trainingReplacementId: strin
               name: true
             }
           }
-        },
+        }
       },
       created_at: true,
       updated_at: true
     }
-  });
+  })
 }
-
 
 export async function updateRealizedTrainingReplacement(trainingReplacementId: string) {
   return prisma.trainingReplacement.update({
@@ -82,6 +76,6 @@ export async function updateRealizedTrainingReplacement(trainingReplacementId: s
     },
     data: {
       realized: true
-    },
-  });
+    }
+  })
 }

@@ -1,26 +1,18 @@
-import {z} from "zod";
+import { z } from 'zod'
 
-export const daysOfWeek = z.enum([
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
-]);
+export const daysOfWeek = z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])
 
 export const usersRole = {
-  role: z.enum(['admin', 'employee', 'member']),
+  role: z.enum(['admin', 'employee', 'member'])
 }
 
-export const trainingModalities = z.enum(['pilates', 'functional']);
+export const trainingModalities = z.enum(['pilates', 'functional'])
 
-export const personalTrainerOccupation = z.enum(['physical_educator', 'physiotherapist']);
+export const personalTrainerOccupation = z.enum(['physical_educator', 'physiotherapist'])
 
-export const trainingStatus = z.enum(['realized', 'foul']);
+export const trainingStatus = z.enum(['realized', 'foul'])
 
-export const trainingTypes = z.enum(['plan', 'singular', 'replacement']);
+export const trainingTypes = z.enum(['plan', 'singular', 'replacement'])
 
 const filtersSchema = z.object({
   cpf: z.string().optional(),
@@ -42,8 +34,8 @@ const filtersSchema = z.object({
   training_id: z.string().optional(),
   type: trainingTypes.optional(),
   training_date: z.string().optional(),
-  realized: z.string().optional(),
-});
+  realized: z.string().optional()
+})
 
 export const usersAddress = {
   users_address: z.object({
@@ -54,49 +46,47 @@ export const usersAddress = {
     city: z.string(),
     state: z.string(),
     country: z.string().nullable(),
-    zip_code: z.string(),
-  }),
-};
+    zip_code: z.string()
+  })
+}
 
 export const userCore = {
   name: z.string(),
   cpf: z.string(),
   birth_date: z.string(),
-  email: z.string().email(
-    {message: 'Email must be a valid email'}
-  ),
+  email: z.string().email({ message: 'Email must be a valid email' }),
   phone: z.string(),
-  role: z.string().optional(),
-};
+  role: z.string().optional()
+}
 
 export const userPassword = {
   password: z.string()
-};
+}
 
 export const dateCreatedUpdated = {
   created_at: z.date().nullable(),
-  updated_at: z.date().nullable(),
-};
+  updated_at: z.date().nullable()
+}
 
 export const loginSchema = z.object({
   email: z.string().email(),
   password: z.string()
-});
+})
 
 export const loginResponseSchema = z.object({
   accessToken: z.string()
-});
+})
 
 export const responseDeleteSchema = {
   type: 'null',
-  description: 'Deleted Success',
-};
+  description: 'Deleted Success'
+}
 
 export const responseInvalidLogin = {
   type: 'object',
   description: 'Invalid Login',
   properties: {
-    message: {type: 'string', example: 'Invalid email or password'}
+    message: { type: 'string', example: 'Invalid email or password' }
   }
 }
 
@@ -104,37 +94,37 @@ export const responseNotAllowed = {
   type: 'object',
   description: 'Not Allowed',
   properties: {
-    message: {type: 'string', example: 'Not Allowed'}
+    message: { type: 'string', example: 'Not Allowed' }
   }
 }
 export const responseIdSchema = {
   type: 'object',
   properties: {
-    id: {type: 'string', description: 'Id return', example: '9fb45576-6e37-4ffb-972a-0b6ed9720bd7'},
+    id: { type: 'string', description: 'Id return', example: '9fb45576-6e37-4ffb-972a-0b6ed9720bd7' }
   }
-};
+}
 
 export const responseMemberExists = {
   type: 'object',
   description: 'Member already exists',
   properties: {
-    message: {type: 'string', example: 'Member already exists'},
+    message: { type: 'string', example: 'Member already exists' }
   }
-};
+}
 
 export const responsePersonalTrainerExists = {
   type: 'object',
   description: 'Not found',
   properties: {
-    message: {type: 'string', example: 'Personal Trainer already exists'},
+    message: { type: 'string', example: 'Personal Trainer already exists' }
   }
-};
+}
 
 export const responseNotFound = {
   type: 'object',
   description: 'Not found',
   properties: {
-    message: {type: 'string', example: 'Not found',},
+    message: { type: 'string', example: 'Not found' }
   }
 }
 
@@ -142,25 +132,25 @@ export const responsePersonalTrainerNotFound = {
   type: 'object',
   description: 'Personal Trainer not found',
   properties: {
-    message: {type: 'string', example: 'Personal Trainer not found'},
+    message: { type: 'string', example: 'Personal Trainer not found' }
   }
-};
+}
 
 export const responseMemberNotFound = {
   type: 'object',
   description: 'Member not found',
   properties: {
-    message: {type: 'string', example: 'Member not found'},
+    message: { type: 'string', example: 'Member not found' }
   }
-};
+}
 
 export const personalTrainerNotFound = {
   message: 'Personal Trainer not found'
-};
+}
 
 export const memberNotFound = {
   message: 'Member not found'
-};
+}
 
 export const personalTrainerExists = {
   message: 'Personal Trainer already exists'
@@ -178,19 +168,18 @@ export const noPermissionAction = {
   message: 'You do not have permission to realize this action'
 }
 
-export const count = {count: z.number()};
+export const count = { count: z.number() }
 
 export const queryStringTraining = {
   type: 'object',
   properties: {
-    training_id: {type: 'string'},
-    training_record_id: {type: 'string'},
-    member_id: {type: 'string'},
-    personal_trainer_id: {type: 'string'},
+    training_id: { type: 'string' },
+    training_record_id: { type: 'string' },
+    member_id: { type: 'string' },
+    personal_trainer_id: { type: 'string' }
   }
-};
+}
 
-export type Filters = z.infer<typeof filtersSchema>;
+export type Filters = z.infer<typeof filtersSchema>
 export type LoginInput = z.infer<typeof loginSchema>
-export type DaysOfWeek = z.infer<typeof daysOfWeek>;
-
+export type DaysOfWeek = z.infer<typeof daysOfWeek>

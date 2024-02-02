@@ -1,17 +1,14 @@
-import prisma from "../../config/prisma";
-import {CreateMemberInput, UpdateMember} from "./member.schema";
-import {hashPassword} from "../../utils/hash";
-import {parseFiltersCommon} from "../../utils/parseFilters";
-import {Filters} from "../../utils/common.schema";
-import {FiltersPermissions} from "../../utils/types";
+import prisma from '../../config/prisma'
+import { CreateMemberInput, UpdateMember } from './member.schema'
+import { hashPassword } from '../../utils/hash'
+import { parseFiltersCommon } from '../../utils/parseFilters'
+import { Filters } from '../../utils/common.schema'
+import { FiltersPermissions } from '../../utils/types'
 
 export async function createMember(input: CreateMemberInput) {
-  const {
-    password, cpf, email, birth_date,
-    phone, name
-  } = input;
+  const { password, cpf, email, birth_date, phone, name } = input
 
-  const {hash, salt} = hashPassword(password);
+  const { hash, salt } = hashPassword(password)
 
   return prisma.users.create({
     data: {
@@ -25,39 +22,39 @@ export async function createMember(input: CreateMemberInput) {
       member: {
         create: {}
       }
-    },
-  });
+    }
+  })
 }
 
 export async function findMemberByEmailCpf(email?: string | undefined, cpf?: string | undefined) {
   return prisma.users.findUnique({
     where: {
       cpf: cpf,
-      email: email,
-    },
-  });
+      email: email
+    }
+  })
 }
 
 export async function findManyMembers(filters: Filters, userId: string) {
-  const applyFilters = await parseFiltersCommon(filters, userId);
+  const applyFilters = await parseFiltersCommon(filters, userId)
 
   const membersCount = await prisma.users.count({
     where: {
       name: {
         contains: filters.name,
-        mode: 'insensitive',
+        mode: 'insensitive'
       },
       cpf: filters.cpf,
       email: filters.email,
       deleted: applyFilters.deleted
     }
-  });
+  })
 
   const members = await prisma.users.findMany({
     where: {
       name: {
         contains: filters.name,
-        mode: 'insensitive',
+        mode: 'insensitive'
       },
       cpf: filters.cpf,
       email: filters.email,
@@ -66,22 +63,20 @@ export async function findManyMembers(filters: Filters, userId: string) {
     select: {
       id: true,
       name: true,
-      deleted: true,
+      deleted: true
     }
-  });
+  })
 
   return {
     count: membersCount,
     data: members
-  };
-
+  }
 }
 
 export async function findUniqueMember(parseFilters: FiltersPermissions) {
-
   return prisma.users.findUnique({
     where: {
-      id: parseFilters.user_id,
+      id: parseFilters.user_id
     },
     select: {
       id: true,
@@ -96,7 +91,7 @@ export async function findUniqueMember(parseFilters: FiltersPermissions) {
           city: true,
           state: true,
           country: true,
-          zip_code: true,
+          zip_code: true
         }
       },
       birth_date: true,
@@ -106,16 +101,15 @@ export async function findUniqueMember(parseFilters: FiltersPermissions) {
       salt: false,
       deleted: true,
       created_at: true,
-      updated_at: true,
+      updated_at: true
     }
-  });
+  })
 }
 
 export async function findUniqueMemberResume(memberId: string) {
-
   return prisma.users.findUnique({
     where: {
-      id: memberId,
+      id: memberId
     },
     select: {
       id: true,
@@ -125,14 +119,13 @@ export async function findUniqueMemberResume(memberId: string) {
       phone: true,
       deleted: true,
       created_at: true,
-      updated_at: true,
+      updated_at: true
     }
-  });
+  })
 }
 
 export async function updateMember(data: UpdateMember, memberId: string) {
-
-  const {name, email, phone, birth_date} = data
+  const { name, email, phone, birth_date } = data
 
   return prisma.users.update({
     where: {
@@ -142,27 +135,26 @@ export async function updateMember(data: UpdateMember, memberId: string) {
       name: name,
       email: email,
       phone: phone,
-      birth_date: birth_date,
+      birth_date: birth_date
     }
-  });
+  })
 }
 
 export async function deleteMember(memberId: string) {
-
   return prisma.users.update({
     where: {
-      id: memberId,
+      id: memberId
     },
     data: {
-      deleted: true,
+      deleted: true
     }
-  });
+  })
 }
 
 export async function findMemberById(memberId: string) {
   return prisma.users.findUnique({
     where: {
-      id: memberId,
-    },
-  });
+      id: memberId
+    }
+  })
 }
