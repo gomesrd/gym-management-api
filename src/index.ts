@@ -3,9 +3,9 @@ import setupServer from './app'
 setupServer()
   .then(({ server }) => {
     const port = process.env.PORT
-    const host = process.env.HOST
+    const host = process.env.HOST || 'localhost'
 
-    server.listen({ port: port ? parseInt(port) : 5001, host: host ? host : 'localhost' }, err => {
+    server.listen({ port: port ? parseInt(port) : 5001, host: host }, err => {
       if (err != null) {
         console.error(err)
         process.exit(1)
