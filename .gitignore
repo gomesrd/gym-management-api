@@ -33,8 +33,5 @@ Thumbs.db
 .env.local
 .env.prod
 .env.docker
-
-
 ngrok.yml
-.sql
-.prisma
+
