@@ -8,7 +8,7 @@ setupServer()
     server.listen(
       {
         port: process.env.PORT ? parseInt(process.env.PORT) : 5001,
-        host: process.env.HOST ? process.env.HOST : 'localhost'
+        host: process.env.HOST ? process.env.HOST : '0.0.0.0'
       },
       err => {
         if (err != null) {
