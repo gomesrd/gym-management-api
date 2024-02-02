@@ -6,7 +6,7 @@ const trainingId = {
   id: z.string()
 }
 
-const trainingCore = {
+const trainingCoreCreate = {
   training: z.array(
     z.object({
       regular_training: daysOfWeek.nullable(),
@@ -20,8 +20,18 @@ const trainingCore = {
   training_replacement_id: z.string().nullable().optional()
 }
 
+const trainingCoreList = {
+  regular_training: daysOfWeek.nullable(),
+  singular_training: z.string().nullable(),
+  start_time: z.string().nullable(),
+  end_time: z.string().nullable(),
+  modality: trainingModalities,
+  type: trainingTypes,
+  training_replacement_id: z.string().nullable().optional()
+}
+
 const trainingInput = {
-  ...trainingCore,
+  ...trainingCoreCreate,
   personal_trainer_id: z.string(),
   member_id: z.string()
 }
@@ -68,7 +78,7 @@ const usersResume = {
 
 const trainingResume = {
   ...trainingId,
-  ...trainingCore,
+  ...trainingCoreList,
   ...usersResume
 }
 
@@ -123,7 +133,7 @@ const trainingReplacementFindManyScheme = z.object({
 })
 
 const trainingUpdateSchema = z.object({
-  ...trainingCore,
+  ...trainingCoreCreate,
   personal_trainer_id: z.string().optional(),
   active: z.boolean().optional()
 })
