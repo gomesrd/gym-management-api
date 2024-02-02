@@ -5,13 +5,19 @@ setupServer()
     const port = process.env.PORT
     const host = process.env.HOST || 'localhost'
 
-    server.listen({ port: port ? parseInt(port) : 5001, host: host }, err => {
-      if (err != null) {
-        console.error(err)
-        process.exit(1)
+    server.listen(
+      {
+        port: process.env.PORT ? parseInt(process.env.PORT) : 5001,
+        host: process.env.HOST ? process.env.HOST : 'localhost'
+      },
+      err => {
+        if (err != null) {
+          console.error(err)
+          process.exit(1)
+        }
+        console.log(`Server ready at http://${process.env.HOST}:${process.env.PORT}`)
       }
-      console.log(`Server ready at http://${process.env.HOST}:${process.env.PORT}`)
-    })
+    )
   })
   .catch(err => {
     console.error('Error: ', err)
