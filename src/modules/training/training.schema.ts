@@ -7,8 +7,8 @@ const trainingId = {
 }
 
 const trainingCore = {
-  fixed_day: daysOfWeek.nullable(),
-  single_date: z.string().nullable(),
+  regular_training: daysOfWeek.nullable(),
+  singular_training: z.string().nullable(),
   start_time: z.string().nullable(),
   end_time: z.string().nullable(),
   modality: trainingModalities,
