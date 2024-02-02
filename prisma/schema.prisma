@@ -117,8 +117,8 @@ model Member {
 
 model Training {
   id                      String               @id @unique @default(uuid()) @db.Uuid
-  fixed_day               Days?
-  single_date             String?              @db.VarChar()
+  regular_training        Days?
+  singular_training       String?              @db.VarChar()
   start_time              String?              @db.VarChar()
   end_time                String?              @db.VarChar()
   modality                Modality             @default(pilates)
@@ -128,14 +128,14 @@ model Training {
   updated_at              DateTime             @updatedAt
   member_id               String               @db.Uuid
   personal_trainer_id     String               @db.Uuid
-  training_replacement_id String?              @db.Uuid @unique
+  training_replacement_id String?              @unique @db.Uuid
   training_replacement    TrainingReplacement? @relation(fields: [training_replacement_id], references: [id])
   member                  Member               @relation(fields: [member_id], references: [user_id])
   personal_trainer        PersonalTrainer      @relation(fields: [personal_trainer_id], references: [user_id])
   training_record         TrainingRecord[]
 
-  @@unique(fields: [start_time, end_time, fixed_day, personal_trainer_id], name: "training_unique_fixed_day")
-  @@unique(fields: [start_time, end_time, single_date, personal_trainer_id], name: "training_unique_single_date")
+  @@unique(fields: [start_time, end_time, regular_training, personal_trainer_id], name: "training_unique_fixed_day")
+  @@unique(fields: [start_time, end_time, singular_training, personal_trainer_id], name: "training_unique_single_date")
   @@map("training")
 }
 
