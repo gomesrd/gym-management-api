@@ -7,10 +7,14 @@ const trainingId = {
 }
 
 const trainingCore = {
-  regular_training: daysOfWeek.nullable(),
-  singular_training: z.string().nullable(),
-  start_time: z.string().nullable(),
-  end_time: z.string().nullable(),
+  training: z.array(
+    z.object({
+      regular_training: daysOfWeek.nullable(),
+      singular_training: z.string().nullable(),
+      start_time: z.string().nullable(),
+      end_time: z.string().nullable()
+    })
+  ),
   modality: trainingModalities,
   type: trainingTypes,
   training_replacement_id: z.string().nullable().optional()
@@ -124,11 +128,9 @@ const trainingUpdateSchema = z.object({
   active: z.boolean().optional()
 })
 
-const trainingCreateSchema = z.array(
-  z.object({
-    ...trainingInput
-  })
-)
+const trainingCreateSchema = z.object({
+  ...trainingInput
+})
 
 const trainingReplacementCreateSchema = z.object({ ...trainingReplacement })
 

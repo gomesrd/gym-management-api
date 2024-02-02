@@ -4,17 +4,19 @@ import { DaysOfWeek, Filters } from '../../../utils/common.schema'
 import { FiltersPermissions } from '../../../utils/types'
 
 export async function createTraining(input: CreateTrainingInput) {
-  const dataTraining = input.map(training => {
+  const { training, training_replacement_id, personal_trainer_id, member_id, modality, type } = input
+
+  const dataTraining = training.map(training => {
     return {
-      start_time: training.start_time,
-      end_time: training.end_time,
-      modality: training.modality,
-      type: training.type,
-      personal_trainer_id: training.personal_trainer_id,
-      member_id: training.member_id,
       regular_training: training.regular_training,
       singular_training: training.singular_training,
-      training_replacement_id: training.training_replacement_id || undefined
+      start_time: training.start_time,
+      end_time: training.end_time,
+      modality: modality,
+      type: type,
+      training_replacement_id: training_replacement_id,
+      personal_trainer_id: personal_trainer_id,
+      member_id: member_id
     }
   })
 
@@ -27,7 +29,7 @@ export async function findManyTrainings(
   filters: Filters,
   parseFilters: FiltersPermissions,
   dayTraining: DaysOfWeek | undefined
-): Promise<FindManyTraining> {
+) {
   const filtersTraining = {
     OR: [
       {
@@ -138,7 +140,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
 }
 
 export async function updateTraining(dataUpdate: UpdateTraining, trainingId: string, parseFilters: FiltersPermissions) {
-  const { start_time, modality, personal_trainer_id, type, singular_training, regular_training, end_time } = dataUpdate
+  const { modality, personal_trainer_id, type, training, training_replacement_id, active } = dataUpdate
 
   try {
     return await prisma.training.update({
@@ -147,10 +149,10 @@ export async function updateTraining(dataUpdate: UpdateTraining, trainingId: str
         personal_trainer_id: parseFilters.personal_trainer_id
       },
       data: {
-        start_time: start_time,
-        end_time: end_time,
-        regular_training: regular_training,
-        singular_training: singular_training,
+        start_time: training[0].start_time,
+        end_time: training[0].end_time,
+        regular_training: training[0].regular_training,
+        singular_training: training[0].singular_training,
         personal_trainer_id: personal_trainer_id,
         modality: modality,
         type: type

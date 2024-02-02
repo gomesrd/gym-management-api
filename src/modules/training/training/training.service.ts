@@ -20,8 +20,8 @@ export async function registerTrainingHandler(
   reply: FastifyReply
 ) {
   const body = request.body
-  const personalTrainerId = body.map(training => training.personal_trainer_id)
-  const personalTrainerValidate = personalTrainerId.every(id => id === request.user.id)
+  const personalTrainerId = body.personal_trainer_id
+  const personalTrainerValidate = personalTrainerId === request.user.id
   if (!personalTrainerValidate) {
     return reply.code(403).send('You can only register trainings for yourself')
   }
@@ -132,3 +132,7 @@ export async function deleteTrainingHandler(
     return replyErrorDefault(reply)
   }
 }
+
+
+// TODO - É necessário validar se a aula a ser criada não está em um horário já ocupado
+// TODO - Treino de reposição só pode ser criado com a presença do replacement_id
