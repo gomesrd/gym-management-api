@@ -34,7 +34,7 @@ const trainingCoreList = {
 const trainingInput = {
   ...trainingCoreCreate,
   personal_trainer_id: z.string(),
-  member_id: z.array(z.string())
+  member_id: z.string().array().nonempty()
 }
 
 const trainingReplacement = {
