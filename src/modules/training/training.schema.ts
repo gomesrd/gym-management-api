@@ -11,8 +11,8 @@ const trainingCoreCreate = {
     z.object({
       regular_training: daysOfWeek.nullable(),
       singular_training: z.string().nullable(),
-      start_time: z.string().nullable(),
-      end_time: z.string().nullable()
+      starts_at: z.string().nullable(),
+      ends_at: z.string().nullable()
     })
   ),
   modality: trainingModalities,
@@ -23,17 +23,18 @@ const trainingCoreCreate = {
 const trainingCoreList = {
   regular_training: daysOfWeek.nullable(),
   singular_training: z.string().nullable(),
-  start_time: z.string().nullable(),
-  end_time: z.string().nullable(),
+  starts_at: z.string().nullable(),
+  ends_at: z.string().nullable(),
   modality: trainingModalities,
   type: trainingTypes,
-  training_replacement_id: z.string().nullable().optional()
+  training_replacement_id: z.string().nullable().optional(),
+  members: z.string()
 }
 
 const trainingInput = {
   ...trainingCoreCreate,
   personal_trainer_id: z.string(),
-  member_id: z.string()
+  member_id: z.array(z.string())
 }
 
 const trainingReplacement = {
