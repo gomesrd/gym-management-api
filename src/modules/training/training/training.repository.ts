@@ -10,19 +10,45 @@ export async function createTraining(input: CreateTrainingInput) {
     return {
       regular_training: training.regular_training,
       singular_training: training.singular_training,
-      start_time: training.start_time,
-      end_time: training.end_time,
+      starts_at: training.starts_at,
+      ends_at: training.ends_at,
       modality: modality,
       type: type,
       training_replacement_id: training_replacement_id,
-      personal_trainer_id: personal_trainer_id,
-      member_id: member_id
+      personal_trainer_id: personal_trainer_id
     }
   })
 
-  return prisma.training.createMany({
-    data: dataTraining
-  })
+  const createManyTraining = await prisma.$transaction(
+    training.map(training =>
+      prisma.training.create({
+        data: {
+          regular_training: training.regular_training,
+          singular_training: training.singular_training,
+          starts_at: training.starts_at,
+          ends_at: training.ends_at,
+          modality: modality,
+          type: type,
+          training_replacement_id: training_replacement_id,
+          personal_trainer_id: personal_trainer_id,
+          MemberTraining: {
+            createMany: {
+              data: member_id.map(member => {
+                return {
+                  member_id: member
+                }
+              })
+            }
+          }
+        },
+        include: {
+          MemberTraining: true
+        }
+      })
+    )
+  )
+
+  return createManyTraining
 }
 
 export async function findManyTrainings(
@@ -48,8 +74,8 @@ export async function findManyTrainings(
     member_id: parseFilters.member_id,
     personal_trainer_id: parseFilters.personal_trainer_id,
     deleted: parseFilters.deleted,
-    start_time: filters.start_time,
-    end_time: filters.end_time,
+    starts_at: filters.starts_at,
+    ends_at: filters.ends_at,
     modality: filters.modality,
     type: filters.type,
     created_at: {
@@ -72,17 +98,21 @@ export async function findManyTrainings(
       id: true,
       regular_training: true,
       singular_training: true,
-      start_time: true,
-      end_time: true,
+      starts_at: true,
+      ends_at: true,
       modality: true,
       type: true,
       training_replacement_id: true,
-      member: {
-        include: {
-          user: {
+      MemberTraining: {
+        select: {
+          member_id: true,
+          Member: {
             select: {
-              id: true,
-              name: true
+              user: {
+                select: {
+                  name: true
+                }
+              }
             }
           }
         }
@@ -90,9 +120,23 @@ export async function findManyTrainings(
     }
   })
 
+  const formattedTrainings = trainings.map(training => ({
+    id: training.id,
+    regular_training: training.regular_training,
+    singular_training: training.singular_training,
+    starts_at: training.starts_at,
+    ends_at: training.ends_at,
+    modality: training.modality,
+    type: training.type,
+    training_replacement_id: training.training_replacement_id,
+    members: training.MemberTraining.map(memberTraining => memberTraining.Member.user.name).join('/')
+  }))
+
+  console.log('formattedTrainings', formattedTrainings)
+
   return {
     count: trainingsCount,
-    data: trainings
+    data: formattedTrainings
   }
 }
 
@@ -101,28 +145,17 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
     where: {
       id: trainingId,
       personal_trainer_id: parseFilters.personal_trainer_id,
-      member_id: parseFilters.member_id,
       deleted: parseFilters.deleted
     },
     select: {
       id: true,
       regular_training: true,
       singular_training: true,
-      start_time: true,
-      end_time: true,
+      starts_at: true,
+      ends_at: true,
       modality: true,
       training_replacement_id: true,
       type: true,
-      member: {
-        select: {
-          user: {
-            select: {
-              id: true,
-              name: true
-            }
-          }
-        }
-      },
       personal_trainer: {
         select: {
           user: {
@@ -149,8 +182,8 @@ export async function updateTraining(dataUpdate: UpdateTraining, trainingId: str
         personal_trainer_id: parseFilters.personal_trainer_id
       },
       data: {
-        start_time: training[0].start_time,
-        end_time: training[0].end_time,
+        starts_at: training[0].starts_at,
+        ends_at: training[0].ends_at,
         regular_training: training[0].regular_training,
         singular_training: training[0].singular_training,
         personal_trainer_id: personal_trainer_id,
