@@ -76,20 +76,28 @@ CREATE TABLE "member" (
 -- CreateTable
 CREATE TABLE "training" (
     "id" UUID NOT NULL,
-    "fixed_day" "Days",
-    "single_date" VARCHAR,
-    "start_time" VARCHAR,
-    "end_time" VARCHAR,
+    "regular_training" "Days",
+    "singular_training" VARCHAR,
+    "starts_at" VARCHAR,
+    "ends_at" VARCHAR,
     "modality" "Modality" NOT NULL DEFAULT 'pilates',
     "type" "TrainingType" NOT NULL DEFAULT 'plan',
     "deleted" BOOLEAN DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
-    "member_id" UUID NOT NULL,
     "personal_trainer_id" UUID NOT NULL,
     "training_replacement_id" UUID,
 
     CONSTRAINT "training_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "member_training" (
+    "id" UUID NOT NULL,
+    "training_id" UUID NOT NULL,
+    "member_id" UUID NOT NULL,
+
+    CONSTRAINT "member_training_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -182,10 +190,13 @@ CREATE UNIQUE INDEX "training_id_key" ON "training"("id");
 CREATE UNIQUE INDEX "training_training_replacement_id_key" ON "training"("training_replacement_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "training_start_time_end_time_fixed_day_personal_trainer_id_key" ON "training"("start_time", "end_time", "fixed_day", "personal_trainer_id");
+CREATE UNIQUE INDEX "training_starts_at_ends_at_regular_training_personal_traine_key" ON "training"("starts_at", "ends_at", "regular_training", "personal_trainer_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "training_start_time_end_time_single_date_personal_trainer_i_key" ON "training"("start_time", "end_time", "single_date", "personal_trainer_id");
+CREATE UNIQUE INDEX "training_starts_at_ends_at_singular_training_personal_train_key" ON "training"("starts_at", "ends_at", "singular_training", "personal_trainer_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "member_training_id_key" ON "member_training"("id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "training_record_id_key" ON "training_record"("id");
@@ -209,10 +220,13 @@ ALTER TABLE "member" ADD CONSTRAINT "member_user_id_fkey" FOREIGN KEY ("user_id"
 ALTER TABLE "training" ADD CONSTRAINT "training_training_replacement_id_fkey" FOREIGN KEY ("training_replacement_id") REFERENCES "training_replacement"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "training" ADD CONSTRAINT "training_member_id_fkey" FOREIGN KEY ("member_id") REFERENCES "member"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "training" ADD CONSTRAINT "training_personal_trainer_id_fkey" FOREIGN KEY ("personal_trainer_id") REFERENCES "personal_trainer"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "training" ADD CONSTRAINT "training_personal_trainer_id_fkey" FOREIGN KEY ("personal_trainer_id") REFERENCES "personal_trainer"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "member_training" ADD CONSTRAINT "member_training_training_id_fkey" FOREIGN KEY ("training_id") REFERENCES "training"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "member_training" ADD CONSTRAINT "member_training_member_id_fkey" FOREIGN KEY ("member_id") REFERENCES "member"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "training_record" ADD CONSTRAINT "training_record_personal_trainer_id_fkey" FOREIGN KEY ("personal_trainer_id") REFERENCES "personal_trainer"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
