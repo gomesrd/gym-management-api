@@ -6,19 +6,6 @@ import { FiltersPermissions } from '../../../utils/types'
 export async function createTraining(input: CreateTrainingInput) {
   const { training, training_replacement_id, personal_trainer_id, member_id, modality, type } = input
 
-  const dataTraining = training.map(training => {
-    return {
-      regular_training: training.regular_training,
-      singular_training: training.singular_training,
-      starts_at: training.starts_at,
-      ends_at: training.ends_at,
-      modality: modality,
-      type: type,
-      training_replacement_id: training_replacement_id,
-      personal_trainer_id: personal_trainer_id
-    }
-  })
-
   const createManyTraining = await prisma.$transaction(
     training.map(training =>
       prisma.training.create({
@@ -131,8 +118,6 @@ export async function findManyTrainings(
     training_replacement_id: training.training_replacement_id,
     members: training.MemberTraining.map(memberTraining => memberTraining.Member.user.name).join('/')
   }))
-
-  console.log('formattedTrainings', formattedTrainings)
 
   return {
     count: trainingsCount,
