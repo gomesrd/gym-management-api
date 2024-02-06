@@ -57,34 +57,30 @@ const trainingReplacementResponse = {
 const usersResume = {
   personal_trainer: z
     .object({
-      user: z
-        .object({
-          name: z.string().optional(),
-          id: z.string().optional()
-        })
-        .optional()
+      name: z.string().optional(),
+      id: z.string().optional()
     })
     .optional(),
-  member: z
-    .object({
-      user: z
+  members: z
+    .array(
+      z
         .object({
           name: z.string().optional(),
           id: z.string().optional()
         })
         .optional()
-    })
+    )
     .optional()
 }
 
 const trainingResume = {
   ...trainingId,
-  ...trainingCoreList,
-  ...usersResume
+  ...trainingCoreList
 }
 
 const trainingFindUniqueSchema = z.object({
   ...trainingResume,
+  ...usersResume,
   ...dateCreatedUpdated
 })
 
