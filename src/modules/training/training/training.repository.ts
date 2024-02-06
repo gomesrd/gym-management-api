@@ -1,5 +1,5 @@
 import prisma from '../../../config/prisma'
-import { CreateTrainingInput, FindManyTraining, UpdateTraining } from '../training.schema'
+import { CreateTrainingInput, UpdateTraining } from '../training.schema'
 import { DaysOfWeek, Filters } from '../../../utils/common.schema'
 import { FiltersPermissions } from '../../../utils/types'
 
@@ -126,7 +126,7 @@ export async function findManyTrainings(
 }
 
 export async function findUniqueTraining(trainingId: string, parseFilters: FiltersPermissions) {
-  return prisma.training.findUnique({
+  const findTraining = await prisma.training.findUnique({
     where: {
       id: trainingId,
       personal_trainer_id: parseFilters.personal_trainer_id,
@@ -151,10 +151,46 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
           }
         }
       },
+      MemberTraining: {
+        select: {
+          member_id: true,
+          Member: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          }
+        }
+      },
       created_at: true,
       updated_at: true
     }
   })
+
+  return {
+    id: findTraining?.id,
+    regular_training: findTraining?.regular_training,
+    singular_training: findTraining?.singular_training,
+    starts_at: findTraining?.starts_at,
+    ends_at: findTraining?.ends_at,
+    modality: findTraining?.modality,
+    type: findTraining?.type,
+    training_replacement_id: findTraining?.training_replacement_id,
+    personal_trainer: {
+      id: findTraining?.personal_trainer.user.id,
+      name: findTraining?.personal_trainer.user.name
+    },
+    members: findTraining?.MemberTraining.map(memberTraining => ({
+      id: memberTraining.Member.user.id,
+      name: memberTraining.Member.user.name
+    })),
+    created_at: findTraining?.created_at,
+    updated_at: findTraining?.updated_at
+  }
 }
 
 export async function updateTraining(dataUpdate: UpdateTraining, trainingId: string, parseFilters: FiltersPermissions) {
