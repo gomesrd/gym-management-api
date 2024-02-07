@@ -97,9 +97,9 @@ export async function updateTrainingHandler(
   const parseFilters = await parseFiltersPermission(userId)
 
   try {
-    const update = await updateTraining(dataUpdate, trainingId, parseFilters)
+    await updateTraining(dataUpdate, trainingId, parseFilters)
 
-    return reply.code(200).send(update)
+    return reply.code(201).send('')
   } catch (e: any) {
     console.log(e)
     if (e.code === 'P2002') {
