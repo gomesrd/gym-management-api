@@ -6,36 +6,40 @@ import { FiltersPermissions } from '../../../utils/types'
 export async function createTraining(input: CreateTrainingInput) {
   const { training, training_replacement_id, personal_trainer_id, member_id, modality, type } = input
 
-  const createManyTraining = await prisma.$transaction(
-    training.map(training =>
-      prisma.training.create({
-        data: {
-          regular_training: training.regular_training,
-          singular_training: training.singular_training,
-          starts_at: training.starts_at,
-          ends_at: training.ends_at,
-          modality: modality,
-          type: type,
-          training_replacement_id: training_replacement_id,
-          personal_trainer_id: personal_trainer_id,
-          MemberTraining: {
-            createMany: {
-              data: member_id.map(member => {
-                return {
-                  member_id: member
-                }
-              })
+  try {
+    const createManyTraining = await prisma.$transaction(
+      training.map(training =>
+        prisma.training.create({
+          data: {
+            regular_training: training.regular_training,
+            singular_training: training.singular_training,
+            starts_at: training.starts_at,
+            ends_at: training.ends_at,
+            modality: modality,
+            type: type,
+            training_replacement_id: training_replacement_id,
+            personal_trainer_id: personal_trainer_id,
+            MemberTraining: {
+              createMany: {
+                data: member_id.map(member => {
+                  return {
+                    member_id: member
+                  }
+                })
+              }
             }
+          },
+          include: {
+            MemberTraining: true
           }
-        },
-        include: {
-          MemberTraining: true
-        }
-      })
+        })
+      )
     )
-  )
 
-  return createManyTraining
+    return createManyTraining
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 export async function findManyTrainings(
@@ -108,14 +112,7 @@ export async function findManyTrainings(
   })
 
   const formattedTrainings = trainings.map(training => ({
-    id: training.id,
-    regular_training: training.regular_training,
-    singular_training: training.singular_training,
-    starts_at: training.starts_at,
-    ends_at: training.ends_at,
-    modality: training.modality,
-    type: training.type,
-    training_replacement_id: training.training_replacement_id,
+    ...training,
     members: training.MemberTraining.map(memberTraining => memberTraining.Member.user.name).join('/')
   }))
 
@@ -172,14 +169,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
   })
 
   return {
-    id: findTraining?.id,
-    regular_training: findTraining?.regular_training,
-    singular_training: findTraining?.singular_training,
-    starts_at: findTraining?.starts_at,
-    ends_at: findTraining?.ends_at,
-    modality: findTraining?.modality,
-    type: findTraining?.type,
-    training_replacement_id: findTraining?.training_replacement_id,
+    ...findTraining,
     personal_trainer: {
       id: findTraining?.personal_trainer.user.id,
       name: findTraining?.personal_trainer.user.name
@@ -187,9 +177,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
     members: findTraining?.MemberTraining.map(memberTraining => ({
       id: memberTraining.Member.user.id,
       name: memberTraining.Member.user.name
-    })),
-    created_at: findTraining?.created_at,
-    updated_at: findTraining?.updated_at
+    }))
   }
 }
 
