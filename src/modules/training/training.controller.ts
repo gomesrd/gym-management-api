@@ -131,7 +131,10 @@ async function trainingRoutes(server: FastifyInstance) {
         params: trainingIdSchema,
         body: $ref('trainingUpdateSchema'),
         response: {
-          200: $ref('trainingUpdateSchema')
+          201: {
+            type: 'string',
+            description: ''
+          }
         }
       }
     },
