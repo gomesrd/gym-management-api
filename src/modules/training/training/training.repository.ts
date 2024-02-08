@@ -51,13 +51,13 @@ export async function findManyTrainings(
     OR: [
       {
         singular_training: {
-          equals: filters.training_date,
+          equals: dayTraining,
           not: null
         }
       },
       {
         regular_training: {
-          equals: dayTraining,
+          equals: filters.regular_training,
           not: null
         }
       }
