@@ -108,6 +108,9 @@ export async function findManyTrainings(
           }
         }
       }
+    },
+    orderBy: {
+      starts_at: 'asc'
     }
   })
 
