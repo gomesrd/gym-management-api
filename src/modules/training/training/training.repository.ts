@@ -109,9 +109,7 @@ export async function findManyTrainings(
         }
       }
     },
-    orderBy: {
-      starts_at: 'asc'
-    }
+    orderBy: [{ regular_training: 'asc' }, { starts_at: 'asc' }]
   })
 
   const formattedTrainings = trainings.map(training => ({
