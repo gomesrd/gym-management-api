@@ -93,12 +93,11 @@ model UsersAddress {
 }
 
 model PersonalTrainer {
-  id              String           @id @unique @default(uuid()) @db.Uuid
-  user_id         String           @unique @default(uuid()) @db.Uuid
-  occupation      Occupation       @default(physical_educator)
-  training        Training[]
-  training_record TrainingRecord[]
-  user            Users            @relation(fields: [user_id], references: [id])
+  id         String     @id @unique @default(uuid()) @db.Uuid
+  user_id    String     @unique @default(uuid()) @db.Uuid
+  occupation Occupation @default(physical_educator)
+  training   Training[]
+  user       Users      @relation(fields: [user_id], references: [id])
 
   @@map("personal_trainer")
 }
@@ -107,7 +106,6 @@ model Member {
   id                  String                @id @unique @default(uuid()) @db.Uuid
   user_id             String                @unique @db.Uuid
   user                Users                 @relation(fields: [user_id], references: [id])
-  training_record     TrainingRecord[]
   MemberPlan          MemberPlan[]
   TrainingReplacement TrainingReplacement[]
   MemberTraining      MemberTraining[]
@@ -139,28 +137,22 @@ model Training {
 }
 
 model MemberTraining {
-  id          String @id @unique @default(uuid()) @db.Uuid
-  training_id String @db.Uuid
-  member_id   String @db.Uuid
-
-  Training Training @relation(fields: [training_id], references: [id])
-  Member   Member   @relation(fields: [member_id], references: [user_id])
+  id          String   @id @unique @default(uuid()) @db.Uuid
+  training_id String   @db.Uuid
+  member_id   String   @db.Uuid
+  Training    Training @relation(fields: [training_id], references: [id])
+  Member      Member   @relation(fields: [member_id], references: [user_id])
 
   @@map("member_training")
 }
 
 model TrainingRecord {
-  id                  String          @id @unique @default(uuid()) @db.Uuid
-  type                TrainingType    @default(plan)
-  status              Status          @default(realized)
-  training_id         String          @db.Uuid
-  personal_trainer_id String          @db.Uuid
-  member_id           String          @db.Uuid
-  created_at          DateTime        @default(now())
-  updated_at          DateTime        @updatedAt
-  personal_trainer    PersonalTrainer @relation(fields: [personal_trainer_id], references: [user_id])
-  member              Member          @relation(fields: [member_id], references: [user_id])
-  training            Training        @relation(fields: [training_id], references: [id])
+  id          String   @id @unique @default(uuid()) @db.Uuid
+  status      Status   @default(realized)
+  training_id String   @db.Uuid
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  training    Training @relation(fields: [training_id], references: [id])
 
   @@map("training_record")
 }

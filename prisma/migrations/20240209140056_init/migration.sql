@@ -103,11 +103,8 @@ CREATE TABLE "member_training" (
 -- CreateTable
 CREATE TABLE "training_record" (
     "id" UUID NOT NULL,
-    "type" "TrainingType" NOT NULL DEFAULT 'plan',
     "status" "Status" NOT NULL DEFAULT 'realized',
     "training_id" UUID NOT NULL,
-    "personal_trainer_id" UUID NOT NULL,
-    "member_id" UUID NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
@@ -227,12 +224,6 @@ ALTER TABLE "member_training" ADD CONSTRAINT "member_training_training_id_fkey" 
 
 -- AddForeignKey
 ALTER TABLE "member_training" ADD CONSTRAINT "member_training_member_id_fkey" FOREIGN KEY ("member_id") REFERENCES "member"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "training_record" ADD CONSTRAINT "training_record_personal_trainer_id_fkey" FOREIGN KEY ("personal_trainer_id") REFERENCES "personal_trainer"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "training_record" ADD CONSTRAINT "training_record_member_id_fkey" FOREIGN KEY ("member_id") REFERENCES "member"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "training_record" ADD CONSTRAINT "training_record_training_id_fkey" FOREIGN KEY ("training_id") REFERENCES "training"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

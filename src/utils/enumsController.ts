@@ -81,6 +81,7 @@ export enum trainingRoutesPath {
 
 export enum trainingRecordSummary {
   findAll = 'Get all Trainings Records',
+  findAllStatus = 'Get all Trainings Records by Status',
   findById = 'Get a specific Training Record',
   register = 'Create a new Training Record',
   update = 'Update a specific Training Record',
@@ -89,6 +90,7 @@ export enum trainingRecordSummary {
 
 export enum trainingRecordRoutesPath {
   findAll = '',
+  findAllStatus = '/status',
   findById = '/:training_record_id',
   register = '',
   update = '/:training_record_id',
