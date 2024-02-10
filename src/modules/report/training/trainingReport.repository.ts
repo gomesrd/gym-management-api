@@ -9,9 +9,7 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
         gte: filters.created_at_gte,
         lte: filters.created_at_lte
       },
-      member_id: memberId,
-      status: Status.realized,
-      type: TrainingType.plan || TrainingType.singular
+      status: Status.realized
     }
   })
 
@@ -21,7 +19,6 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
         gte: filters.created_at_gte,
         lte: filters.created_at_lte
       },
-      member_id: memberId,
       status: Status.foul
     }
   })
@@ -32,9 +29,7 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
         gte: filters.created_at_gte,
         lte: filters.created_at_lte
       },
-      member_id: memberId,
-      status: Status.realized,
-      type: TrainingType.replacement
+      status: Status.realized
     }
   })
 

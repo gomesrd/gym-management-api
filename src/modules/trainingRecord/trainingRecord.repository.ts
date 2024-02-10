@@ -10,15 +10,12 @@ import { parseFiltersPermission, parseFiltersTraining } from '../../utils/parseF
 import { FiltersPermissions } from '../../utils/types'
 
 export async function createTrainingRecord(input: CreateTrainingRecordInput) {
-  const { training_id, personal_trainer_id, status, type, member_id } = input
+  const { training_id, status } = input
 
   return prisma.trainingRecord.create({
     data: {
       training_id,
-      personal_trainer_id,
-      status,
-      type,
-      member_id
+      status
     }
   })
 }
@@ -27,10 +24,7 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
   const trainingRecordsCount = await prisma.trainingRecord.count({
     where: {
       training_id: filters.training_id,
-      member_id: parseFilters.member_id,
-      personal_trainer_id: parseFilters.personal_trainer_id,
       status: filters.status,
-      type: filters.type,
       created_at: {
         gte: filters.created_at_gte,
         lte: filters.created_at_lte
@@ -41,10 +35,7 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
   const trainingRecords = await prisma.trainingRecord.findMany({
     where: {
       training_id: filters.training_id,
-      member_id: parseFilters.member_id,
-      personal_trainer_id: parseFilters.personal_trainer_id,
       status: filters.status,
-      type: filters.type,
       created_at: {
         gte: filters.created_at_gte,
         lte: filters.created_at_lte
@@ -52,46 +43,113 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
     },
     select: {
       id: true,
-      type: true,
       status: true,
       training_id: true,
-      personal_trainer_id: false,
-      member_id: false,
-      personal_trainer: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: false,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false
-            }
-          }
-        }
-      },
-      member: {
-        select: {
-          user_id: false,
-          user: {
-            select: {
-              id: false,
-              name: true,
-              email: false,
-              password: false,
-              role: false,
-              created_at: false,
-              updated_at: false
-            }
-          }
-        }
-      },
       training: {
         select: {
-          modality: true
+          modality: true,
+          type: true,
+          personal_trainer: {
+            select: {
+              user: {
+                select: {
+                  id: false,
+                  name: true
+                }
+              }
+            }
+          },
+          MemberTraining: {
+            select: {
+              member_id: true,
+              Member: {
+                select: {
+                  user: {
+                    select: {
+                      id: false,
+                      name: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      created_at: true,
+      updated_at: true
+    }
+  })
+
+  const formatedTrainingRecords = trainingRecords.map(trainingRecord => {
+    return {
+      ...trainingRecord,
+      modality: trainingRecord.training.modality,
+      type: trainingRecord.training.type,
+      personal_trainer: trainingRecord.training.personal_trainer.user.name,
+      members: trainingRecord.training.MemberTraining.map(memberTraining => memberTraining.Member.user.name).join('/')
+    }
+  })
+
+  return {
+    count: trainingRecordsCount,
+    data: formatedTrainingRecords
+  }
+}
+
+export async function findManyTrainingRecordsStatus(filters: Filters) {
+  return prisma.trainingRecord.findMany({
+    where: {
+      created_at: {
+        gte: filters.created_at_gte,
+        lte: filters.created_at_lte
+      }
+    },
+    select: {
+      status: true,
+      training_id: true
+    }
+  })
+}
+
+export async function findUniqueTrainingRecord(trainingRecordId: string, parseFilters: FiltersPermissions) {
+  const trainingRecord = await prisma.trainingRecord.findUnique({
+    where: {
+      id: trainingRecordId
+    },
+    select: {
+      id: true,
+      status: true,
+      training_id: true,
+      training: {
+        select: {
+          modality: true,
+          type: true,
+          personal_trainer: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          },
+          MemberTraining: {
+            select: {
+              member_id: true,
+              Member: {
+                select: {
+                  user: {
+                    select: {
+                      id: true,
+                      name: true
+                    }
+                  }
+                }
+              }
+            }
+          }
         }
       },
       created_at: true,
@@ -100,47 +158,20 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
   })
 
   return {
-    count: trainingRecordsCount,
-    data: trainingRecords
-  }
-}
-
-export async function findUniqueTrainingRecord(trainingRecordId: string, parseFilters: FiltersPermissions) {
-  return prisma.trainingRecord.findUnique({
-    where: {
-      id: trainingRecordId,
-      personal_trainer_id: parseFilters.personal_trainer_id,
-      member_id: parseFilters.member_id
+    ...trainingRecord,
+    modality: trainingRecord?.training.modality,
+    type: trainingRecord?.training.type,
+    personal_trainer: {
+      id: trainingRecord?.training.personal_trainer.user.id,
+      name: trainingRecord?.training.personal_trainer.user.name
     },
-    select: {
-      id: true,
-      type: true,
-      status: true,
-      training_id: true,
-      personal_trainer: {
-        select: {
-          user: {
-            select: {
-              id: true,
-              name: true
-            }
-          }
-        }
-      },
-      member: {
-        select: {
-          user: {
-            select: {
-              id: true,
-              name: true
-            }
-          }
-        }
-      },
-      created_at: true,
-      updated_at: true
-    }
-  })
+    members: trainingRecord?.training.MemberTraining.map(member => {
+      return {
+        id: member.member_id,
+        name: member.Member.user.name
+      }
+    })
+  }
 }
 
 export async function updateTrainingRecord(trainingId: string, dataUpdate: UpdateTrainingRecord) {

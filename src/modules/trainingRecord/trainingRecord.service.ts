@@ -11,7 +11,8 @@ import {
   deleteTrainingRecord,
   findUniqueTrainingRecord,
   findManyTrainingRecords,
-  updateTrainingRecord
+  updateTrainingRecord,
+  findManyTrainingRecordsStatus
 } from './trainingRecord.repository'
 import { personalTrainerValidate } from '../../utils/permissions.service'
 import { deleteTraining } from '../training/training/training.repository'
@@ -26,24 +27,22 @@ export async function registerTrainingRecordHandler(
 ) {
   const body = request.body
   const userId = request.user.id
-  const personalTrainerId = body.personal_trainer_id
-  const memberId = body.member_id
-  const trainingReplacementId = body.training_replacement_id
-  const trainingType = body.type
   const parseFilters = await parseFiltersPermission(userId)
 
-  const invalidRequest = await personalTrainerValidate(userId, personalTrainerId, memberId)
-  if (invalidRequest) {
-    return reply.code(403).send(invalidRequest)
-  }
+  // TODO: refactor to use personalTrainerValidate
+  // const invalidRequest = await personalTrainerValidate(userId)
+  // if (invalidRequest) {
+  //   return reply.code(403).send(invalidRequest)
+  // }
 
   try {
     const trainingRecord = await createTrainingRecord(body)
 
-    if (trainingType === 'replacement' && trainingReplacementId) {
-      await updateRealizedTrainingReplacement(trainingReplacementId)
-      await deleteTraining(body.training_id, parseFilters)
-    }
+    // TODO: refactor update training replacement to use trainingRecordId
+    // if (trainingType === 'replacement' && trainingReplacementId) {
+    //   await updateRealizedTrainingReplacement(trainingReplacementId)
+    //   await deleteTraining(body.training_id, parseFilters)
+    // }
 
     return reply.code(201).send(trainingRecord)
   } catch (e) {
@@ -65,6 +64,23 @@ export async function getManyTrainingRecordsHandler(
 
   try {
     const findMany = await findManyTrainingRecords(filters, parseFilters)
+
+    return reply.code(200).send(findMany)
+  } catch (e: any) {
+    console.log(e)
+  }
+}
+
+export async function getManyTrainingRecordsStatusHandler(
+  request: FastifyRequest<{
+    Querystring: TrainingRecordsQueryString
+  }>,
+  reply: FastifyReply
+) {
+  const filters = request.query
+
+  try {
+    const findMany = await findManyTrainingRecordsStatus(filters)
 
     return reply.code(200).send(findMany)
   } catch (e: any) {

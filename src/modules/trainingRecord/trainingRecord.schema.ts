@@ -12,41 +12,43 @@ const trainingRecordDateCreated = {
 }
 
 const trainingRecordInput = {
-  type: trainingTypes,
   status: trainingStatus,
-  training_id: z.string(),
-  personal_trainer_id: z.string(),
-  member_id: z.string(),
-  training_replacement_id: z.string().nullable().optional(),
-  realized: z.boolean().optional().default(true)
+  training_id: z.string()
 }
 
 const trainingRecordCount = {
   count: z.number()
 }
+const userArraySchema = z
+  .array(
+    z.object({
+      id: z.string().optional(),
+      name: z.string().optional()
+    })
+  )
+  .optional()
+
+const UserObjectSchema = z
+  .object({
+    id: z.string().optional(),
+    name: z.string().optional()
+  })
+  .optional()
+
+const userStringSchema = z.string().optional()
+
+const userSchema = z.union([userArraySchema, UserObjectSchema, userStringSchema])
 
 const trainingRecordResume = {
   ...trainingRecordId,
-  type: trainingTypes,
-  status: trainingStatus,
-  training_id: z.string(),
-  personal_trainer: z.object({
-    user: z.object({
-      name: z.string(),
-      id: z.string().optional()
-    })
-  }),
-  member: z.object({
-    user: z.object({
-      name: z.string(),
-      id: z.string().optional()
-    })
-  }),
-  training: z.object({
-    modality: z.string()
-  }),
+  ...trainingRecordInput,
+  modality: z.string(),
+  type: z.string(),
+  personal_trainer: userSchema,
+  members: userSchema,
   ...trainingRecordDateCreated
 }
+
 const trainingRecordFindUniqueSchema = z.object({
   ...trainingRecordResume
 })
@@ -59,6 +61,13 @@ const trainingRecordFindManyScheme = z.object({
     })
   )
 })
+
+const trainingRecordStatusFindManyScheme = z.array(
+  z.object({
+    training_id: z.string(),
+    status: trainingStatus
+  })
+)
 
 const trainingRecordsQueryStringSchema = z.object({
   id: z.string().optional(),
@@ -92,7 +101,8 @@ export const { schemas: trainingRecordSchemas, $ref } = buildJsonSchemas(
     trainingRecordFindUniqueSchema,
     TrainingRecordIdSchema,
     updateTrainingRecordSchema,
-    trainingRecordsQueryStringSchema
+    trainingRecordsQueryStringSchema,
+    trainingRecordStatusFindManyScheme
   },
   { $id: 'TrainingRecordSchemas' }
 )

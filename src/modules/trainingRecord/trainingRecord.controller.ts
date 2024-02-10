@@ -5,7 +5,8 @@ import {
   getUniqueTrainingRecordHandler,
   getManyTrainingRecordsHandler,
   registerTrainingRecordHandler,
-  updateTrainingRecordHandler
+  updateTrainingRecordHandler,
+  getManyTrainingRecordsStatusHandler
 } from './trainingRecord.service'
 import { tags, trainingRecordRoutesPath, trainingRecordSummary } from '../../utils/enumsController'
 
@@ -31,6 +32,28 @@ async function trainingRecordRoutes(server: FastifyInstance) {
       }
     },
     getManyTrainingRecordsHandler
+  )
+
+  server.get(
+    trainingRecordRoutesPath.findAllStatus,
+    {
+      preHandler: [server.authenticate],
+      schema: {
+        tags: [tags.trainingRecord],
+        summary: trainingRecordSummary.findAllStatus,
+        querystring: {
+          type: 'object',
+          properties: {
+            created_at_gte: { type: 'string' },
+            created_at_lte: { type: 'string' }
+          }
+        },
+        response: {
+          200: $ref('trainingRecordStatusFindManyScheme')
+        }
+      }
+    },
+    getManyTrainingRecordsStatusHandler
   )
 
   server.get(
