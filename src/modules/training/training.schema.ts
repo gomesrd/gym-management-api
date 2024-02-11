@@ -38,9 +38,7 @@ const trainingInput = {
 }
 
 const trainingReplacement = {
-  id: z.string().optional(),
-  member_id: z.string(),
-  realized: z.boolean()
+  member_id: z.string().array().nonempty()
 }
 
 const trainingReplacementResponse = {
