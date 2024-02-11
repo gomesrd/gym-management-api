@@ -15,9 +15,12 @@ import {
   findManyTrainingRecordsStatus
 } from './trainingRecord.repository'
 import { personalTrainerValidate } from '../../utils/permissions.service'
-import { deleteTraining } from '../training/training/training.repository'
+import { deleteTraining, findUniqueTraining } from '../training/training/training.repository'
 import { parseFiltersPermission, parseFiltersTraining } from '../../utils/parseFilters'
-import { updateRealizedTrainingReplacement } from '../training/replacement/trainingReplacement.repository'
+import {
+  createTrainingReplacement,
+  updateRealizedTrainingReplacement
+} from '../training/replacement/trainingReplacement.repository'
 
 export async function registerTrainingRecordHandler(
   request: FastifyRequest<{
@@ -28,6 +31,10 @@ export async function registerTrainingRecordHandler(
   const body = request.body
   const userId = request.user.id
   const parseFilters = await parseFiltersPermission(userId)
+  const trainingType = body.type
+  const replacement = body.replacement
+  const status = body.status
+  const trainingReplacementId = body.training_replacement_id
 
   // TODO: refactor to use personalTrainerValidate
   // const invalidRequest = await personalTrainerValidate(userId)
@@ -36,15 +43,35 @@ export async function registerTrainingRecordHandler(
   // }
 
   try {
-    const trainingRecord = await createTrainingRecord(body)
+    if (trainingType === 'plan' && replacement && status === 'foul') {
+      await createTrainingRecord(body)
+      const findMembersIdTraining = await findUniqueTraining(body.training_id, parseFilters)
+      const member_id = findMembersIdTraining?.members?.map(member => member.id) as [string, ...string[]]
+      if (member_id) {
+        await createTrainingReplacement({ member_id })
 
-    // TODO: refactor update training replacement to use trainingRecordId
-    // if (trainingType === 'replacement' && trainingReplacementId) {
-    //   await updateRealizedTrainingReplacement(trainingReplacementId)
+        return reply.code(201).send('')
+      }
+    }
+
+    if (trainingType === 'replacement') {
+      const trainingRecord = await createTrainingRecord(body)
+      await deleteTraining(body.training_id, parseFilters)
+      await updateRealizedTrainingReplacement(trainingReplacementId as string)
+
+      return reply.code(201).send(trainingRecord)
+    }
+
+    // else if (trainingType === 'singular') {
+    //  const trainingRecord = await createTrainingRecord(body)
     //   await deleteTraining(body.training_id, parseFilters)
+    //   return reply.code(201).send(trainingRecord)
     // }
+    else {
+      const trainingRecord = await createTrainingRecord(body)
 
-    return reply.code(201).send(trainingRecord)
+      return reply.code(201).send(trainingRecord)
+    }
   } catch (e) {
     console.log(e)
 
