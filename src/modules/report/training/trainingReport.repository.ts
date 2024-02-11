@@ -33,12 +33,12 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
     }
   })
 
-  const totalTrainingsPendingReplacement = await prisma.trainingReplacement.count({
-    where: {
-      member_id: memberId,
-      realized: false
-    }
-  })
+  // const totalTrainingsPendingReplacement = await prisma.trainingReplacement.count({
+  //   where: {
+  //     member_id: memberId,
+  //     realized: false
+  //   }
+  // })
 
   const totalTrainings = totalRegularTrainingsRealized + totalTrainingsFoul + totalTrainingsReplacement
 
@@ -58,6 +58,6 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
     totalTrainingsFoul: totalTrainingsFoul,
     totalTrainingsReplacement: totalTrainingsReplacement,
     totalTraining: totalTrainings,
-    totalTrainingsPendingReplacement: totalTrainingsPendingReplacement
+    totalTrainingsPendingReplacement: 1
   }
 }
