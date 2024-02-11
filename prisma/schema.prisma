@@ -103,12 +103,12 @@ model PersonalTrainer {
 }
 
 model Member {
-  id                  String                @id @unique @default(uuid()) @db.Uuid
-  user_id             String                @unique @db.Uuid
-  user                Users                 @relation(fields: [user_id], references: [id])
-  MemberPlan          MemberPlan[]
-  TrainingReplacement TrainingReplacement[]
-  MemberTraining      MemberTraining[]
+  id                String              @id @unique @default(uuid()) @db.Uuid
+  user_id           String              @unique @db.Uuid
+  user              Users               @relation(fields: [user_id], references: [id])
+  MemberPlan        MemberPlan[]
+  MemberTraining    MemberTraining[]
+  MemberReplacement MemberReplacement[]
 
   @@map("member")
 }
@@ -125,9 +125,9 @@ model Training {
   created_at              DateTime             @default(now())
   updated_at              DateTime             @updatedAt
   personal_trainer_id     String               @db.Uuid
-  training_replacement_id String?              @unique @db.Uuid
-  training_replacement    TrainingReplacement? @relation(fields: [training_replacement_id], references: [id])
+  training_replacement_id String?              @db.Uuid
   personal_trainer        PersonalTrainer      @relation(fields: [personal_trainer_id], references: [user_id])
+  TrainingReplacement     TrainingReplacement? @relation(fields: [training_replacement_id], references: [id])
   training_record         TrainingRecord[]
   MemberTraining          MemberTraining[]
 
@@ -146,6 +146,16 @@ model MemberTraining {
   @@map("member_training")
 }
 
+model MemberReplacement {
+  id                  String              @id @unique @default(uuid()) @db.Uuid
+  replacement_id      String              @db.Uuid
+  member_id           String              @db.Uuid
+  TrainingReplacement TrainingReplacement @relation(fields: [replacement_id], references: [id])
+  Member              Member              @relation(fields: [member_id], references: [user_id])
+
+  @@map("member_replacement")
+}
+
 model TrainingRecord {
   id          String   @id @unique @default(uuid()) @db.Uuid
   status      Status   @default(realized)
@@ -158,13 +168,12 @@ model TrainingRecord {
 }
 
 model TrainingReplacement {
-  id         String     @id @unique @default(uuid()) @db.Uuid
-  realized   Boolean?   @default(false) @db.Boolean()
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  member_id  String     @db.Uuid
-  member     Member     @relation(fields: [member_id], references: [user_id])
-  Training   Training[]
+  id                String              @id @unique @default(uuid()) @db.Uuid
+  realized          Boolean?            @default(false) @db.Boolean()
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+  Training          Training[]
+  MemberReplacement MemberReplacement[]
 
   @@map("training_replacement")
 }
