@@ -13,7 +13,10 @@ const trainingRecordDateCreated = {
 
 const trainingRecordInput = {
   status: trainingStatus,
-  training_id: z.string()
+  training_id: z.string(),
+  type: trainingTypes,
+  replacement: z.boolean(),
+  training_replacement_id: z.string().optional()
 }
 
 const trainingRecordCount = {
