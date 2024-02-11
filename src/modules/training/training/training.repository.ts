@@ -4,7 +4,7 @@ import { DaysOfWeek, Filters } from '../../../utils/common.schema'
 import { FiltersPermissions } from '../../../utils/types'
 
 export async function createTraining(input: CreateTrainingInput) {
-  const { training, training_replacement_id, personal_trainer_id, member_id, modality, type } = input
+  const { training_replacement_id, training, personal_trainer_id, member_id, modality, type } = input
 
   try {
     const createManyTraining = await prisma.$transaction(
@@ -17,8 +17,8 @@ export async function createTraining(input: CreateTrainingInput) {
             ends_at: training.ends_at,
             modality: modality,
             type: type,
-            training_replacement_id: training_replacement_id,
             personal_trainer_id: personal_trainer_id,
+            training_replacement_id: training_replacement_id,
             MemberTraining: {
               createMany: {
                 data: member_id.map(member => {
@@ -137,8 +137,8 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
       starts_at: true,
       ends_at: true,
       modality: true,
-      training_replacement_id: true,
       type: true,
+      training_replacement_id: true,
       personal_trainer: {
         select: {
           user: {
@@ -183,7 +183,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
 }
 
 export async function updateTraining(dataUpdate: UpdateTraining, trainingId: string, parseFilters: FiltersPermissions) {
-  const { modality, personal_trainer_id, type, training, training_replacement_id, active } = dataUpdate
+  const { modality, personal_trainer_id, type, training, active } = dataUpdate
 
   try {
     return await prisma.training.update({
