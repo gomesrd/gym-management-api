@@ -15,7 +15,7 @@ const trainingRecordInput = {
   status: trainingStatus,
   training_id: z.string(),
   type: trainingTypes,
-  replacement: z.boolean(),
+  replacement: z.boolean().nullable().optional(),
   training_replacement_id: z.string().optional()
 }
 
