@@ -22,6 +22,7 @@ export async function registerTrainingHandler(
   const body = request.body
   const personalTrainerId = body.personal_trainer_id
   const personalTrainerValidate = personalTrainerId === request.user.id
+
   if (!personalTrainerValidate) {
     return reply.code(403).send('You can only register trainings for yourself')
   }
@@ -29,7 +30,7 @@ export async function registerTrainingHandler(
   try {
     const create = await createTraining(body)
 
-    return reply.code(201).send('')
+    if (create) return reply.code(201).send('')
   } catch (e: any) {
     console.log(e)
     if (e.code === 'P2002') {
