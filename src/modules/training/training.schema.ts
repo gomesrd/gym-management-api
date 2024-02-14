@@ -40,16 +40,23 @@ const trainingInput = {
 const trainingReplacement = {
   member_id: z.string().array().nonempty()
 }
+const userArraySchema = z
+  .array(
+    z.object({
+      id: z.string().optional()
+    })
+  )
+  .optional()
+
+const userStringSchema = z.string().optional()
+
+const userSchema = z.union([userArraySchema, userStringSchema])
 
 const trainingReplacementResponse = {
   id: z.string().optional(),
-  realized: z.boolean(),
-  member: z.object({
-    user: z.object({
-      id: z.string(),
-      name: z.string()
-    })
-  })
+  realized: z.boolean().optional(),
+  members: userSchema,
+  ...dateCreatedUpdated
 }
 
 const usersResume = {
@@ -83,8 +90,7 @@ const trainingFindUniqueSchema = z.object({
 })
 
 const trainingReplacementFindUniqueSchema = z.object({
-  ...trainingReplacementResponse,
-  ...dateCreatedUpdated
+  ...trainingReplacementResponse
 })
 
 export const trainingIdSchema = {
