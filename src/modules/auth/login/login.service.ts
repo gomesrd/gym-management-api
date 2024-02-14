@@ -13,19 +13,18 @@ export async function loginHandler(
 ) {
   const body = request.body
   const email = body.email
-  const user = await findPersonalTrainerByEmailCpf(email)
-
-  if (!user) return reply.code(401).send(invalidLogin)
-
-  const correctPassword = verifyPassword({
-    candidatePassword: body.password,
-    salt: user.salt,
-    hash: user.password
-  })
-
-  if (!correctPassword) return reply.code(401).send(invalidLogin)
 
   try {
+    const user = await findPersonalTrainerByEmailCpf(email)
+
+    if (!user) return reply.code(401).send(invalidLogin)
+
+    const correctPassword = await verifyPassword({
+      candidatePassword: body.password,
+      salt: user.salt,
+      hash: user.password
+    })
+
     const { id, name, role } = user
     const userData = { id, name, role }
 
@@ -33,9 +32,7 @@ export async function loginHandler(
     const accessToken = server.jwt.sign(userData)
 
     return reply.code(200).send({ accessToken })
-  } catch (e) {
-    console.log(e)
-
-    return replyErrorDefault(reply)
+  } catch (e: any) {
+    return reply.code(401).send(invalidLogin)
   }
 }
