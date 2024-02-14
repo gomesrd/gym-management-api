@@ -38,7 +38,7 @@ export async function createTraining(input: CreateTrainingInput) {
 
     return createManyTraining
   } catch (error) {
-    console.log(error)
+    throw error
   }
 }
 
