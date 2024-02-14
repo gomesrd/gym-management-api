@@ -23,24 +23,33 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
     }
   })
 
-  const totalTrainingsReplacement = await prisma.trainingRecord.count({
+  const totalTrainingsReplacement = await prisma.trainingReplacement.count({
     where: {
       created_at: {
         gte: filters.created_at_gte,
         lte: filters.created_at_lte
       },
-      status: Status.realized
+      realized: true,
+      MemberReplacement: {
+        some: {
+          member_id: memberId
+        }
+      }
     }
   })
 
-  // const totalTrainingsPendingReplacement = await prisma.trainingReplacement.count({
-  //   where: {
-  //     member_id: memberId,
-  //     realized: false
-  //   }
-  // })
+  const totalTrainingsPendingReplacement = await prisma.trainingReplacement.count({
+    where: {
+      MemberReplacement: {
+        some: {
+          member_id: memberId
+        }
+      },
+      realized: false
+    }
+  })
 
-  const totalTrainings = totalRegularTrainingsRealized + totalTrainingsFoul + totalTrainingsReplacement
+  const totalTrainings = totalRegularTrainingsRealized + totalTrainingsFoul - totalTrainingsReplacement
 
   const memberData = await prisma.users.findUnique({
     where: {
@@ -55,9 +64,9 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
   return {
     member: memberData,
     totalRegularTrainingsRealized: totalRegularTrainingsRealized,
-    totalTrainingsFoul: totalTrainingsFoul,
     totalTrainingsReplacement: totalTrainingsReplacement,
+    totalTrainingsFoul: totalTrainingsFoul,
     totalTraining: totalTrainings,
-    totalTrainingsPendingReplacement: 1
+    totalTrainingsPendingReplacement: totalTrainingsPendingReplacement
   }
 }
