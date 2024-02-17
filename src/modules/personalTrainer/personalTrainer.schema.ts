@@ -34,7 +34,8 @@ const personalTrainerResume = {
 const updatePersonalTrainerSchema = z.object({
   email: z.string().email().optional(),
   name: z.string().optional(),
-  phone: z.string().optional()
+  phone: z.string().optional(),
+  birth_date: z.string().optional()
 })
 
 export const personalTrainerIdSchema = {

@@ -134,7 +134,7 @@ export async function createPersonalTrainer(input: CreatePersonalTrainerInput, h
 }
 
 export async function updatePersonalTrainer(dataUpdate: UpdatePersonalTrainer, personalTrainerId: string) {
-  const { name, email, phone } = dataUpdate
+  const { name, email, phone, birth_date } = dataUpdate
 
   return prisma.users.update({
     where: {
@@ -143,7 +143,8 @@ export async function updatePersonalTrainer(dataUpdate: UpdatePersonalTrainer, p
     data: {
       name: name,
       email: email,
-      phone: phone
+      phone: phone,
+      birth_date: birth_date
     }
   })
 }
