@@ -34,7 +34,9 @@ const filtersSchema = z.object({
   training_id: z.string().optional(),
   type: trainingTypes.optional(),
   training_date: z.string().optional(),
-  realized: z.string().optional()
+  realized: z.string().optional(),
+  page: z.number().optional().default(1),
+  pageSize: z.number().optional().default(10)
 })
 
 export const usersAddress = {
@@ -61,6 +63,11 @@ export const userCore = {
 
 export const userPassword = {
   password: z.string()
+}
+
+export const pageable = {
+  page: z.number().optional(),
+  pageSize: z.number().optional()
 }
 
 export const dateCreatedUpdated = {
