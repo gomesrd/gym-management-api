@@ -10,7 +10,6 @@ import {
   findMemberById
 } from './member.repository'
 import { CreateMemberInput, UpdateMember } from './member.schema'
-import { verifyPassword } from '../../utils/hash'
 import { server } from '../../app'
 import {
   Filters,
@@ -24,7 +23,7 @@ import { verifyPermissionActionOnlyMember } from '../../utils/permissions.servic
 import { MemberId } from '../../utils/types'
 import { replyErrorDefault } from '../../utils/error'
 import { parseFiltersPermission } from '../../utils/parseFilters'
-import { findPersonalTrainerById } from '../personalTrainer/personalTrainer.repository'
+import { cognitoCreateAccount } from '../../config/aws/cognitoAuth'
 
 export async function getManyMembersHandler(
   request: FastifyRequest<{
@@ -106,12 +105,24 @@ export async function registerMemberHandler(
 ) {
   const body = request.body
   const cpf = body.cpf
+  const { email, password, name } = body
 
   const verifyMember = await findMemberByEmailCpf(undefined, cpf)
   if (verifyMember) return reply.code(400).send(memberExists)
 
   try {
-    const member = await createMember(body)
+    const createUserCognito = await cognitoCreateAccount({
+      username: email,
+      password: password,
+      role: 'member',
+      name: name
+    })
+
+    if (!createUserCognito) return reply.code(500).send('Error creating user in cognito')
+
+    const { userSub } = createUserCognito
+
+    const member = await createMember(body, userSub)
 
     return reply.code(201).send(member)
   } catch (e: any) {
