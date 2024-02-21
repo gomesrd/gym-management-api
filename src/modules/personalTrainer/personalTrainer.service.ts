@@ -26,6 +26,7 @@ import {
   personalTrainerNotFound
 } from '../../utils/common.schema'
 import { replyErrorDefault } from '../../utils/error'
+import { cognitoCreateAccount } from '../../config/aws/cognitoAuth'
 
 export async function getManyPersonalTrainersHandler(
   request: FastifyRequest<{
@@ -33,9 +34,9 @@ export async function getManyPersonalTrainersHandler(
   }>,
   reply: FastifyReply
 ): Promise<PersonalTrainersManyResponse | undefined> {
-  const userid = request.user.id
+  const userId = request.user.id
   const filters = request.query
-  const parseFilters = await parseFiltersTraining(filters, userid)
+  const parseFilters = await parseFiltersTraining(filters, userId)
 
   try {
     const findPersonalTrainers = await findManyPersonalTrainers(filters, parseFilters)
@@ -85,15 +86,24 @@ export async function registerPersonalTrainerHandler(
 ) {
   const body = request.body
   const password = body.password
-  const { hash, salt } = hashPassword(password)
-  const cpf = body.cpf
-  const email = body.email
+  const { cpf, email, role, name } = body
 
   const personalTrainer = await findPersonalTrainerByEmailCpf(email, cpf)
   if (personalTrainer) return reply.code(400).send(personalTrainerExists)
 
   try {
-    const personalTrainer = await createPersonalTrainer(body, hash, salt)
+    const createUserCognito = await cognitoCreateAccount({
+      username: email,
+      password: password,
+      role: role,
+      name: name
+    })
+
+    if (!createUserCognito) return reply.code(500).send('Error creating user in cognito')
+
+    const { userSub } = createUserCognito
+
+    const personalTrainer = await createPersonalTrainer(body, userSub)
 
     return reply.code(201).send(personalTrainer)
   } catch (e: any) {
@@ -114,14 +124,6 @@ export async function loginHandler(
   const personalTrainer = await findPersonalTrainerByEmailCpf(email)
 
   if (!personalTrainer) return reply.code(401).send(invalidLogin)
-
-  const correctPassword = verifyPassword({
-    candidatePassword: body.password,
-    salt: personalTrainer.salt,
-    hash: personalTrainer.password
-  })
-
-  if (!correctPassword) return reply.code(401).send(invalidLogin)
 
   try {
     const { id, name, role } = personalTrainer
