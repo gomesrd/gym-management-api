@@ -1,8 +1,7 @@
 import { FastifyInstance } from 'fastify'
-import { loginHandler } from './login.service'
+import { requestLoginCognito } from './login.service'
 import { $ref } from './login.schema'
 import { tags, usersSummary } from '../../../utils/enumsController'
-import { responseInvalidLogin } from '../../../utils/common.schema'
 
 async function authRoutes(server: FastifyInstance) {
   server.post(
@@ -13,12 +12,11 @@ async function authRoutes(server: FastifyInstance) {
         summary: usersSummary.login,
         body: $ref('loginSchema'),
         response: {
-          200: $ref('loginResponseSchema'),
-          401: responseInvalidLogin
+          200: $ref('loginResponseSchema')
         }
       }
     },
-    loginHandler
+    requestLoginCognito
   )
 }
 
