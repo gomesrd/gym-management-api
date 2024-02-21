@@ -1,38 +1,53 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { findPersonalTrainerByEmailCpf } from './login.repository'
-import { verifyPassword } from '../../../utils/hash'
-import { server } from '../../../app'
 import { invalidLogin, LoginInput } from '../../../utils/common.schema'
-import { replyErrorDefault } from '../../../utils/error'
+import { CognitoUserSession } from 'amazon-cognito-identity-js'
+import { cognitoAuthLogin, ILoginData } from '../../../config/aws/cognitoAuth'
 
-export async function loginHandler(
+export interface LoggedUser {
+  idToken: {
+    jwtToken: string
+  }
+  refreshToken: {
+    token: string
+  }
+}
+
+export async function requestLoginCognito(
   request: FastifyRequest<{
     Body: LoginInput
   }>,
   reply: FastifyReply
 ) {
   const body = request.body
-  const email = body.email
+  const data: ILoginData = {
+    username: body.email,
+    password: body.password
+  }
+  const user = await findPersonalTrainerByEmailCpf(body.email)
 
+  if (!user) return reply.code(401).send(invalidLogin)
+
+  const { authenticationDetails, cognitoUserLogin } = cognitoAuthLogin(data)
   try {
-    const user = await findPersonalTrainerByEmailCpf(email)
-
-    if (!user) return reply.code(401).send(invalidLogin)
-
-    const correctPassword = await verifyPassword({
-      candidatePassword: body.password,
-      salt: user.salt,
-      hash: user.password
+    const session: CognitoUserSession = await new Promise((resolve, reject) => {
+      cognitoUserLogin.authenticateUser(authenticationDetails, {
+        onSuccess: (session: CognitoUserSession) => resolve(session),
+        onFailure: (err: any) => reject(err)
+      })
     })
 
-    const { id, name, role } = user
-    const userData = { id, name, role }
+    const loggedUser: LoggedUser = {
+      idToken: {
+        jwtToken: session.getIdToken().getJwtToken()
+      },
+      refreshToken: {
+        token: session.getRefreshToken().getToken()
+      }
+    }
 
-    // const expiresIn = 60 * 120;
-    const accessToken = server.jwt.sign(userData)
-
-    return reply.code(200).send({ accessToken })
-  } catch (e: any) {
-    return reply.code(401).send(invalidLogin)
+    reply.code(200).send({ loggedUser })
+  } catch (error: any) {
+    throw error
   }
 }
