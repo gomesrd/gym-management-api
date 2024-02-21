@@ -16,7 +16,7 @@ export async function getManyReportTrainingHandler(
     personal_trainer_id,
     created_at_gte,
     created_at_lte
-  }
+  } as Filters
 
   return await getManyReportTrainingRepository(filters, memberId)
 }

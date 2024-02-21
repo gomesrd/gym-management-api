@@ -21,6 +21,7 @@ import {
   createTrainingReplacement,
   updateRealizedTrainingReplacement
 } from '../training/replacement/trainingReplacement.repository'
+import { Filters } from '../../utils/common.schema'
 
 export async function registerTrainingRecordHandler(
   request: FastifyRequest<{
@@ -81,7 +82,7 @@ export async function registerTrainingRecordHandler(
 
 export async function getManyTrainingRecordsHandler(
   request: FastifyRequest<{
-    Querystring: TrainingRecordsQueryString
+    Querystring: Filters
   }>,
   reply: FastifyReply
 ) {
@@ -100,7 +101,7 @@ export async function getManyTrainingRecordsHandler(
 
 export async function getManyTrainingRecordsStatusHandler(
   request: FastifyRequest<{
-    Querystring: TrainingRecordsQueryString
+    Querystring: Filters
   }>,
   reply: FastifyReply
 ) {
