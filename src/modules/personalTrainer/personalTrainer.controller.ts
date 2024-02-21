@@ -55,7 +55,7 @@ async function personalTrainerRoutes(server: FastifyInstance) {
   server.post(
     personalTrainerRoutesPath.register,
     {
-      preHandler: [server.authenticate, server.authorizationExclusive],
+      // preHandler: [server.authenticate, server.authorizationExclusive],
       schema: {
         tags: [tags.personalTrainer],
         summary: personalTrainerSummary.register,
