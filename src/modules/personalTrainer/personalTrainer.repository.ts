@@ -87,8 +87,6 @@ export async function findUniquePersonalTrainer(filters: FiltersPermissions) {
           occupation: true
         }
       },
-      password: false,
-      salt: false,
       role: true,
       created_at: true,
       updated_at: true
@@ -96,7 +94,7 @@ export async function findUniquePersonalTrainer(filters: FiltersPermissions) {
   })
 }
 
-export async function createPersonalTrainer(input: CreatePersonalTrainerInput, hash: string, salt: string) {
+export async function createPersonalTrainer(input: CreatePersonalTrainerInput, userId: string) {
   const {
     cpf,
     email,
@@ -110,14 +108,13 @@ export async function createPersonalTrainer(input: CreatePersonalTrainerInput, h
 
   return prisma.users.create({
     data: {
+      id: userId,
       name,
       cpf,
       birth_date,
       email,
       phone,
       role,
-      salt,
-      password: hash,
       users_address: {
         create: users_address
       },
