@@ -5,8 +5,8 @@ import { parseFiltersCommon } from '../../utils/parseFilters'
 import { Filters } from '../../utils/common.schema'
 import { FiltersPermissions } from '../../utils/types'
 
-export async function createMember(input: CreateMemberInput) {
-  const { cpf, email, birth_date, phone, name } = input
+export async function createMember(input: CreateMemberInput, userId: string) {
+  const { cpf, email, birth_date, phone, name, users_address } = input
 
   return prisma.users.create({
     data: {
@@ -17,6 +17,9 @@ export async function createMember(input: CreateMemberInput) {
       phone,
       member: {
         create: {}
+      },
+      users_address: {
+        create: users_address
       }
     }
   })
