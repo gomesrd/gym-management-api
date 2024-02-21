@@ -6,9 +6,7 @@ import { Filters } from '../../utils/common.schema'
 import { FiltersPermissions } from '../../utils/types'
 
 export async function createMember(input: CreateMemberInput) {
-  const { password, cpf, email, birth_date, phone, name } = input
-
-  const { hash, salt } = hashPassword(password)
+  const { cpf, email, birth_date, phone, name } = input
 
   return prisma.users.create({
     data: {
@@ -17,8 +15,6 @@ export async function createMember(input: CreateMemberInput) {
       birth_date,
       email,
       phone,
-      salt,
-      password: hash,
       member: {
         create: {}
       }
@@ -97,8 +93,6 @@ export async function findUniqueMember(parseFilters: FiltersPermissions) {
       birth_date: true,
       email: true,
       phone: true,
-      password: false,
-      salt: false,
       deleted: true,
       created_at: true,
       updated_at: true

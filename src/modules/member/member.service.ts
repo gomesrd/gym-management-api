@@ -134,11 +134,6 @@ export async function loginHandler(
   if (!member) return reply.code(401).send(invalidLogin)
 
   try {
-    await verifyPassword({
-      candidatePassword: body.password,
-      salt: member.salt,
-      hash: member.password
-    })
     const { id, name } = member
     const dataMember = { id, name }
     const expiresIn = 60 * 120
