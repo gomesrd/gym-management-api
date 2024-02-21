@@ -81,7 +81,14 @@ export const loginSchema = z.object({
 })
 
 export const loginResponseSchema = z.object({
-  accessToken: z.string()
+  loggedUser: z.object({
+    idToken: z.object({
+      jwtToken: z.string()
+    }),
+    refreshToken: z.object({
+      token: z.string()
+    })
+  })
 })
 
 export const responseDeleteSchema = {
