@@ -64,8 +64,6 @@ model Users {
   birth_date       String           @db.VarChar()
   email            String           @unique @db.VarChar()
   phone            String           @db.VarChar()
-  password         String           @db.Text
-  salt             String           @db.Text
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
   deleted          Boolean?         @default(false) @db.Boolean()
