@@ -134,6 +134,5 @@ export async function deleteTrainingHandler(
   }
 }
 
-
 // TODO - É necessário validar se a aula a ser criada não está em um horário já ocupado
 // TODO - Treino de reposição só pode ser criado com a presença do replacement_id
