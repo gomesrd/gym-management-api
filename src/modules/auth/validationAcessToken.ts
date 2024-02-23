@@ -41,9 +41,9 @@ export async function validationAcessToken(server: FastifyInstance) {
     const token = authHeader.replace('Bearer ', '')
 
     const verifier = CognitoJwtVerifier.create({
-      userPoolId: 'us-east-1_XqCpDsHSq',
+      userPoolId: process.env.USER_POOL_ID as string,
       tokenUse: 'id',
-      clientId: 'e4jflpv3k84m3ts6j4i21353r'
+      clientId: process.env.USER_POOL_APP_CLIENT_ID as string
     })
 
     try {
