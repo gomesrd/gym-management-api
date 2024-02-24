@@ -29,9 +29,5 @@ Thumbs.db
 
 # Env files
 .env
-.env.dev
-.env.local
-.env.prod
-.env.docker
 ngrok.yml
 
