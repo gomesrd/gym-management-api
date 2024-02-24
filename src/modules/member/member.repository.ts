@@ -36,6 +36,9 @@ export async function findMemberByEmailCpf(email?: string | undefined, cpf?: str
 
 export async function findManyMembers(filters: Filters, userId: string) {
   const applyFilters = await parseFiltersCommon(filters, userId)
+  const page = filters?.page || 1
+  const pageSize = filters?.pageSize || 10
+  const skip = (page - 1) * pageSize
 
   const membersCount = await prisma.users.count({
     where: {
@@ -63,11 +66,15 @@ export async function findManyMembers(filters: Filters, userId: string) {
       id: true,
       name: true,
       deleted: true
-    }
+    },
+    skip: skip,
+    take: pageSize
   })
 
   return {
-    count: membersCount,
+    countAll: membersCount,
+    page: page,
+    pageSize: pageSize,
     data: members
   }
 }
