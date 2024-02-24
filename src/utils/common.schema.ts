@@ -14,7 +14,7 @@ export const trainingStatus = z.enum(['realized', 'foul'])
 
 export const trainingTypes = z.enum(['plan', 'singular', 'replacement'])
 
-const filtersSchema = z.object({
+export const filtersSchema = z.object({
   cpf: z.string().optional(),
   created_at_gte: z.string().optional(),
   created_at_lte: z.string().optional(),
@@ -35,8 +35,8 @@ const filtersSchema = z.object({
   type: trainingTypes.optional(),
   training_date: z.string().optional(),
   realized: z.string().optional(),
-  page: z.number().optional().default(1),
-  pageSize: z.number().optional().default(10)
+  page: z.number().gte(1).optional(),
+  pageSize: z.number().gte(1).lte(10).optional()
 })
 
 export const usersAddress = {
@@ -65,9 +65,15 @@ export const userPassword = {
   password: z.string()
 }
 
-export const pageable = {
-  page: z.number().optional(),
-  pageSize: z.number().optional()
+export const pageableQueryString = {
+  page: { type: 'number', description: 'Page number' },
+  pageSize: { type: 'number', description: 'Page size' }
+}
+
+export const responseManyDefault = {
+  countAll: z.number(),
+  page: z.number(),
+  pageSize: z.number()
 }
 
 export const dateCreatedUpdated = {
