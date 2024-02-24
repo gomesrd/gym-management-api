@@ -1,6 +1,5 @@
 import prisma from '../../config/prisma'
 import { CreateMemberInput, UpdateMember } from './member.schema'
-import { hashPassword } from '../../utils/hash'
 import { parseFiltersCommon } from '../../utils/parseFilters'
 import { Filters } from '../../utils/common.schema'
 import { FiltersPermissions } from '../../utils/types'

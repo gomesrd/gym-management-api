@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { buildJsonSchemas } from 'fastify-zod'
-import { emailInvalid, emailRequired, passwordInvalid, passwordRequired } from './member.mesages'
 import {
-  count,
   dateCreatedUpdated,
   loginResponseSchema,
   loginSchema,
+  pageableQueryString,
+  responseManyDefault,
   userPassword,
   usersAddress
 } from '../../utils/common.schema'
@@ -49,8 +49,10 @@ export const queryAllMembersSchema = {
     cpf: { type: 'string', description: 'CPF' },
     email: { type: 'string', description: 'Email' },
     deleted: { type: 'string', description: 'true or false' },
-    name: { type: 'string', description: 'Name' }
-  }
+    name: { type: 'string', description: 'Name' },
+    ...pageableQueryString
+  },
+  required: ['page', 'pageSize']
 }
 
 export const memberIdSchema = {
@@ -92,7 +94,7 @@ const MemberUniqueResponseSchema = z.object({
 })
 
 const MembersAllResponseSchema = z.object({
-  ...count,
+  ...responseManyDefault,
   ...memberFindMany
 })
 
