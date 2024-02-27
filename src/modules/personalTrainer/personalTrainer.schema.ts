@@ -1,11 +1,12 @@
 import { z } from 'zod'
 import { buildJsonSchemas } from 'fastify-zod'
 import {
-  count,
   dateCreatedUpdated,
   loginResponseSchema,
   loginSchema,
+  pageableQueryString,
   personalTrainerOccupation,
+  responseManyDefault,
   userCore,
   userPassword,
   usersAddress,
@@ -51,8 +52,10 @@ export const queryAllPersonalTrainersSchema = {
     cpf: { type: 'string', description: 'CPF' },
     email: { type: 'string', description: 'Email' },
     name: { type: 'string', description: 'Name' },
-    occupation: { type: 'string', description: 'physical_educator or physiotherapist' }
-  }
+    occupation: { type: 'string', description: 'physical_educator or physiotherapist' },
+    ...pageableQueryString
+  },
+  required: ['page', 'pageSize']
 }
 
 const personalTrainerFindUnique = {
@@ -80,7 +83,7 @@ const PersonalTrainerUniqueResponseSchema = z.object({
 })
 
 const PersonalTrainersManyResponseSchema = z.object({
-  ...count,
+  ...responseManyDefault,
   ...personalTrainerFindMany
 })
 

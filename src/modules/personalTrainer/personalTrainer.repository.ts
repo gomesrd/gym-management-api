@@ -4,6 +4,10 @@ import { Filters } from '../../utils/common.schema'
 import { FiltersPermissions } from '../../utils/types'
 
 export async function findManyPersonalTrainers(filters: Filters, parseFilters: FiltersPermissions) {
+  const page = filters?.page || 1
+  const pageSize = filters?.pageSize || 10
+  const skip = (page - 1) * pageSize
+
   const countOfPersonalTrainers = await prisma.users.count({
     where: {
       name: {
@@ -41,7 +45,9 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
         }
       },
       deleted: true
-    }
+    },
+    skip: skip,
+    take: pageSize
   })
 
   const simplifiedResult = personalTrainers.map(user => ({
@@ -53,7 +59,9 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
 
   return {
     data: simplifiedResult,
-    count: countOfPersonalTrainers
+    countAll: countOfPersonalTrainers,
+    page: page,
+    pageSize: pageSize
   }
 }
 
