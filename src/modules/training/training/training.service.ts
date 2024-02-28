@@ -52,9 +52,8 @@ export async function getManyTrainingsHandler(
   const userId = request.user.id
   const filters = request.query
   const parseFilters = await parseFiltersTraining(filters, userId)
-  const dayTraining = await getDayTraining(filters.training_date)
   try {
-    const findMany = await findManyTrainings(filters, parseFilters, dayTraining)
+    const findMany = await findManyTrainings(filters, parseFilters)
 
     return reply.code(200).send(findMany)
   } catch (e) {

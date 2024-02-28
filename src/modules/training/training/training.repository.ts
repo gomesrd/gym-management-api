@@ -42,11 +42,11 @@ export async function createTraining(input: CreateTrainingInput) {
   }
 }
 
-export async function findManyTrainings(
-  filters: Filters,
-  parseFilters: FiltersPermissions,
-  dayTraining: DaysOfWeek | undefined
-) {
+export async function findManyTrainings(filters: Filters, parseFilters: FiltersPermissions) {
+  const page = filters?.page || 1
+  const pageSize = filters?.pageSize || 10
+  const skip = (page - 1) * pageSize
+
   const filtersTraining = {
     OR: [
       {
@@ -109,6 +109,8 @@ export async function findManyTrainings(
         }
       }
     },
+    skip: skip,
+    take: pageSize,
     orderBy: [{ regular_training: 'asc' }, { starts_at: 'asc' }]
   })
 
@@ -118,8 +120,10 @@ export async function findManyTrainings(
   }))
 
   return {
-    count: trainingsCount,
-    data: formattedTrainings
+    countAll: trainingsCount,
+    data: formattedTrainings,
+    page: page,
+    pageSize: pageSize
   }
 }
 

@@ -196,8 +196,10 @@ export const queryStringTraining = {
     training_id: { type: 'string' },
     training_record_id: { type: 'string' },
     member_id: { type: 'string' },
-    personal_trainer_id: { type: 'string' }
-  }
+    personal_trainer_id: { type: 'string' },
+    ...pageableQueryString
+  },
+  required: ['page', 'pageSize']
 }
 
 export type Filters = z.infer<typeof filtersSchema>

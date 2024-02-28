@@ -1,6 +1,14 @@
 import { z } from 'zod'
 import { buildJsonSchemas } from 'fastify-zod'
-import { count, dateCreatedUpdated, daysOfWeek, trainingModalities, trainingTypes } from '../../utils/common.schema'
+import {
+  count,
+  dateCreatedUpdated,
+  daysOfWeek,
+  pageableQueryString,
+  responseManyDefault,
+  trainingModalities,
+  trainingTypes
+} from '../../utils/common.schema'
 
 const trainingId = {
   id: z.string()
@@ -111,12 +119,14 @@ export const queryStringTrainingReplacement = {
   type: 'object',
   properties: {
     member_id: { type: 'string' },
-    realized: { type: 'string' }
-  }
+    realized: { type: 'string' },
+    ...pageableQueryString
+  },
+  required: ['page', 'pageSize']
 }
 
 const trainingFindManyScheme = z.object({
-  ...count,
+  ...responseManyDefault,
   data: z.array(
     z.object({
       ...trainingResume
@@ -125,7 +135,7 @@ const trainingFindManyScheme = z.object({
 })
 
 const trainingReplacementFindManyScheme = z.object({
-  ...count,
+  ...responseManyDefault,
   data: z.array(
     z.object({
       ...trainingReplacementResponse
