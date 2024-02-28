@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { buildJsonSchemas } from 'fastify-zod'
-import { trainingStatus, trainingTypes } from '../../utils/common.schema'
+import { responseManyDefault, trainingStatus, trainingTypes } from '../../utils/common.schema'
 
 const trainingRecordId = {
   id: z.string()
@@ -19,9 +19,6 @@ const trainingRecordInput = {
   training_replacement_id: z.string().optional()
 }
 
-const trainingRecordCount = {
-  count: z.number()
-}
 const userArraySchema = z
   .array(
     z.object({
@@ -57,7 +54,7 @@ const trainingRecordFindUniqueSchema = z.object({
 })
 
 const trainingRecordFindManyScheme = z.object({
-  ...trainingRecordCount,
+  ...responseManyDefault,
   data: z.array(
     z.object({
       ...trainingRecordResume

@@ -9,6 +9,7 @@ import {
   getManyTrainingRecordsStatusHandler
 } from './trainingRecord.service'
 import { tags, trainingRecordRoutesPath, trainingRecordSummary } from '../../utils/enumsController'
+import { pageableQueryString } from '../../utils/common.schema'
 
 async function trainingRecordRoutes(server: FastifyInstance) {
   server.get(
@@ -23,8 +24,10 @@ async function trainingRecordRoutes(server: FastifyInstance) {
           properties: {
             id: { type: 'string' },
             member_id: { type: 'string' },
-            personal_trainer_id: { type: 'string' }
-          }
+            personal_trainer_id: { type: 'string' },
+            ...pageableQueryString
+          },
+          required: ['page', 'pageSize']
         },
         response: {
           200: $ref('trainingRecordFindManyScheme')

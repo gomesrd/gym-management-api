@@ -21,6 +21,10 @@ export async function createTrainingRecord(input: CreateTrainingRecordInput) {
 }
 
 export async function findManyTrainingRecords(filters: Filters, parseFilters: FiltersPermissions) {
+  const page = filters?.page || 1
+  const pageSize = filters?.pageSize || 10
+  const skip = (page - 1) * pageSize
+
   const trainingRecordsCount = await prisma.trainingRecord.count({
     where: {
       training_id: filters.training_id,
@@ -78,7 +82,9 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
       },
       created_at: true,
       updated_at: true
-    }
+    },
+    skip: skip,
+    take: pageSize
   })
 
   const formatedTrainingRecords = trainingRecords.map(trainingRecord => {
@@ -92,8 +98,10 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
   })
 
   return {
-    count: trainingRecordsCount,
-    data: formatedTrainingRecords
+    countAll: trainingRecordsCount,
+    data: formatedTrainingRecords,
+    page: page,
+    pageSize: pageSize
   }
 }
 
