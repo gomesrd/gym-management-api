@@ -26,6 +26,10 @@ export async function createTrainingReplacement(input: CreateTrainingReplacement
 }
 
 export async function findManyTrainingsReplacement(filters: Filters, parseFilters: FiltersPermissions) {
+  const page = filters?.page || 1
+  const pageSize = filters?.pageSize || 10
+  const skip = (page - 1) * pageSize
+
   const countTrainingReplacement = await prisma.trainingReplacement.count({
     where: {
       realized: parseFilters.realized
@@ -53,7 +57,9 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
       },
       created_at: true,
       updated_at: true
-    }
+    },
+    skip: skip,
+    take: pageSize
   })
 
   const trainingReplacementMap = trainingReplacement.map(training => {
@@ -64,8 +70,10 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
   })
 
   return {
-    count: countTrainingReplacement,
-    data: trainingReplacementMap
+    countAll: countTrainingReplacement,
+    data: trainingReplacementMap,
+    page: page,
+    pageSize: pageSize
   }
 }
 
