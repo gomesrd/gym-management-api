@@ -59,7 +59,8 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
       updated_at: true
     },
     skip: skip,
-    take: pageSize
+    take: pageSize,
+    orderBy: [{ created_at: 'asc' }, { realized: 'asc' }]
   })
 
   const trainingReplacementMap = trainingReplacement.map(training => {
@@ -70,7 +71,7 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
   })
 
   return {
-    countAll: countTrainingReplacement,
+    totalCount: countTrainingReplacement,
     data: trainingReplacementMap,
     page: page,
     pageSize: pageSize

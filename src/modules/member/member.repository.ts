@@ -67,11 +67,12 @@ export async function findManyMembers(filters: Filters, userId: string) {
       deleted: true
     },
     skip: skip,
-    take: pageSize
+    take: pageSize,
+    orderBy: [{ name: 'asc' }]
   })
 
   return {
-    countAll: membersCount,
+    totalCount: membersCount,
     page: page,
     pageSize: pageSize,
     data: members

@@ -84,7 +84,8 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
       updated_at: true
     },
     skip: skip,
-    take: pageSize
+    take: pageSize,
+    orderBy: [{ created_at: 'asc' }, { status: 'asc' }]
   })
 
   const formatedTrainingRecords = trainingRecords.map(trainingRecord => {
@@ -98,7 +99,7 @@ export async function findManyTrainingRecords(filters: Filters, parseFilters: Fi
   })
 
   return {
-    countAll: trainingRecordsCount,
+    totalCount: trainingRecordsCount,
     data: formatedTrainingRecords,
     page: page,
     pageSize: pageSize

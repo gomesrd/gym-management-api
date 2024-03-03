@@ -47,7 +47,8 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
       deleted: true
     },
     skip: skip,
-    take: pageSize
+    take: pageSize,
+    orderBy: [{ name: 'asc' }]
   })
 
   const simplifiedResult = personalTrainers.map(user => ({
@@ -59,7 +60,7 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
 
   return {
     data: simplifiedResult,
-    countAll: countOfPersonalTrainers,
+    totalCount: countOfPersonalTrainers,
     page: page,
     pageSize: pageSize
   }

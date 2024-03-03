@@ -120,7 +120,7 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
   }))
 
   return {
-    countAll: trainingsCount,
+    totalCount: trainingsCount,
     data: formattedTrainings,
     page: page,
     pageSize: pageSize
