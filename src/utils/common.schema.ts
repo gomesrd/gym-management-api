@@ -71,7 +71,7 @@ export const pageableQueryString = {
 }
 
 export const responseManyDefault = {
-  countAll: z.number(),
+  totalCount: z.number(),
   page: z.number(),
   pageSize: z.number()
 }
