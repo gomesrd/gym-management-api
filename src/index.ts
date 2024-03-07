@@ -23,8 +23,6 @@ setupServer()
     console.error('Error: ', err)
   })
 
-// TODO - Implementar integração com cognito ou firebase
-// TODO - Criar paginação
 // TODO - Criar validação para cpf
 // TODO - Criar validação para cadastro de usuários
 // TODO - Incluir try catch em todos os endpoints
@@ -38,5 +36,4 @@ setupServer()
 // TODO - Adicionar validação para verificar se o registro do treino está sendo salvo para o member correto
 // TODO - Criar regra de negócio para verificar se o número de aulas do mês ultrapassa a quantidade de aula que o aluno tem direito
 // TODO - Adicionar o nome dos query path (id --> personal_traine_id, member_id, etc)
-// TODO - Criar método para reset de senha (apenas se não integrar com o firebase)
 // TODO - Refatorar querys complexas utilizando o $executeRaw
