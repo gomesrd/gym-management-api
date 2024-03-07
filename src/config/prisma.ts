@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
 
-const prima = new PrismaClient()
+const prisma = new PrismaClient()
 
-export default prima
+export default prisma
