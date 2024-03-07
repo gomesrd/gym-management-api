@@ -3,6 +3,7 @@ import { CreateTrainingReplacement } from '../training.schema'
 
 import { Filters } from '../../../utils/common.schema'
 import { FiltersPermissions } from '../../../utils/types'
+import { UpdateTrainingRecord } from '../../trainingRecord/trainingRecord.schema'
 
 export async function createTrainingReplacement(input: CreateTrainingReplacement) {
   const { member_id } = input
@@ -31,17 +32,13 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
   const skip = (page - 1) * pageSize
 
   const countTrainingReplacement = await prisma.trainingReplacement.count({
-    where: {
-      realized: parseFilters.realized
-    }
+    where: {}
   })
   const trainingReplacement = await prisma.trainingReplacement.findMany({
-    where: {
-      realized: parseFilters.deleted
-    },
+    where: {},
     select: {
       id: true,
-      realized: true,
+      status: true,
       MemberReplacement: {
         select: {
           Member: {
@@ -60,7 +57,7 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
     },
     skip: skip,
     take: pageSize,
-    orderBy: [{ created_at: 'asc' }, { realized: 'asc' }]
+    orderBy: [{ created_at: 'asc' }]
   })
 
   const trainingReplacementMap = trainingReplacement.map(training => {
@@ -81,8 +78,7 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
 export async function findUniqueTrainingReplacement(trainingReplacementId: string, parseFilters: FiltersPermissions) {
   const findTrainingReplacement = await prisma.trainingReplacement.findUnique({
     where: {
-      id: trainingReplacementId,
-      realized: parseFilters.realized
+      id: trainingReplacementId
     },
     select: {
       id: true,
@@ -112,13 +108,15 @@ export async function findUniqueTrainingReplacement(trainingReplacementId: strin
   }
 }
 
-export async function updateRealizedTrainingReplacement(trainingReplacementId: string) {
+export async function updateRealizedTrainingReplacement(trainingReplacementId: string, status: UpdateTrainingRecord) {
+  console.log(status.status)
+
   return prisma.trainingReplacement.update({
     where: {
       id: trainingReplacementId
     },
     data: {
-      realized: true
+      status: status.status
     }
   })
 }

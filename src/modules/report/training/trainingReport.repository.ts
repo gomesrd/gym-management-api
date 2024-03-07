@@ -29,7 +29,7 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
         gte: filters.created_at_gte,
         lte: filters.created_at_lte
       },
-      realized: true,
+      status: 'realized',
       MemberReplacement: {
         some: {
           member_id: memberId
@@ -45,7 +45,9 @@ export async function getManyReportTrainingRepository(filters: Filters, memberId
           member_id: memberId
         }
       },
-      realized: false
+      status: {
+        in: ['scheduled', 'pending']
+      }
     }
   })
 

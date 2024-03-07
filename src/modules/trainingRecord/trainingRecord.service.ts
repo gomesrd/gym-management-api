@@ -58,7 +58,7 @@ export async function registerTrainingRecordHandler(
     if (trainingType === 'replacement') {
       const trainingRecord = await createTrainingRecord(body)
       await deleteTraining(body.training_id, parseFilters)
-      await updateRealizedTrainingReplacement(trainingReplacementId as string)
+      await updateRealizedTrainingReplacement(trainingReplacementId as string, { status: 'realized' })
 
       return reply.code(201).send(trainingRecord)
     }

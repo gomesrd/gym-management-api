@@ -12,6 +12,7 @@ import { parseFiltersPermission, parseFiltersTraining } from '../../../utils/par
 import { TrainingId } from '../../../utils/types'
 import { getDayTraining } from '../../../utils/getDay'
 import { replyErrorDefault } from '../../../utils/error'
+import { updateRealizedTrainingReplacement } from '../replacement/trainingReplacement.repository'
 
 export async function registerTrainingHandler(
   request: FastifyRequest<{
@@ -20,6 +21,7 @@ export async function registerTrainingHandler(
   reply: FastifyReply
 ) {
   const body = request.body
+  const { training_replacement_id } = body
   const personalTrainerId = body.personal_trainer_id
   const personalTrainerValidate = personalTrainerId === request.user.id
 
@@ -29,6 +31,8 @@ export async function registerTrainingHandler(
 
   try {
     const create = await createTraining(body)
+    if (create && training_replacement_id)
+      await updateRealizedTrainingReplacement(training_replacement_id as string, { status: 'scheduled' })
 
     if (create) return reply.code(201).send('')
   } catch (e: any) {

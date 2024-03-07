@@ -7,6 +7,7 @@ import {
   pageableQueryString,
   responseManyDefault,
   trainingModalities,
+  trainingStatus,
   trainingTypes
 } from '../../utils/common.schema'
 
@@ -62,7 +63,7 @@ const userSchema = z.union([userArraySchema, userStringSchema])
 
 const trainingReplacementResponse = {
   id: z.string().optional(),
-  realized: z.boolean().optional(),
+  status: trainingStatus.optional(),
   members: userSchema,
   ...dateCreatedUpdated
 }
@@ -119,7 +120,7 @@ export const queryStringTrainingReplacement = {
   type: 'object',
   properties: {
     member_id: { type: 'string' },
-    realized: { type: 'string' },
+    status: { type: 'string' },
     ...pageableQueryString
   },
   required: ['page', 'pageSize']
