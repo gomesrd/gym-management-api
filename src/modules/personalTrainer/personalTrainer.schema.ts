@@ -49,10 +49,9 @@ export const personalTrainerIdSchema = {
 export const queryAllPersonalTrainersSchema = {
   type: 'object',
   properties: {
-    cpf: { type: 'string', description: 'CPF' },
-    email: { type: 'string', description: 'Email' },
-    name: { type: 'string', description: 'Name' },
+    search: { type: 'string', description: 'Search for user by Email, Name or CPF' },
     occupation: { type: 'string', description: 'physical_educator or physiotherapist' },
+    deleted: { type: 'string', description: 'Deleted' },
     ...pageableQueryString
   },
   required: ['page', 'pageSize']
