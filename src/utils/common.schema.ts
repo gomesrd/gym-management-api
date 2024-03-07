@@ -10,11 +10,12 @@ export const trainingModalities = z.enum(['pilates', 'functional'])
 
 export const personalTrainerOccupation = z.enum(['physical_educator', 'physiotherapist'])
 
-export const trainingStatus = z.enum(['realized', 'foul'])
+export const trainingStatus = z.enum(['realized', 'foul', 'pending', 'scheduled'])
 
 export const trainingTypes = z.enum(['plan', 'singular', 'replacement'])
 
 export const filtersSchema = z.object({
+  search: z.string().optional(),
   cpf: z.string().optional(),
   created_at_gte: z.string().optional(),
   created_at_lte: z.string().optional(),
