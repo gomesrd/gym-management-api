@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
@@ -21,6 +22,8 @@ enum TrainingType {
 enum Status {
   realized
   foul
+  pending
+  scheduled
 }
 
 enum Role {
@@ -71,6 +74,7 @@ model Users {
   member           Member?
   users_address    UsersAddress?
 
+  @@index([cpf, name, email], name: "cpf_name_email_index")
   @@map("users")
 }
 
@@ -167,7 +171,7 @@ model TrainingRecord {
 
 model TrainingReplacement {
   id                String              @id @unique @default(uuid()) @db.Uuid
-  realized          Boolean?            @default(false) @db.Boolean()
+  status            Status              @default(pending)
   created_at        DateTime            @default(now())
   updated_at        DateTime            @updatedAt
   Training          Training[]
