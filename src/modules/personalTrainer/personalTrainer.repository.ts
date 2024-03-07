@@ -7,17 +7,17 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
   const page = filters?.page || 1
   const pageSize = filters?.pageSize || 10
   const skip = (page - 1) * pageSize
+  const { search, occupation } = filters
 
   const countOfPersonalTrainers = await prisma.users.count({
     where: {
-      name: {
-        contains: filters.name,
-        mode: 'insensitive'
-      },
-      cpf: filters.cpf,
-      email: filters.email,
+      OR: [
+        { name: { contains: search ?? '' } },
+        { email: { contains: filters.search ?? '' } },
+        { cpf: { contains: filters.search ?? '' } }
+      ],
       personal_trainer: {
-        is: { occupation: filters.occupation } || { not: null }
+        is: { occupation: occupation } || { not: null }
       },
       deleted: parseFilters.deleted
     }
@@ -25,12 +25,11 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
 
   const personalTrainers = await prisma.users.findMany({
     where: {
-      name: {
-        contains: filters.name,
-        mode: 'insensitive'
-      },
-      cpf: filters.cpf,
-      email: filters.email,
+      OR: [
+        { name: { contains: search ?? '' } },
+        { email: { contains: filters.search ?? '' } },
+        { cpf: { contains: filters.search ?? '' } }
+      ],
       personal_trainer: {
         is: { occupation: filters.occupation } || { not: null }
       },
