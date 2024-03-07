@@ -12,6 +12,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "dev": "dotenv -e .env nodemon src/index.ts",
+    "generate": "npx prisma generate ",
     "migrate-dev": "dotenv -e .env prisma migrate dev --name init",
     "migrate": "dotenv -e .env prisma migrate deploy",
     "lint": "eslint --fix \"src/**/*.{js,ts}\"",
