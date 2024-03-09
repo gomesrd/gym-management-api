@@ -30,12 +30,36 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
   const page = filters?.page || 1
   const pageSize = filters?.pageSize || 10
   const skip = (page - 1) * pageSize
+  const { member_id, status } = filters
 
   const countTrainingReplacement = await prisma.trainingReplacement.count({
-    where: {}
+    where: {
+      status: status || undefined,
+      MemberReplacement: {
+        some: {
+          Member: {
+            user: {
+              id: member_id || undefined
+            }
+          }
+        }
+      }
+    }
   })
   const trainingReplacement = await prisma.trainingReplacement.findMany({
-    where: {},
+    where: {
+      status: status || undefined,
+
+      MemberReplacement: {
+        some: {
+          Member: {
+            user: {
+              id: member_id || undefined
+            }
+          }
+        }
+      }
+    },
     select: {
       id: true,
       status: true,
@@ -57,7 +81,7 @@ export async function findManyTrainingsReplacement(filters: Filters, parseFilter
     },
     skip: skip,
     take: pageSize,
-    orderBy: [{ created_at: 'asc' }]
+    orderBy: [{ created_at: 'asc' }, { status: 'asc' }]
   })
 
   const trainingReplacementMap = trainingReplacement.map(training => {
