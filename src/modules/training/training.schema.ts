@@ -130,7 +130,9 @@ const trainingFindManyScheme = z.object({
   ...responseManyDefault,
   data: z.array(
     z.object({
-      ...trainingResume
+      ...trainingResume,
+      personal_trainer: z.string(),
+      deleted: z.boolean()
     })
   )
 })
