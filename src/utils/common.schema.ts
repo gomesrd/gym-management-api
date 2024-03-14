@@ -21,7 +21,7 @@ export const filtersSchema = z.object({
   created_at_lte: z.string().optional(),
   deleted: z.string().optional(),
   email: z.string().optional(),
-  regular_training: daysOfWeek.optional().nullable(),
+  regular_training: daysOfWeek.optional(),
   id: z.string().optional(),
   member_id: z.string().optional(),
   modality: trainingModalities.optional(),
