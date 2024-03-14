@@ -47,22 +47,23 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
   const pageSize = filters?.pageSize || 10
   const skip = (page - 1) * pageSize
 
+  const filtersOrTraining =
+    filters.singular_training || filters.regular_training
+      ? {
+          OR: [
+            filters.singular_training ? { singular_training: filters.singular_training } : {},
+            filters.regular_training ? { regular_training: filters.regular_training } : {}
+          ]
+        }
+      : {}
+
   const filtersTraining = {
-    OR: [
-      {
-        singular_training: {
-          equals: filters.singular_training,
-          not: null
-        }
-      },
-      {
-        regular_training: {
-          equals: filters.regular_training,
-          not: null
-        }
+    ...filtersOrTraining,
+    MemberTraining: {
+      some: {
+        member_id: parseFilters.member_id
       }
-    ],
-    member_id: parseFilters.member_id,
+    },
     personal_trainer_id: parseFilters.personal_trainer_id,
     deleted: parseFilters.deleted,
     starts_at: filters.starts_at,
@@ -76,15 +77,11 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
   }
 
   const trainingsCount = await prisma.training.count({
-    where: {
-      ...filtersTraining
-    }
+    where: filtersTraining
   })
 
   const trainings = await prisma.training.findMany({
-    where: {
-      ...filtersTraining
-    },
+    where: filtersTraining,
     select: {
       id: true,
       regular_training: true,
@@ -94,6 +91,16 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
       modality: true,
       type: true,
       training_replacement_id: true,
+      deleted: true,
+      personal_trainer: {
+        select: {
+          user: {
+            select: {
+              name: true
+            }
+          }
+        }
+      },
       MemberTraining: {
         select: {
           member_id: true,
@@ -116,7 +123,8 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
 
   const formattedTrainings = trainings.map(training => ({
     ...training,
-    members: training.MemberTraining.map(memberTraining => memberTraining.Member.user.name).join('/')
+    members: training.MemberTraining.map(memberTraining => memberTraining.Member.user.name).join('/'),
+    personal_trainer: training.personal_trainer.user.name
   }))
 
   return {
