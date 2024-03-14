@@ -12,9 +12,9 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
   const countOfPersonalTrainers = await prisma.users.count({
     where: {
       OR: [
-        { name: { contains: search ?? '' } },
-        { email: { contains: filters.search ?? '' } },
-        { cpf: { contains: filters.search ?? '' } }
+        { name: { contains: search ?? '', mode: 'insensitive' } },
+        { email: { contains: search ?? '', mode: 'insensitive' } },
+        { cpf: { contains: search ?? '' } }
       ],
       personal_trainer: {
         is: { occupation: occupation } || { not: null }
@@ -26,9 +26,9 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
   const personalTrainers = await prisma.users.findMany({
     where: {
       OR: [
-        { name: { contains: search ?? '' } },
-        { email: { contains: filters.search ?? '' } },
-        { cpf: { contains: filters.search ?? '' } }
+        { name: { contains: search ?? '', mode: 'insensitive' } },
+        { email: { contains: search ?? '', mode: 'insensitive' } },
+        { cpf: { contains: search ?? '' } }
       ],
       personal_trainer: {
         is: { occupation: filters.occupation } || { not: null }
