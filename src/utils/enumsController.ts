@@ -2,6 +2,7 @@ export enum routesPath {
   members = '/members',
   personalTrainers = '/personal-trainers',
   trainings = '/trainings',
+  plans = '/plans',
   trainingsRecord = '/trainings-record',
   trainingsReport = '/reports/trainings',
   login = '/login'
