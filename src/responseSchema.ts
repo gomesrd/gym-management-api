@@ -4,6 +4,7 @@ import { memberSchemas } from './modules/member/member.schema'
 import { trainingSchemas } from './modules/training/training.schema'
 import { trainingRecordSchemas } from './modules/trainingRecord/trainingRecord.schema'
 import { trainingReportSchemas } from './modules/report/training/trainingReport.schema'
+import { plansSchemas } from './modules/plans/plans.schema'
 
 export async function responseSchema(server: FastifyInstance) {
   for (const schema of [
@@ -11,7 +12,8 @@ export async function responseSchema(server: FastifyInstance) {
     ...memberSchemas,
     ...trainingSchemas,
     ...trainingRecordSchemas,
-    ...trainingReportSchemas
+    ...trainingReportSchemas,
+    ...plansSchemas
   ]) {
     server.addSchema(schema)
   }

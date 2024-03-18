@@ -1,12 +1,6 @@
 import prisma from '../../config/prisma'
-import {
-  CreateTrainingRecordInput,
-  DeleteTrainingRecord,
-  GetTrainingRecord,
-  UpdateTrainingRecord
-} from './trainingRecord.schema'
+import { CreateTrainingRecordInput, UpdateTrainingRecord } from './trainingRecord.schema'
 import { Filters } from '../../utils/common.schema'
-import { parseFiltersPermission, parseFiltersTraining } from '../../utils/parseFilters'
 import { FiltersPermissions } from '../../utils/types'
 
 export async function createTrainingRecord(input: CreateTrainingRecordInput) {
