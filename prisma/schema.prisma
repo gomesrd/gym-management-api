@@ -182,7 +182,8 @@ model TrainingReplacement {
 
 model Plan {
   id              String       @id @unique @default(uuid()) @db.Uuid
-  name            String       @db.VarChar()
+  name            String       @unique @db.VarChar()
+  description     String?      @db.VarChar()
   modality        Modality     @default(pilates)
   recurrence      Recurrence   @default(quarterly)
   member_amount   MemberAmount @default(singular)
@@ -193,6 +194,7 @@ model Plan {
   updated_at      DateTime     @updatedAt
   MemberPlan      MemberPlan[]
 
+  @@unique(fields: [name, modality, recurrence, member_amount, training_amount], name: "plan_unique")
   @@map("plan")
 }
 
