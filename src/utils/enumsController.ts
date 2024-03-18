@@ -15,7 +15,8 @@ export enum tags {
   trainingRecord = 'Training Record',
   trainingReport = 'Training Report',
   trainingReplacement = 'Training Replacement',
-  login = 'Login'
+  login = 'Login',
+  plan = 'Plan'
 }
 
 export enum personalTrainerSummary {
@@ -96,6 +97,22 @@ export enum trainingRecordRoutesPath {
   register = '',
   update = '/:training_record_id',
   delete = '/:training_record_id'
+}
+
+export enum plansRoutesPath {
+  findAll = '',
+  findById = '/:plan_id',
+  register = '',
+  update = '/:plan_id',
+  delete = '/:plan_id'
+}
+
+export enum plansSummary {
+  findAll = 'Get all Plans',
+  findById = 'Get a specific Plan',
+  register = 'Create a new Plan',
+  update = 'Update a specific Plan',
+  delete = 'Delete a specific Plan'
 }
 
 export enum trainingReportSummary {
