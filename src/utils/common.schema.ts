@@ -8,6 +8,10 @@ export const usersRole = {
 
 export const trainingModalities = z.enum(['pilates', 'functional'])
 
+export const recurrenceTrainingPlan = z.enum(['monthly', 'quarterly', 'semiannual', 'annual'])
+
+export const memberAmountTraining = z.enum(['singular', 'pair'])
+
 export const personalTrainerOccupation = z.enum(['physical_educator', 'physiotherapist'])
 
 export const trainingStatus = z.enum(['realized', 'foul', 'pending', 'scheduled'])
