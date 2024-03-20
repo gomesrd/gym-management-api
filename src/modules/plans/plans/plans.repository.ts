@@ -1,6 +1,6 @@
-import prisma from '../../config/prisma'
+import prisma from '../../../config/prisma'
 import { PlanRegisterInput } from './plans.schema'
-import { Filters } from '../../utils/common.schema'
+import { Filters } from '../../../utils/common.schema'
 
 export async function createPlan(input: PlanRegisterInput) {
   const { name, description, modality, recurrence, member_amount, training_amount, price } = input
@@ -69,6 +69,15 @@ export async function getManyPlans(filters: Filters) {
     page: page,
     pageSize: pageSize
   }
+}
+
+export async function getListPlans() {
+  return prisma.plan.findMany({
+    select: {
+      id: true,
+      name: true
+    }
+  })
 }
 
 export async function updatePlans(planId: string, dataUpdate: PlanRegisterInput) {

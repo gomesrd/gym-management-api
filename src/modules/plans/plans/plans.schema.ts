@@ -1,11 +1,11 @@
-import { object, z } from 'zod'
+import { z } from 'zod'
 import {
   dateCreatedUpdated,
   memberAmountTraining,
   recurrenceTrainingPlan,
   responseManyDefault,
   trainingModalities
-} from '../../utils/common.schema'
+} from '../../../utils/common.schema'
 import { buildJsonSchemas } from 'fastify-zod'
 
 const planId = {
@@ -42,11 +42,18 @@ const plansGetManySchema = z.object({
   )
 })
 
+const plansGetListSchema = z.array(
+  z.object({
+    ...planId,
+    name: z.string()
+  })
+)
 export const { schemas: plansSchemas, $ref } = buildJsonSchemas(
   {
     PlanRegisterSchema,
     planGetByIdSchema,
-    plansGetManySchema
+    plansGetManySchema,
+    plansGetListSchema
   },
   { $id: 'PlansSchemas' }
 )

@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { createPlan, deletePlans, getManyPlans, getUniquePlan, updatePlans } from './plans.repository'
+import { createPlan, deletePlans, getListPlans, getManyPlans, getUniquePlan, updatePlans } from './plans.repository'
 import { PlanRegisterInput } from './plans.schema'
-import { Filters } from '../../utils/common.schema'
+import { Filters } from '../../../utils/common.schema'
 
 export async function registerPlanHandler(
   request: FastifyRequest<{
@@ -49,6 +49,18 @@ export async function getManyPlansHandler(
   try {
     const filters = request.query
     const getPlans = await getManyPlans(filters)
+
+    return reply.code(200).send(getPlans)
+  } catch (error: any) {
+    console.log(error)
+
+    return reply.code(500).send('Internal server error')
+  }
+}
+
+export async function getListPlansHandler(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    const getPlans = await getListPlans()
 
     return reply.code(200).send(getPlans)
   } catch (error: any) {
