@@ -1,14 +1,17 @@
 import { FastifyInstance } from 'fastify'
 import { plansRoutesPath, plansSummary, tags } from '../../utils/enumsController'
-import { $ref } from './plans.schema'
 import {
   deletePlansHandler,
+  getListPlansHandler,
   getManyPlansHandler,
   getUniquePlanHandler,
   registerPlanHandler,
   updatePlansHandler
-} from './plans.service'
+} from './plans/plans.service'
 import { pageableQueryString } from '../../utils/common.schema'
+import { $ref as $refSubscription } from './subscriptions/subscriptions.schema'
+import { registerPlanSubscriptionHandler } from './subscriptions/subscriptions.service'
+import { $ref } from './plans/plans.schema'
 
 async function plansRoutes(server: FastifyInstance) {
   server.post(
@@ -72,6 +75,21 @@ async function plansRoutes(server: FastifyInstance) {
     getManyPlansHandler
   )
 
+  server.get(
+    plansRoutesPath.findAllList,
+    {
+      preHandler: [server.authenticate, server.authorizationLimited],
+      schema: {
+        tags: [tags.plan],
+        summary: plansSummary.findAllList,
+        response: {
+          200: $ref('plansGetListSchema')
+        }
+      }
+    },
+    getListPlansHandler
+  )
+
   server.put(
     plansRoutesPath.update,
     {
@@ -117,6 +135,27 @@ async function plansRoutes(server: FastifyInstance) {
       }
     },
     deletePlansHandler
+  )
+
+  server.post(
+    plansRoutesPath.subscriptions,
+    {
+      preHandler: [server.authenticate, server.authorizationExclusive],
+      schema: {
+        tags: [tags.plan],
+        body: $refSubscription('planSubscriptionBodySchema'),
+        summary: plansSummary.subscription,
+        response: {
+          201: {
+            type: 'object',
+            properties: {
+              message: { type: 'string', example: '' }
+            }
+          }
+        }
+      }
+    },
+    registerPlanSubscriptionHandler
   )
 }
 
