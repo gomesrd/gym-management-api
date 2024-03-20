@@ -210,5 +210,6 @@ model MemberPlan {
   member     Member   @relation(fields: [member_id], references: [user_id])
   plan       Plan     @relation(fields: [plan_id], references: [id])
 
+  @@unique(fields: [member_id, plan_id], name: "member_plan_unique")
   @@map("member_plan")
 }
