@@ -101,16 +101,20 @@ export enum trainingRecordRoutesPath {
 
 export enum plansRoutesPath {
   findAll = '',
+  findAllList = '/list',
   findById = '/:plan_id',
   register = '',
+  subscriptions = '/subscriptions',
   update = '/:plan_id',
   delete = '/:plan_id'
 }
 
 export enum plansSummary {
   findAll = 'Get all Plans',
+  findAllList = 'Get all Plans to list',
   findById = 'Get a specific Plan',
   register = 'Create a new Plan',
+  subscription = 'Create a new Plan Subscription',
   update = 'Update a specific Plan',
   delete = 'Delete a specific Plan'
 }
