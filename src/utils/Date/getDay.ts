@@ -1,4 +1,4 @@
-import { daysOfWeek, DaysOfWeek } from './common.schema'
+import { daysOfWeek, DaysOfWeek } from '../common.schema'
 
 export async function getDayTraining(date: string | undefined): Promise<DaysOfWeek | undefined> {
   if (!date) return

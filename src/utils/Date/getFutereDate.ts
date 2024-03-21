@@ -1,5 +1,5 @@
 import { addMonths, addQuarters, addYears } from 'date-fns'
-import { recurrenceTrainingPlan } from './common.schema'
+import { recurrenceTrainingPlan } from '../common.schema'
 import { z } from 'zod'
 
 export interface FutureDate {

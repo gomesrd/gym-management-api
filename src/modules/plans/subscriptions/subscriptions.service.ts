@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { planSubscriptionBodyInput } from './subscriptions.schema'
 import { getUniquePlan } from '../plans/plans.repository'
-import { getDatesForMemberPlans } from '../../../utils/getFutereDate'
+import { getDatesForMemberPlans } from '../../../utils/Date/getFutereDate'
 import { createPlansSubscriptions } from './subscriptions.repository'
 
 export async function registerPlanSubscriptionHandler(

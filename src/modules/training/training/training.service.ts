@@ -10,7 +10,7 @@ import {
 import { Filters } from '../../../utils/common.schema'
 import { parseFiltersPermission, parseFiltersTraining } from '../../../utils/parseFilters'
 import { TrainingId } from '../../../utils/types'
-import { getDayTraining } from '../../../utils/getDay'
+import { getDayTraining } from '../../../utils/Date/getDay'
 import { replyErrorDefault } from '../../../utils/error'
 import { updateRealizedTrainingReplacement } from '../replacement/trainingReplacement.repository'
 
