@@ -16,17 +16,15 @@ const trainingId = {
 }
 
 const trainingCoreCreate = {
-  training: z.array(
-    z.object({
-      regular_training: daysOfWeek.nullable(),
-      singular_training: z.string().nullable(),
-      starts_at: z.string().nullable(),
-      ends_at: z.string().nullable()
-    })
-  ),
+  training: z.object({
+    training_date: z.string(),
+    starts_at: z.string().nullable(),
+    ends_at: z.string().nullable()
+  }),
   modality: trainingModalities,
   type: trainingTypes,
-  training_replacement_id: z.string().nullable().optional()
+  training_replacement_id: z.string().nullable().optional(),
+  plan_id: z.string()
 }
 
 const trainingCoreList = {

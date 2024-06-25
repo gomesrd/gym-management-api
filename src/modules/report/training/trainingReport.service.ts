@@ -1,6 +1,7 @@
 import { FastifyRequest } from 'fastify'
 import { Filters } from '../../../utils/common.schema'
 import { getManyReportTrainingRepository } from './trainingReport.repository'
+import { getDateWithThreeHours } from '../../../utils/Date/getDateNow'
 
 export async function getManyReportTrainingHandler(
   request: FastifyRequest<{

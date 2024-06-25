@@ -1,8 +1,11 @@
 import { Filters } from '../../../utils/common.schema'
 import prisma from '../../../config/prisma'
 import { Status, TrainingType } from '@prisma/client'
+import { getDateWithThreeHours } from '../../../utils/Date/getDateNow'
 
 export async function getManyReportTrainingRepository(filters: Filters, memberId: string) {
+  if (filters.created_at_lte) console.log(getDateWithThreeHours(filters.created_at_lte))
+
   const totalRegularTrainingsRealized = await prisma.trainingRecord.count({
     where: {
       created_at: {

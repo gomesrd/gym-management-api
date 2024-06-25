@@ -10,9 +10,10 @@ import {
 import { Filters } from '../../../utils/common.schema'
 import { parseFiltersPermission, parseFiltersTraining } from '../../../utils/parseFilters'
 import { TrainingId } from '../../../utils/types'
-import { getDayTraining } from '../../../utils/Date/getDay'
 import { replyErrorDefault } from '../../../utils/error'
 import { updateRealizedTrainingReplacement } from '../replacement/trainingReplacement.repository'
+import { add, format } from 'date-fns'
+import { getUniquePlanSubscriptionMember } from '../../plans/subscriptions/subscriptions.repository'
 
 export async function registerTrainingHandler(
   request: FastifyRequest<{
@@ -29,20 +30,30 @@ export async function registerTrainingHandler(
     return reply.code(403).send('You can only register trainings for yourself')
   }
 
+  const initialTrainingDate = body.training.training_date
+  const planId = body.plan_id
+  const plan = await getUniquePlanSubscriptionMember(planId)
+
+  if (!plan) {
+    return reply.code(400).send('Plan not found')
+  }
+  debugger
+  const trainingAmount = plan.plan.training_amount
+
+  const daysTraining = [initialTrainingDate]
+
+  for (let i = 0; i < trainingAmount; i++) {
+    const newDate = add(new Date(daysTraining[i]), { days: 8 })
+    daysTraining.push(format(newDate, 'yyyy-MM-dd'))
+  }
+
   try {
-    const create = await createTraining(body)
+    const create = await createTraining(body, daysTraining)
     if (create && training_replacement_id)
       await updateRealizedTrainingReplacement(training_replacement_id as string, { status: 'scheduled' })
 
     if (create) return reply.code(201).send('')
   } catch (e: any) {
-    console.log(e)
-    if (e.code === 'P2002') {
-      return reply.code(400).send({
-        message: 'Training already exists'
-      })
-    }
-
     return replyErrorDefault(reply)
   }
 }

@@ -1,24 +1,24 @@
 import prisma from '../../../config/prisma'
 import { CreateTrainingInput, UpdateTraining } from '../training.schema'
-import { DaysOfWeek, Filters } from '../../../utils/common.schema'
+import { Filters } from '../../../utils/common.schema'
 import { FiltersPermissions } from '../../../utils/types'
 
-export async function createTraining(input: CreateTrainingInput) {
-  const { training_replacement_id, training, personal_trainer_id, member_id, modality, type } = input
+export async function createTraining(input: CreateTrainingInput, daysTrainings: string[]) {
+  const { plan_id, training_replacement_id, training, personal_trainer_id, member_id, modality, type } = input
 
   try {
-    const createManyTraining = await prisma.$transaction(
-      training.map(training =>
+    return await prisma.$transaction(
+      daysTrainings.map(date =>
         prisma.training.create({
           data: {
-            regular_training: training.regular_training,
-            singular_training: training.singular_training,
+            training_date: date,
             starts_at: training.starts_at,
             ends_at: training.ends_at,
             modality: modality,
             type: type,
             personal_trainer_id: personal_trainer_id,
             training_replacement_id: training_replacement_id,
+            plan_id: plan_id,
             MemberTraining: {
               createMany: {
                 data: member_id.map(member => {
@@ -35,8 +35,6 @@ export async function createTraining(input: CreateTrainingInput) {
         })
       )
     )
-
-    return createManyTraining
   } catch (error) {
     throw error
   }
@@ -47,18 +45,8 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
   const pageSize = filters?.pageSize || 10
   const skip = (page - 1) * pageSize
 
-  const filtersOrTraining =
-    filters.singular_training || filters.regular_training
-      ? {
-          OR: [
-            filters.singular_training ? { singular_training: filters.singular_training } : {},
-            filters.regular_training ? { regular_training: filters.regular_training } : {}
-          ]
-        }
-      : {}
-
   const filtersTraining = {
-    ...filtersOrTraining,
+    training_date: filters.training_date,
     MemberTraining: {
       some: {
         member_id: parseFilters.member_id
@@ -84,8 +72,7 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
     where: filtersTraining,
     select: {
       id: true,
-      regular_training: true,
-      singular_training: true,
+      training_date: true,
       starts_at: true,
       ends_at: true,
       modality: true,
@@ -118,7 +105,7 @@ export async function findManyTrainings(filters: Filters, parseFilters: FiltersP
     },
     skip: skip,
     take: pageSize,
-    orderBy: [{ regular_training: 'asc' }, { starts_at: 'asc' }]
+    orderBy: [{ training_date: 'asc' }, { starts_at: 'asc' }]
   })
 
   const formattedTrainings = trainings.map(training => ({
@@ -144,8 +131,7 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
     },
     select: {
       id: true,
-      regular_training: true,
-      singular_training: true,
+      training_date: true,
       starts_at: true,
       ends_at: true,
       modality: true,
@@ -204,10 +190,9 @@ export async function updateTraining(dataUpdate: UpdateTraining, trainingId: str
         personal_trainer_id: parseFilters.personal_trainer_id
       },
       data: {
-        starts_at: training[0].starts_at,
-        ends_at: training[0].ends_at,
-        regular_training: training[0].regular_training,
-        singular_training: training[0].singular_training,
+        starts_at: training.starts_at,
+        ends_at: training.ends_at,
+        training_date: training.training_date,
         personal_trainer_id: personal_trainer_id,
         modality: modality,
         type: type
