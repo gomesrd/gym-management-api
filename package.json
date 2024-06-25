@@ -21,7 +21,7 @@
   "dependencies": {
     "@fastify/cors": "^8.5.0",
     "@fastify/jwt": "^5.0.1",
-    "@prisma/client": "^5.8.1",
+    "@prisma/client": "^5.16.0",
     "amazon-cognito-identity-js": "^6.3.7",
     "aws-jwt-verify": "^4.0.1",
     "aws-sdk": "^2.1562.0",
@@ -48,7 +48,7 @@
     "eslint-plugin-import": "^2.29.1",
     "nodemon": "^3.0.3",
     "prettier": "^3.2.4",
-    "prisma": "^5.8.1",
+    "prisma": "^5.16.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
