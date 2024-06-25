@@ -117,24 +117,26 @@ model Member {
 
 model Training {
   id                      String               @id @unique @default(uuid()) @db.Uuid
-  regular_training        Days?
-  singular_training       String?              @db.VarChar()
+  training_date           String               @db.VarChar()
   starts_at               String?              @db.VarChar()
   ends_at                 String?              @db.VarChar()
   modality                Modality             @default(pilates)
   type                    TrainingType         @default(plan)
   deleted                 Boolean?             @default(false) @db.Boolean()
+  done                    Boolean?             @default(false) @db.Boolean()
   created_at              DateTime             @default(now())
   updated_at              DateTime             @updatedAt
   personal_trainer_id     String               @db.Uuid
   training_replacement_id String?              @db.Uuid
+  plan_id                 String               @db.Uuid
   personal_trainer        PersonalTrainer      @relation(fields: [personal_trainer_id], references: [user_id])
   TrainingReplacement     TrainingReplacement? @relation(fields: [training_replacement_id], references: [id])
+  Plan                    Plan                 @relation(fields: [plan_id], references: [id])
   training_record         TrainingRecord[]
   MemberTraining          MemberTraining[]
+  MemberPlan              MemberPlan[]
 
-  @@unique(fields: [starts_at, ends_at, regular_training, personal_trainer_id], name: "training_unique_regular_training")
-  @@unique(fields: [starts_at, ends_at, singular_training, personal_trainer_id], name: "training_unique_singular_training")
+  @@unique(fields: [starts_at, ends_at, training_date, personal_trainer_id], name: "training_unique_regular_training")
   @@map("training")
 }
 
@@ -193,23 +195,28 @@ model Plan {
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
   MemberPlan      MemberPlan[]
+  Training        Training[]
 
   @@unique(fields: [name, modality, recurrence, member_amount, training_amount], name: "plan_unique")
   @@map("plan")
 }
 
 model MemberPlan {
-  id         String   @id @default(uuid()) @db.Uuid
-  starts_at  DateTime @default(now())
+  id         String    @id @default(uuid()) @db.Uuid
+  starts_at  DateTime  @default(now())
   ends_at    DateTime
-  deleted    Boolean  @default(false) @db.Boolean()
-  member_id  String   @db.Uuid
-  plan_id    String   @db.Uuid
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-  member     Member   @relation(fields: [member_id], references: [user_id])
-  plan       Plan     @relation(fields: [plan_id], references: [id])
+  deleted    Boolean   @default(false) @db.Boolean()
+  member_id  String    @db.Uuid
+  plan_id    String    @db.Uuid
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  member     Member    @relation(fields: [member_id], references: [user_id])
+  plan       Plan      @relation(fields: [plan_id], references: [id])
+  Training   Training? @relation(fields: [trainingId], references: [id])
+  trainingId String?   @db.Uuid
 
   @@unique(fields: [member_id, plan_id], name: "member_plan_unique")
   @@map("member_plan")
 }
+
+// TODO - trocar as relação de chave estrangeira para o id
