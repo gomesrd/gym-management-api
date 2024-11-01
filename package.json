@@ -21,6 +21,7 @@
   "dependencies": {
     "@fastify/cors": "^8.5.0",
     "@fastify/jwt": "^5.0.1",
+    "@google-cloud/local-auth": "^2.1.0",
     "@prisma/client": "^5.16.0",
     "amazon-cognito-identity-js": "^6.3.7",
     "aws-jwt-verify": "^4.0.1",
@@ -32,6 +33,7 @@
     "fastify": "^4.25.2",
     "fastify-swagger": "^5.2.0",
     "fastify-zod": "^1.4.0",
+    "googleapis": "^105.0.0",
     "yarn": "^1.22.21",
     "zod": "^3.22.4",
     "zod-to-json-schema": "^3.22.3"

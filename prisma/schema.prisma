@@ -14,9 +14,9 @@ enum Modality {
 }
 
 enum TrainingType {
-  plan
-  singular
-  replacement
+  plan // plano
+  singular // aula avulsa - aula de outro professor
+  replacement // reposição
 }
 
 enum Status {
@@ -55,8 +55,8 @@ enum Recurrence {
 }
 
 enum MemberAmount {
-  singular
-  pair
+  singular // individual
+  pair // dupla
 }
 
 model Users {
@@ -128,10 +128,8 @@ model Training {
   updated_at              DateTime             @updatedAt
   personal_trainer_id     String               @db.Uuid
   training_replacement_id String?              @db.Uuid
-  plan_id                 String               @db.Uuid
-  personal_trainer        PersonalTrainer      @relation(fields: [personal_trainer_id], references: [user_id])
+  personal_trainer        PersonalTrainer      @relation(fields: [personal_trainer_id], references: [id])
   TrainingReplacement     TrainingReplacement? @relation(fields: [training_replacement_id], references: [id])
-  Plan                    Plan                 @relation(fields: [plan_id], references: [id])
   training_record         TrainingRecord[]
   MemberTraining          MemberTraining[]
   MemberPlan              MemberPlan[]
@@ -145,7 +143,7 @@ model MemberTraining {
   training_id String   @db.Uuid
   member_id   String   @db.Uuid
   Training    Training @relation(fields: [training_id], references: [id])
-  Member      Member   @relation(fields: [member_id], references: [user_id])
+  Member      Member   @relation(fields: [member_id], references: [id])
 
   @@map("member_training")
 }
@@ -155,7 +153,7 @@ model MemberReplacement {
   replacement_id      String              @db.Uuid
   member_id           String              @db.Uuid
   TrainingReplacement TrainingReplacement @relation(fields: [replacement_id], references: [id])
-  Member              Member              @relation(fields: [member_id], references: [user_id])
+  Member              Member              @relation(fields: [member_id], references: [id])
 
   @@map("member_replacement")
 }
@@ -195,7 +193,6 @@ model Plan {
   created_at      DateTime     @default(now())
   updated_at      DateTime     @updatedAt
   MemberPlan      MemberPlan[]
-  Training        Training[]
 
   @@unique(fields: [name, modality, recurrence, member_amount, training_amount], name: "plan_unique")
   @@map("plan")
@@ -210,7 +207,7 @@ model MemberPlan {
   plan_id    String    @db.Uuid
   created_at DateTime  @default(now())
   updated_at DateTime  @updatedAt
-  member     Member    @relation(fields: [member_id], references: [user_id])
+  member     Member    @relation(fields: [member_id], references: [id])
   plan       Plan      @relation(fields: [plan_id], references: [id])
   Training   Training? @relation(fields: [trainingId], references: [id])
   trainingId String?   @db.Uuid

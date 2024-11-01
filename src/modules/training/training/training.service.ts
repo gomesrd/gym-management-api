@@ -26,9 +26,10 @@ export async function registerTrainingHandler(
   const personalTrainerId = body.personal_trainer_id
   const personalTrainerValidate = personalTrainerId === request.user.id
 
+  /*  console.log(request.user.id)
   if (!personalTrainerValidate) {
     return reply.code(403).send('You can only register trainings for yourself')
-  }
+  }*/
 
   const initialTrainingDate = body.training.training_date
   const planId = body.plan_id
@@ -37,7 +38,7 @@ export async function registerTrainingHandler(
   if (!plan) {
     return reply.code(400).send('Plan not found')
   }
-  debugger
+
   const trainingAmount = plan.plan.training_amount
 
   const daysTraining = [initialTrainingDate]

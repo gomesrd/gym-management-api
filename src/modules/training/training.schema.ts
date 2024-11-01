@@ -28,8 +28,6 @@ const trainingCoreCreate = {
 }
 
 const trainingCoreList = {
-  regular_training: daysOfWeek.nullable(),
-  singular_training: z.string().nullable(),
   starts_at: z.string().nullable(),
   ends_at: z.string().nullable(),
   modality: trainingModalities,

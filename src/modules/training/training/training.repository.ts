@@ -4,7 +4,7 @@ import { Filters } from '../../../utils/common.schema'
 import { FiltersPermissions } from '../../../utils/types'
 
 export async function createTraining(input: CreateTrainingInput, daysTrainings: string[]) {
-  const { plan_id, training_replacement_id, training, personal_trainer_id, member_id, modality, type } = input
+  const { training_replacement_id, training, personal_trainer_id, member_id, modality, type } = input
 
   try {
     return await prisma.$transaction(
@@ -18,7 +18,6 @@ export async function createTraining(input: CreateTrainingInput, daysTrainings: 
             type: type,
             personal_trainer_id: personal_trainer_id,
             training_replacement_id: training_replacement_id,
-            plan_id: plan_id,
             MemberTraining: {
               createMany: {
                 data: member_id.map(member => {
