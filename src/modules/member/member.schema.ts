@@ -26,7 +26,19 @@ const memberCore = {
 const memberResume = {
   ...memberId,
   name: z.string(),
-  deleted: z.boolean()
+  deleted: z.boolean(),
+  member: z.object({
+    id: z.string(),
+    user_id: z.string(),
+    MemberPlan: z
+        .array(
+            z.object({
+              id: z.string(),
+              member_id: z.string(),
+            })
+        )
+        .optional()
+  })
 }
 
 const updateMemberSchema = z.object({

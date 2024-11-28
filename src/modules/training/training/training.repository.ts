@@ -173,9 +173,10 @@ export async function findUniqueTraining(trainingId: string, parseFilters: Filte
       name: findTraining?.personal_trainer.user.name
     },
     members: findTraining?.MemberTraining.map(memberTraining => ({
+      member_id: memberTraining.member_id,
       id: memberTraining.Member.user.id,
       name: memberTraining.Member.user.name
-    }))
+    })),
   }
 }
 

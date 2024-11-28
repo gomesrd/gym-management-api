@@ -215,5 +215,3 @@ model MemberPlan {
   @@unique(fields: [member_id, plan_id], name: "member_plan_unique")
   @@map("member_plan")
 }
-
-// TODO - trocar as relação de chave estrangeira para o id

@@ -64,7 +64,14 @@ export async function findManyMembers(filters: Filters, userId: string) {
     select: {
       id: true,
       name: true,
-      deleted: true
+      deleted: true,
+      member: {
+        select: {
+          id: true,
+          user_id: true,
+          MemberPlan: true
+        }
+      },
     },
     skip: skip,
     take: pageSize,
@@ -105,7 +112,14 @@ export async function findUniqueMember(parseFilters: FiltersPermissions) {
       phone: true,
       deleted: true,
       created_at: true,
-      updated_at: true
+      updated_at: true,
+      member: {
+        select: {
+          id: true,
+          user_id: true,
+          MemberPlan: true
+        }
+      },
     }
   })
 }

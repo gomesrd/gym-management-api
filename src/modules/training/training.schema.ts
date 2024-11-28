@@ -33,7 +33,8 @@ const trainingCoreList = {
   modality: trainingModalities,
   type: trainingTypes,
   training_replacement_id: z.string().nullable().optional(),
-  members: z.string()
+  members: z.string(),
+  training_date: z.string().nullable(),
 }
 
 const trainingInput = {
@@ -75,6 +76,7 @@ const usersResume = {
     .array(
       z
         .object({
+          member_id: z.string().optional(),
           name: z.string().optional(),
           id: z.string().optional()
         })

@@ -20,7 +20,8 @@ const personalTrainerId = {
 const personalTrainerCore = {
   ...userCore,
   personal_trainer: z.object({
-    occupation: personalTrainerOccupation
+    occupation: personalTrainerOccupation,
+    id: z.string().optional()
   }),
   ...usersAddress
 }
@@ -29,7 +30,8 @@ const personalTrainerResume = {
   id: z.string(),
   name: z.string(),
   deleted: z.boolean().nullable(),
-  occupation: personalTrainerOccupation.optional()
+  occupation: personalTrainerOccupation.optional(),
+  personal_trainer_id: z.string().optional()
 }
 
 const updatePersonalTrainerSchema = z.object({

@@ -5,18 +5,18 @@ services:
     image: "postgres:15"
     container_name: "gym_postgres"
     ports:
-      - "5432:5432"
+      - "54320:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 15059471
       POSTGRES_DB: postgres
 
 
-  api-gym-manager:
-    build: .
-    container_name: "api-gym-management"
-    ports:
-      - "80:80"
+#  api-gym-manager:
+#    build: .
+#    container_name: "api-gym-management"
+#    ports:
+#      - "80:80"
 
 
   ngrok:

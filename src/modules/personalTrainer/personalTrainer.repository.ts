@@ -40,6 +40,7 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
       name: true,
       personal_trainer: {
         select: {
+          id: true,
           occupation: true
         }
       },
@@ -54,7 +55,8 @@ export async function findManyPersonalTrainers(filters: Filters, parseFilters: F
     id: user.id,
     name: user.name,
     deleted: user.deleted,
-    occupation: user.personal_trainer?.occupation
+    occupation: user.personal_trainer?.occupation,
+    personal_trainer_id: user.personal_trainer?.id
   }))
 
   return {
@@ -92,7 +94,8 @@ export async function findUniquePersonalTrainer(filters: FiltersPermissions) {
       },
       personal_trainer: {
         select: {
-          occupation: true
+          occupation: true,
+          id: true
         }
       },
       role: true,
